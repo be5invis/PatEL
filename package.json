@@ -1,0 +1,11 @@
+{
+	"version": "0.6.0",
+	"name": "patel",
+	"description": "A Patrisika-based Example Language",
+	"repository": "https://github.com/be5invis/patel",
+	"dependencies": {
+		"patrisika": ">=0.6.0",
+		"escodegen": ">=1.1.0"
+	},
+	"main": "./index.js"
+}
