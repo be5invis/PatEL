@@ -16,31 +16,40 @@
 			return head
 		}
 	}
+	function buildleft(car, cdr){
+		if(!cdr.length) return car;
+		var form = car;
+		for(var j = 0; j < cdr.length; j++){
+			form = [cdr[j][1], form, cdr[j][3]]
+		};
+		return form;
+	}
 }
 
 start = it:block {
 	return ['.begin'].concat(it)
 }
 // Expression
-factorStart
+primitiveStart
 	= identifier / numberliteral / stringliteral / "[" / "(" / "{"
-factor
+primitive
 	= group
-	/ identifier
 	/ it:numberliteral { return ['.quote', it] }
 	/ it:stringliteral { return ['.quote', it] }
+	/ identifier
 
 group
-	= "[" OPTIONAL_EXPRESSION_SPACES it:invoke OPTIONAL_EXPRESSION_SPACES "]" { return it }
-	/ "(" OPTIONAL_EXPRESSION_SPACES it:invoke OPTIONAL_EXPRESSION_SPACES ")" { return it }
+	= "[" OPTIONAL_EXPRESSION_SPACES "]" { return [] }
+	/ "[" OPTIONAL_EXPRESSION_SPACES it:invoke OPTIONAL_EXPRESSION_SPACES "]" { return it }
+	/ "(" OPTIONAL_EXPRESSION_SPACES it:either OPTIONAL_EXPRESSION_SPACES ")" { return it }
 	/ "#{" OPTIONAL_EXPRESSION_SPACES "}" { return ['.hash'] }
 	/ "#{" OPTIONAL_EXPRESSION_SPACES it:invoke OPTIONAL_EXPRESSION_SPACES "}" { return ['.hash'].concat(it) }
 	/ "{" OPTIONAL_EXPRESSION_SPACES "}" { return ['.list'] }
-	/ "{" OPTIONAL_EXPRESSION_SPACES "|" OPTIONAL_EXPRESSION_SPACES cdr:term OPTIONAL_EXPRESSION_SPACES "}" { return ['.conslist', cdr] }
-	/ "{" OPTIONAL_EXPRESSION_SPACES it:invoke OPTIONAL_EXPRESSION_SPACES "|" OPTIONAL_EXPRESSION_SPACES cdr:term OPTIONAL_EXPRESSION_SPACES "}" { return ['.conslist'].concat(it, [cdr]) }
+	/ "{" OPTIONAL_EXPRESSION_SPACES "|" OPTIONAL_EXPRESSION_SPACES cdr:parting OPTIONAL_EXPRESSION_SPACES "}" { return ['.conslist', cdr] }
+	/ "{" OPTIONAL_EXPRESSION_SPACES it:invoke OPTIONAL_EXPRESSION_SPACES "|" OPTIONAL_EXPRESSION_SPACES cdr:parting OPTIONAL_EXPRESSION_SPACES "}" { return ['.conslist'].concat(it, [cdr]) }
 	/ "{" OPTIONAL_EXPRESSION_SPACES it:invoke OPTIONAL_EXPRESSION_SPACES "}" { return ['.list'].concat(it) }
-term
-	= head:factor rear:(qualifier*) {
+parting
+	= head:primitive rear:(qualifier*) {
 		var res = head;
 		for(var j = 0; j < rear.length; j++){
 			res = ['.', res, rear[j]];
@@ -49,7 +58,33 @@ term
 	}
 qualifier
 	= "." property:identifier { return ['.quote', property] }
-	/ "." "[" OPTIONAL_EXPRESSION_SPACES property:term OPTIONAL_EXPRESSION_SPACES "]" { return property }
+	/ "." "[" OPTIONAL_EXPRESSION_SPACES property:parting OPTIONAL_EXPRESSION_SPACES "]" { return property }
+	/ "." "(" OPTIONAL_EXPRESSION_SPACES property:either OPTIONAL_EXPRESSION_SPACES ")" { return property }
+
+term
+	= car:parting cdr:((OPTIONAL_EXPRESSION_SPACES termOp OPTIONAL_EXPRESSION_SPACES parting)*) { return buildleft(car, cdr) }
+termOp = $([*/%] [\-_/+*<=>!?$%_&~^@]*)
+
+sum
+	= car:term cdr:((OPTIONAL_EXPRESSION_SPACES sumOp OPTIONAL_EXPRESSION_SPACES term)*) { return buildleft(car, cdr) }
+sumOp = $([+\-] [\-_/+*<=>!?$%_&~^@]*)
+
+equality
+	= car:sum cdr:((OPTIONAL_EXPRESSION_SPACES equalityOp OPTIONAL_EXPRESSION_SPACES sum)*) { return buildleft(car, cdr) }
+equalityOp = $([=!] [\-_/+*<=>!?$%_&~^@]+)
+
+compare
+	= car:equality cdr:((OPTIONAL_EXPRESSION_SPACES compareOp OPTIONAL_EXPRESSION_SPACES equality)*) { return buildleft(car, cdr) }
+compareOp = $([<>] [\-_/+*<=>!?$%_&~^@]*)
+
+both
+	= car:compare cdr:((OPTIONAL_EXPRESSION_SPACES bothOp OPTIONAL_EXPRESSION_SPACES compare)*) { return buildleft(car, cdr) }
+bothOp = $([&] [\-_/+*<=>!?$%_&~^@]*)
+
+either
+	= car:both cdr:((OPTIONAL_EXPRESSION_SPACES eitherOp OPTIONAL_EXPRESSION_SPACES both)*) { return buildleft(car, cdr) }
+eitherOp = $([&] [\-_/+*<=>!?$%_&~^@]*)
+
 block
 	= indentBlockContent
 	/ NEWLINE_INDENT_SAME? it:blockContent NEWLINE_INDENT_SAME? { return it }
@@ -66,13 +101,21 @@ blockContent
 		return res;
 	}
 line
-	= ":" OPTIONAL_EXPRESSION_SPACES it:term { return it }
-	/ head:invoke OPTIONAL_EXPRESSION_SPACES ":" OPTIONAL_EXPRESSION_SPACES rear:line { return head.concat([rear]) }
-	/ head:invoke OPTIONAL_EXPRESSION_SPACES rear:indentBlockContent { return head.concat(rear) }
-	/ invoke
+	= ":" INLINE_SPACES it:parting { return it }
+	/ head:lineInvoke INLINE_SPACES ":" INLINE_SPACES rear:line { return head.concat([rear]) }
+	/ head:lineInvoke INLINE_SPACES rear:indentBlockContent { return head.concat(rear) }
+	/ lineInvoke
 
 invoke
-	= head:term rear:(OPTIONAL_EXPRESSION_SPACES term)* { 
+	= head:parting rear:(OPTIONAL_EXPRESSION_SPACES parting)* { 
+		var res = [head]
+		for(var j = 0; j < rear.length; j++){
+			res.push(rear[j][1])
+		};
+		return res;
+	}
+lineInvoke
+	= head:parting rear:(INLINE_SPACES parting)* { 
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
 			res.push(rear[j][1])
@@ -123,8 +166,10 @@ SPACES "Space without Newline"
 	= $(SPACE_CHARACTER+)
 EXPRESSION_SPACE
 	= SPACE_CHARACTER
+	/ LINE_BREAK
 OPTIONAL_EXPRESSION_SPACES
 	= $(EXPRESSION_SPACE*)
+INLINE_SPACES = $(SPACE_CHARACTER*)
 
 NEWLINE
 	= LINE_BREAK SPACE_CHARACTER_OR_NEWLINE*

@@ -8,7 +8,7 @@ var empty = require('../commons/match.js').empty;
 var any = require('../commons/match.js').any;
 var prim = require('../commons/match.js').prim;
 
-var Scope = require('../../patrisika').Scope;
+var Scope = require('patrisika').Scope;
 
 var ex = syntax_rule(
 	[['.quote', ',..x'], function(form, env){ return form }],
