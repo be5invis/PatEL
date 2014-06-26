@@ -10,16 +10,16 @@ define [ex form env]: match form
 	{".lambda" {|args} body} : begin
 		define derived [new Scope env]
 		for [local j 0] (j < args.length) [inc j] : begin
-			derived.declare args.[j] true
-			set args.[j] : derived.use args.[j]
+			derived.declare args.(j) true
+			set args.(j) : derived.use args.(j)
 		return {".lambda.scoped" args [ex body derived] derived}
 	{".beta" {|args} body | params} : begin
 		define derived [new Scope env]
 		for [local j 0] (j < args.length) [inc j] : begin
-			derived.declare args.[j] true
-			set args.[j] : derived.use args.[j]
+			derived.declare args.(j) true
+			set args.(j) : derived.use args.(j)
 		for [local j 0] (j < args.length) [inc j] : begin
-			set params.[j] [ex params.[j] env]
+			set params.(j) [ex params.(j) env]
 		return {".beta.scoped" args [ex body derived] derived | params}
 	{".try" block {param} handler} : begin
 		env.declare param
@@ -27,7 +27,7 @@ define [ex form env]: match form
 	{".hash" | args} : begin
 		local a {".hash"}
 		for [local j 1] (j < form.length) [inc j] : begin
-			set a.[j] {form.[j].[0] [ex form.[j].[1] env]}
+			set a.(j) {form.(j).(0) [ex form.(j).(1) env]}
 		return a
 	{".local" x} : begin
 		env.declare x
@@ -38,7 +38,7 @@ define [ex form env]: match form
 		if [not [prim callee]] : set callee [ex callee env]
 		local a {callee}
 		for [local j 1] (j < form.length) [inc j] : begin
-			set a.[j] [ex form.[j] env]
+			set a.(j) [ex form.(j) env]
 		return a
 	x ([atom x] && [env.macros.has x] && [not ([env.macros.get x] <@ Function)]) : return [env.macros.get x]
 	x [prim x] : return x

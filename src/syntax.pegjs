@@ -59,8 +59,7 @@ parting
 qualifier
 	= "." property:identifier { return ['.quote', property] }
 	/ "." property:stringliteral { return property }
-	/ "." "[" OPTIONAL_EXPRESSION_SPACES property:parting OPTIONAL_EXPRESSION_SPACES "]" { return property }
-	/ "." "(" OPTIONAL_EXPRESSION_SPACES property:either OPTIONAL_EXPRESSION_SPACES ")" { return property }
+	/ "." property: group { return property }
 
 term
 	= car:parting cdr:((OPTIONAL_EXPRESSION_SPACES termOp OPTIONAL_EXPRESSION_SPACES parting)*) { return buildleft(car, cdr) }
