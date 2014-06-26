@@ -3000,7 +3000,7 @@ module.exports = (function() {
 
       s0 = peg$parseSPACE_CHARACTER();
       if (s0 === peg$FAILED) {
-        s0 = peg$parseLINE_BREAK();
+        s0 = peg$parseNEWLINE_INDENT_SAME_OR_MORE();
       }
 
       return s0;
