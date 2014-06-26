@@ -185,7 +185,7 @@ define [Create] : begin
 				piecewise
 					cond : begin
 						local tc : env.newt
-						: {".begin" 
+						# {".begin" 
 							{".set" tc {".quote" false}} 
 							{".if" cond {".begin" 
 								[pat.assign t]

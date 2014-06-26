@@ -42,8 +42,8 @@ group
 	= "[" OPTIONAL_EXPRESSION_SPACES "]" { return [] }
 	/ "[" OPTIONAL_EXPRESSION_SPACES it:invoke OPTIONAL_EXPRESSION_SPACES "]" { return it }
 	/ "(" OPTIONAL_EXPRESSION_SPACES it:either OPTIONAL_EXPRESSION_SPACES ")" { return it }
-	/ "#{" OPTIONAL_EXPRESSION_SPACES "}" { return ['.hash'] }
-	/ "#{" OPTIONAL_EXPRESSION_SPACES it:invoke OPTIONAL_EXPRESSION_SPACES "}" { return ['.hash'].concat(it) }
+	/ "{.}" { return ['.hash'] }
+	/ "{" OPTIONAL_EXPRESSION_SPACES it:propertyPairs OPTIONAL_EXPRESSION_SPACES "}" { return ['.hash'].concat(it) }
 	/ "{" OPTIONAL_EXPRESSION_SPACES "}" { return ['.list'] }
 	/ "{" OPTIONAL_EXPRESSION_SPACES "|" OPTIONAL_EXPRESSION_SPACES cdr:parting OPTIONAL_EXPRESSION_SPACES "}" { return ['.conslist', cdr] }
 	/ "{" OPTIONAL_EXPRESSION_SPACES it:invoke OPTIONAL_EXPRESSION_SPACES "|" OPTIONAL_EXPRESSION_SPACES cdr:parting OPTIONAL_EXPRESSION_SPACES "}" { return ['.conslist'].concat(it, [cdr]) }
@@ -58,6 +58,7 @@ parting
 	}
 qualifier
 	= "." property:identifier { return ['.quote', property] }
+	/ "." property:stringliteral { return property }
 	/ "." "[" OPTIONAL_EXPRESSION_SPACES property:parting OPTIONAL_EXPRESSION_SPACES "]" { return property }
 	/ "." "(" OPTIONAL_EXPRESSION_SPACES property:either OPTIONAL_EXPRESSION_SPACES ")" { return property }
 
@@ -83,7 +84,7 @@ bothOp = $([&] [\-_/+*<=>!?$%_&~^@]*)
 
 either
 	= car:both cdr:((OPTIONAL_EXPRESSION_SPACES eitherOp OPTIONAL_EXPRESSION_SPACES both)*) { return buildleft(car, cdr) }
-eitherOp = $([&] [\-_/+*<=>!?$%_&~^@]*)
+eitherOp = $([|] [\-_/+*<=>!?$%_&~^@]*)
 
 block
 	= indentBlockContent
@@ -101,7 +102,7 @@ blockContent
 		return res;
 	}
 line
-	= ":" INLINE_SPACES it:parting { return it }
+	= "#" INLINE_SPACES it:parting { return it }
 	/ head:lineInvoke INLINE_SPACES ":" INLINE_SPACES rear:line { return head.concat([rear]) }
 	/ head:lineInvoke INLINE_SPACES rear:indentBlockContent { return head.concat(rear) }
 	/ lineInvoke
@@ -114,6 +115,17 @@ invoke
 		};
 		return res;
 	}
+propertyPairs
+	= head:propertyPair rear:(OPTIONAL_EXPRESSION_SPACES propertyPair)* { 
+		var res = [head]
+		for(var j = 0; j < rear.length; j++){
+			res.push(rear[j][1])
+		};
+		return res;
+	}
+propertyPair
+	= "." head:stringliteral INLINE_SPACES rear:parting { return [head[1], rear]}
+	/ "." head:identifier INLINE_SPACES rear:parting { return [head, rear]}
 lineInvoke
 	= head:parting rear:(INLINE_SPACES parting)* { 
 		var res = [head]
