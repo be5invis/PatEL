@@ -1,45 +1,41 @@
 var s2_atom, s2_Scope, s2_prim, s2_ex;
 
 s2_atom = require("../commons/match").atom, s2_Scope = require("patrisika").Scope, 
-s2_prim = require("../commons/match").prim, s2_ex = function(s3_form, s3_env) {
-    var s3_form, s3_env, s3_any, s3_x, s3_callee, s3_args, s3_a, s3_j, s3_block, s3_param, s3_handler, s3_body, s3_params, s3_derived, _s3_t0, _s3_t9, _s3_t10;
-    if (_s3_t0 = s3_form, _s3_t0 instanceof Array && _s3_t0.length >= 1 && ".quote" === _s3_t0[0]) return s3_x = _s3_t0.slice(1), 
-    s3_form;
-    if (_s3_t0 instanceof Array && _s3_t0.length >= 1 && ".id" === _s3_t0[0]) return s3_x = _s3_t0.slice(1), 
-    s3_form;
-    if (_s3_t0 instanceof Array && 3 === _s3_t0.length && ".lambda" === _s3_t0[0] && _s3_t0[1] instanceof Array && _s3_t0[1].length >= 0) {
-        for (s3_args = _s3_t0[1].slice(0), s3_body = _s3_t0[2], s3_derived = new s2_Scope(s3_env), 
-        s3_j = 0; s3_j < s3_args.length; ) s3_derived.declare(s3_args[s3_j], !0), s3_args[s3_j] = s3_derived.use(s3_args[s3_j]), 
-        s3_j += 1;
-        return [ ".lambda.scoped", s3_args, s2_ex(s3_body, s3_derived), s3_derived ];
+s2_prim = require("../commons/match").prim, s2_ex = function(e, r) {
+    var e, r, s, n, t, a, o, c, i, l, f, _, h, m, u, g, p;
+    if (u = e, u instanceof Array && u.length >= 1 && ".quote" === u[0]) return n = u.slice(1), 
+    e;
+    if (u instanceof Array && u.length >= 1 && ".id" === u[0]) return n = u.slice(1), 
+    e;
+    if (u instanceof Array && 3 === u.length && ".lambda" === u[0] && u[1] instanceof Array && u[1].length >= 0) {
+        for (a = u[1].slice(0), _ = u[2], m = new s2_Scope(r), c = 0; c < a.length; ) m.declare(a[c], !0), 
+        a[c] = m.use(a[c]), c += 1;
+        return [ ".lambda.scoped", a, s2_ex(_, m), m ];
     }
-    if (_s3_t0 instanceof Array && _s3_t0.length >= 3 && ".beta" === _s3_t0[0] && _s3_t0[1] instanceof Array && _s3_t0[1].length >= 0) {
-        for (s3_args = _s3_t0[1].slice(0), s3_body = _s3_t0[2], s3_params = _s3_t0.slice(3), 
-        s3_derived = new s2_Scope(s3_env), s3_j = 0; s3_j < s3_args.length; ) s3_derived.declare(s3_args[s3_j], !0), 
-        s3_args[s3_j] = s3_derived.use(s3_args[s3_j]), s3_j += 1;
-        for (s3_j = 0; s3_j < s3_args.length; ) s3_params[s3_j] = s2_ex(s3_params[s3_j], s3_env), 
-        s3_j += 1;
-        return [ ".beta.scoped", s3_args, s2_ex(s3_body, s3_derived), s3_derived ].concat(s3_params);
+    if (u instanceof Array && u.length >= 3 && ".beta" === u[0] && u[1] instanceof Array && u[1].length >= 0) {
+        for (a = u[1].slice(0), _ = u[2], h = u.slice(3), m = new s2_Scope(r), c = 0; c < a.length; ) m.declare(a[c], !0), 
+        a[c] = m.use(a[c]), c += 1;
+        for (c = 0; c < a.length; ) h[c] = s2_ex(h[c], r), c += 1;
+        return [ ".beta.scoped", a, s2_ex(_, m), m ].concat(h);
     }
-    if (_s3_t0 instanceof Array && 4 === _s3_t0.length && ".try" === _s3_t0[0] && _s3_t0[2] instanceof Array && 1 === _s3_t0[2].length) return s3_block = _s3_t0[1], 
-    s3_param = _s3_t0[2][0], s3_handler = _s3_t0[3], s3_env.declare(s3_param), [ ".try", s2_ex(s3_block, s3_env), s3_env.use(s3_param), s2_ex(s3_handler, s3_env) ];
-    if (_s3_t0 instanceof Array && _s3_t0.length >= 1 && ".hash" === _s3_t0[0]) {
-        for (s3_args = _s3_t0.slice(1), s3_a = [ ".hash" ], s3_j = 1; s3_j < s3_form.length; ) s3_a[s3_j] = [ s3_form[s3_j][0], s2_ex(s3_form[s3_j][1], s3_env) ], 
-        s3_j += 1;
-        return s3_a;
+    if (u instanceof Array && 4 === u.length && ".try" === u[0] && u[2] instanceof Array && 1 === u[2].length) return i = u[1], 
+    l = u[2][0], f = u[3], r.declare(l), [ ".try", s2_ex(i, r), [ r.use(l) ], s2_ex(f, r) ];
+    if (u instanceof Array && u.length >= 1 && ".hash" === u[0]) {
+        for (a = u.slice(1), o = [ ".hash" ], c = 1; c < e.length; ) o[c] = [ e[c][0], s2_ex(e[c][1], r) ], 
+        c += 1;
+        return o;
     }
-    if (_s3_t0 instanceof Array && 2 === _s3_t0.length && ".local" === _s3_t0[0]) return s3_x = _s3_t0[1], 
-    s3_env.declare(s3_x), s3_env.use(s3_x);
-    if (_s3_t0 instanceof Array && _s3_t0.length >= 1) {
-        if (s3_callee = _s3_t0[0], s3_args = _s3_t0.slice(1), s2_atom(s3_callee) && s3_env.macros.has(s3_callee)) return s3_env.macros.get(s3_callee)(s2_ex, s3_form, s3_env);
-        for (_s3_t9 = void 0, _s3_t10 = s2_prim(s3_callee) ? void 0 : s3_callee = s2_ex(s3_callee, s3_env), 
-        s3_a = [ s3_callee ], s3_j = 1; s3_j < s3_form.length; ) s3_a[s3_j] = s2_ex(s3_form[s3_j], s3_env), 
-        s3_j += 1;
-        return s3_a;
+    if (u instanceof Array && 2 === u.length && ".local" === u[0]) return n = u[1], 
+    r.declare(n), r.use(n);
+    if (u instanceof Array && u.length >= 1) {
+        if (t = u[0], a = u.slice(1), s2_atom(t) && r.macros.has(t)) return r.macros.get(t)(s2_ex, e, r);
+        for (g = void 0, p = s2_prim(t) ? void 0 : t = s2_ex(t, r), o = [ t ], c = 1; c < e.length; ) o[c] = s2_ex(e[c], r), 
+        c += 1;
+        return o;
     }
-    return s3_x = _s3_t0, !s2_atom(s3_x) || !s3_env.macros.has(s3_x) || s3_env.macros.get(s3_x) instanceof Function ? (s3_x = _s3_t0, 
-    s2_prim(s3_x) ? s3_x : (s3_x = _s3_t0, s2_atom(s3_x) ? s3_env.use(s3_x) : s3_any = _s3_t0)) : s3_env.macros.get(s3_x);
-}, exports.pass = function(s4_form, s4_globalScope) {
-    var s4_form, s4_globalScope;
-    return s2_ex(s4_form, s4_globalScope);
+    return n = u, !s2_atom(n) || !r.macros.has(n) || r.macros.get(n) instanceof Function ? (n = u, 
+    s2_prim(n) ? n : (n = u, s2_atom(n) ? r.use(n) : s = u)) : r.macros.get(n);
+}, exports.pass = function(e, r) {
+    var e, r;
+    return s2_ex(e, r);
 };

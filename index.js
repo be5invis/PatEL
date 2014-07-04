@@ -3,7 +3,7 @@ var fs = require('fs');
 var util = require('util');
 var patrisika = require('patrisika');
 var escodegen = require('escodegen');
-var ex = require('./src/ex.js').pass;
+var ex = require('./src/ex').pass;
 var exm = require('./src/externs');
 
 function trace(s){ process.stderr.write(s + '\n') }
