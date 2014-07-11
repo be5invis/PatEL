@@ -6,21 +6,15 @@ var escodegen = require('escodegen');
 var ex = require('./src/ex').pass;
 var exm = require('./src/externs');
 
-function trace(s){ process.stderr.write(s + '\n') }
+function trace(s){ process.stderr.write(s + '\n') };
 
-var st = new Date();
-var input = fs.readFileSync(process.argv[2], 'utf-8');
-var ast = parse(input);
-var et = new Date();
-trace(et - st);
+var globals = function(){ return new patrisika.Scope(exm.Create()) };
+var compile = function(ast, globals){ 
+	var xast = ex(ast, globals);
+	var rast = patrisika.generate(xast, globals)
+	return escodegen.generate(rast) 
+};
 
-var globals = new patrisika.Scope(exm.Create());
-
-var xast = ex(ast, globals);
-trace(util.inspect(xast, {depth: null}))
-trace('##############################################')
-
-var rast = patrisika.generate(xast, globals);
-//console.log(util.inspect(rast, {depth: null}))
-
-console.log(escodegen.generate(rast));
+exports.globals = globals;
+exports.parse = parse;
+exports.compile = compile;
