@@ -1,41 +1,45 @@
-var s2_atom, s2_Scope, s2_prim, s2_ex;
+var s1_atom, s1_Scope, s1_prim, s1_ex;
 
-s2_atom = require("../commons/match").atom, s2_Scope = require("patrisika").Scope, 
-s2_prim = require("../commons/match").prim, s2_ex = function(e, r) {
-    var e, r, s, n, t, a, o, c, i, l, f, _, h, m, u, g, p;
-    if (u = e, u instanceof Array && u.length >= 1 && ".quote" === u[0]) return n = u.slice(1), 
-    e;
-    if (u instanceof Array && u.length >= 1 && ".id" === u[0]) return n = u.slice(1), 
-    e;
-    if (u instanceof Array && 3 === u.length && ".lambda" === u[0] && u[1] instanceof Array && u[1].length >= 0) {
-        for (a = u[1].slice(0), _ = u[2], m = new s2_Scope(r), c = 0; c < a.length; ) m.declare(a[c], !0), 
-        a[c] = m.use(a[c]), c += 1;
-        return [ ".lambda.scoped", a, s2_ex(_, m), m ];
+s1_atom = require("../commons/match").atom, s1_Scope = require("patrisika").Scope, 
+s1_prim = require("../commons/match").prim, s1_ex = function(s2_form, s2_env) {
+    var s2_form, s2_env, s2_any, s2_x, s2_callee, s2_args, s2_a, s2_j, s2_block, s2_param, s2_handler, s2_body, s2_params, s2_derived, _s2_t0, _s2_t9, _s2_t10;
+    if (_s2_t0 = s2_form, _s2_t0 instanceof Array && _s2_t0.length >= 1 && ".quote" === _s2_t0[0]) return s2_x = _s2_t0.slice(1), 
+    s2_form;
+    if (_s2_t0 instanceof Array && _s2_t0.length >= 1 && ".id" === _s2_t0[0]) return s2_x = _s2_t0.slice(1), 
+    s2_form;
+    if (_s2_t0 instanceof Array && 3 === _s2_t0.length && ".lambda" === _s2_t0[0] && _s2_t0[1] instanceof Array && _s2_t0[1].length >= 0) {
+        for (s2_args = _s2_t0[1].slice(0), s2_body = _s2_t0[2], s2_derived = new s1_Scope(s2_env), 
+        s2_j = 0; s2_j < s2_args.length; ) s2_derived.declare(s2_args[s2_j], !0), s2_args[s2_j] = s2_derived.use(s2_args[s2_j]), 
+        s2_j += 1;
+        return [ ".lambda.scoped", s2_args, s1_ex(s2_body, s2_derived), s2_derived ];
     }
-    if (u instanceof Array && u.length >= 3 && ".beta" === u[0] && u[1] instanceof Array && u[1].length >= 0) {
-        for (a = u[1].slice(0), _ = u[2], h = u.slice(3), m = new s2_Scope(r), c = 0; c < a.length; ) m.declare(a[c], !0), 
-        a[c] = m.use(a[c]), c += 1;
-        for (c = 0; c < a.length; ) h[c] = s2_ex(h[c], r), c += 1;
-        return [ ".beta.scoped", a, s2_ex(_, m), m ].concat(h);
+    if (_s2_t0 instanceof Array && _s2_t0.length >= 3 && ".beta" === _s2_t0[0] && _s2_t0[1] instanceof Array && _s2_t0[1].length >= 0) {
+        for (s2_args = _s2_t0[1].slice(0), s2_body = _s2_t0[2], s2_params = _s2_t0.slice(3), 
+        s2_derived = new s1_Scope(s2_env), s2_j = 0; s2_j < s2_args.length; ) s2_derived.declare(s2_args[s2_j], !0), 
+        s2_args[s2_j] = s2_derived.use(s2_args[s2_j]), s2_j += 1;
+        for (s2_j = 0; s2_j < s2_args.length; ) s2_params[s2_j] = s1_ex(s2_params[s2_j], s2_env), 
+        s2_j += 1;
+        return [ ".beta.scoped", s2_args, s1_ex(s2_body, s2_derived), s2_derived ].concat(s2_params);
     }
-    if (u instanceof Array && 4 === u.length && ".try" === u[0] && u[2] instanceof Array && 1 === u[2].length) return i = u[1], 
-    l = u[2][0], f = u[3], r.declare(l), [ ".try", s2_ex(i, r), [ r.use(l) ], s2_ex(f, r) ];
-    if (u instanceof Array && u.length >= 1 && ".hash" === u[0]) {
-        for (a = u.slice(1), o = [ ".hash" ], c = 1; c < e.length; ) o[c] = [ e[c][0], s2_ex(e[c][1], r) ], 
-        c += 1;
-        return o;
+    if (_s2_t0 instanceof Array && 4 === _s2_t0.length && ".try" === _s2_t0[0] && _s2_t0[2] instanceof Array && 1 === _s2_t0[2].length) return s2_block = _s2_t0[1], 
+    s2_param = _s2_t0[2][0], s2_handler = _s2_t0[3], s2_env.declare(s2_param), [ ".try", s1_ex(s2_block, s2_env), [ s2_env.use(s2_param) ], s1_ex(s2_handler, s2_env) ];
+    if (_s2_t0 instanceof Array && _s2_t0.length >= 1 && ".hash" === _s2_t0[0]) {
+        for (s2_args = _s2_t0.slice(1), s2_a = [ ".hash" ], s2_j = 1; s2_j < s2_form.length; ) s2_a[s2_j] = [ s2_form[s2_j][0], s1_ex(s2_form[s2_j][1], s2_env) ], 
+        s2_j += 1;
+        return s2_a;
     }
-    if (u instanceof Array && 2 === u.length && ".local" === u[0]) return n = u[1], 
-    r.declare(n), r.use(n);
-    if (u instanceof Array && u.length >= 1) {
-        if (t = u[0], a = u.slice(1), s2_atom(t) && r.macros.has(t)) return r.macros.get(t)(s2_ex, e, r);
-        for (g = void 0, p = s2_prim(t) ? void 0 : t = s2_ex(t, r), o = [ t ], c = 1; c < e.length; ) o[c] = s2_ex(e[c], r), 
-        c += 1;
-        return o;
+    if (_s2_t0 instanceof Array && 2 === _s2_t0.length && ".local" === _s2_t0[0]) return s2_x = _s2_t0[1], 
+    s2_env.declare(s2_x), s2_env.use(s2_x);
+    if (_s2_t0 instanceof Array && _s2_t0.length >= 1) {
+        if (s2_callee = _s2_t0[0], s2_args = _s2_t0.slice(1), s1_atom(s2_callee) && s2_env.macros.has(s2_callee)) return s2_env.macros.get(s2_callee)(s1_ex, s2_form, s2_env);
+        for (_s2_t9 = void 0, _s2_t10 = s1_prim(s2_callee) ? void 0 : s2_callee = s1_ex(s2_callee, s2_env), 
+        s2_a = [ s2_callee ], s2_j = 1; s2_j < s2_form.length; ) s2_a[s2_j] = s1_ex(s2_form[s2_j], s2_env), 
+        s2_j += 1;
+        return s2_a;
     }
-    return n = u, !s2_atom(n) || !r.macros.has(n) || r.macros.get(n) instanceof Function ? (n = u, 
-    s2_prim(n) ? n : (n = u, s2_atom(n) ? r.use(n) : s = u)) : r.macros.get(n);
-}, exports.pass = function(e, r) {
-    var e, r;
-    return s2_ex(e, r);
+    return s2_x = _s2_t0, !s1_atom(s2_x) || !s2_env.macros.has(s2_x) || s2_env.macros.get(s2_x) instanceof Function ? (s2_x = _s2_t0, 
+    s1_prim(s2_x) ? s2_x : (s2_x = _s2_t0, s1_atom(s2_x) ? s2_env.use(s2_x) : s2_any = _s2_t0)) : s2_env.macros.get(s2_x);
+}, exports.pass = function(s3_form, s3_globalScope) {
+    var s3_form, s3_globalScope;
+    return s1_ex(s3_form, s3_globalScope);
 };
