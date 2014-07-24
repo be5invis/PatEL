@@ -1,7 +1,7 @@
 define patrisika [require "patrisika"]
-define atom [require "../commons/match"].atom
+define [atom x] ([typeof x] == "string")
+define [prim x] ([atom x] && x !== "&" && x !== "&!" && (x.(0) === "." || [[regex "^\W+"].test x]))
 define Scope [require "patrisika"].Scope
-define prim [require "../commons/match"].prim
 
 ; This file defines built-in macros of PatEL
 define [Create] : begin
@@ -30,6 +30,7 @@ define [Create] : begin
 	externs.macros.put "yield" : operatorRename ".yield"
 	externs.macros.put "throw" : operatorRename ".throw"
 	externs.macros.put "list" : operatorRename ".list"
+	externs.macros.put "typeof" : operatorRename ".typeof"
 
 	externs.macros.put ".conslist" : lambda [ex form env]
 		return {

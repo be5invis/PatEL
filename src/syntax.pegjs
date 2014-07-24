@@ -63,27 +63,27 @@ qualifier
 
 term
 	= car:parting cdr:((OPTIONAL_EXPRESSION_SPACES termOp OPTIONAL_EXPRESSION_SPACES parting)*) { return buildleft(car, cdr) }
-termOp = $([*/%] [\-_/+*<=>!?$%_&~^@]*)
+termOp = $([*/%] [\-_/+*<=>!?$%_&~^@|]*)
 
 sum
 	= car:term cdr:((OPTIONAL_EXPRESSION_SPACES sumOp OPTIONAL_EXPRESSION_SPACES term)*) { return buildleft(car, cdr) }
-sumOp = $([+\-] [\-_/+*<=>!?$%_&~^@]*)
+sumOp = $([+\-] [\-_/+*<=>!?$%_&~^@|]*)
 
 equality
 	= car:sum cdr:((OPTIONAL_EXPRESSION_SPACES equalityOp OPTIONAL_EXPRESSION_SPACES sum)*) { return buildleft(car, cdr) }
-equalityOp = $([=!] [\-_/+*<=>!?$%_&~^@]+)
+equalityOp = $([=!] [\-_/+*<=>!?$%_&~^@|]+)
 
 compare
 	= car:equality cdr:((OPTIONAL_EXPRESSION_SPACES compareOp OPTIONAL_EXPRESSION_SPACES equality)*) { return buildleft(car, cdr) }
-compareOp = $([<>] [\-_/+*<=>!?$%_&~^@]*)
+compareOp = $([<>] [\-_/+*<=>!?$%_&~^@|]*)
 
 both
 	= car:compare cdr:((OPTIONAL_EXPRESSION_SPACES bothOp OPTIONAL_EXPRESSION_SPACES compare)*) { return buildleft(car, cdr) }
-bothOp = $([&] [\-_/+*<=>!?$%_&~^@]*)
+bothOp = $([&] [\-_/+*<=>!?$%_&~^@|]*)
 
 either
 	= car:both cdr:((OPTIONAL_EXPRESSION_SPACES eitherOp OPTIONAL_EXPRESSION_SPACES both)*) { return buildleft(car, cdr) }
-eitherOp = $([|] [\-_/+*<=>!?$%_&~^@]*)
+eitherOp = $([|] [\-_/+*<=>!?$%_&~^@|]*)
 
 block
 	= indentBlockContent
@@ -136,7 +136,8 @@ lineInvoke
 
 // Tokens
 identifier "Identifier"
-	= id:$((UnicodeLetter / [\-_/+*<=>!?$%_&~^@]) (UnicodeLetter / UnicodeCombiningMark / UnicodeDigit / UnicodeConnectorPunctuation / [\-_/+*<=>!?$%_&~^@])*) { return id }
+	= $((UnicodeLetter / [_$@]) (UnicodeLetter / UnicodeCombiningMark / UnicodeDigit / UnicodeConnectorPunctuation / [_$@])*)
+	/ $("(" [\-_/+*<=>!?$%_&~^@|]+ ")")
 	/ "." !("}" / UnicodeLetter)
 numberliteral "Numeric Literal"
 	= '-' positive:numberliteral { return -positive }
@@ -156,6 +157,7 @@ stringcharacter
 			case('"'): return "\""
 			case('t'): return "\t"
 			case('v'): return "\v"
+			case('\\'): return "\\"
 			default: return "\\" + which
 		}
 	}

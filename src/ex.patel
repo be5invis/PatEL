@@ -1,7 +1,7 @@
 ; These are imports
-define atom [require "../commons/match"].atom
 define Scope [require "patrisika"].Scope
-define prim [require "../commons/match"].prim
+define [atom x] ([typeof x] == "string")
+define [prim x] ([atom x] && x !== "&" && x !== "&!" && (x.(0) === "." || [[regex "^\W+"].test x]))
 
 ; Function [ex form env]: Expand macros and do scoping
 define [ex form env]: match form
