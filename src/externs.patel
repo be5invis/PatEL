@@ -60,6 +60,23 @@ define [Create] : begin
 		id [atom id] : piecewise
 			locallyQ {".set" [ex {".local" id} env] [ex right env]}
 			true     {".set" [ex left env] [ex right env]}
+
+		{".list" | items} : begin
+			local t [env.newt]
+			local assignments {".begin" {".set" t [ex right env]}}
+			for [local j 0] (j < items.length) [inc j]
+				assignments.push : Assign ex items.(j) {"." t {".quote" j}}  env locallyQ
+			assignments.push t
+			return assignments
+
+		{".hash" | items} : begin
+			local t [env.newt]
+			local assignments {".begin" {".set" t [ex right env]}}
+			for [local j 0] (j < items.length) [inc j]
+				assignments.push : Assign ex items.(j).(1) {"." t {".quote" items.(j).(0)}}  env locallyQ
+			assignments.push t
+			return assignments
+
 		{callee | paras} : piecewise
 			[prim callee] {".set" [ex left env] [ex right env]}
 			[atom callee] : piecewise
@@ -192,8 +209,7 @@ define [Create] : begin
 								[pat.assign t]
 								{".if" [ex guard env] 
 									{".set" tc {".quote" true}} 
-									{".set" tc {".quote" false}}} 
-								{".set" tc {".quote" false}}}}
+									{".set" tc {".quote" false}}}}}
 							{".if" tc [ex body env] f}}
 					true {".begin" 
 						[pat.assign t] 

@@ -7,6 +7,7 @@ define [prim x] ([atom x] && x !== "&" && x !== "&!" && (x.(0) === "." || [[rege
 define [ex form env]: match form
 	{".quote" | x} : return form
 	{".id" | x} : return form
+	{".t" | x} : return form
 	{".lambda" {|args} body} : begin
 		define derived [new Scope env]
 		for [local j 0] (j < args.length) [inc j] : begin
