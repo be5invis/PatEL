@@ -136,7 +136,7 @@ lineInvoke
 
 // Tokens
 identifier "Identifier"
-	= $((UnicodeLetter / [_$@]) (UnicodeLetter / UnicodeCombiningMark / UnicodeDigit / UnicodeConnectorPunctuation / [_$@])*)
+	= $((UnicodeLetter / [_$@]) (UnicodeLetter / UnicodeCombiningMark / UnicodeDigit / UnicodeConnectorPunctuation / [\-_$@])*)
 	/ $("(" [\-_/+*<=>!?$%_&~^@|]+ ")")
 	/ "." !("}" / UnicodeLetter)
 numberliteral "Numeric Literal"
