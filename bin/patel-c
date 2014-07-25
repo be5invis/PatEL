@@ -3,4 +3,17 @@ var patel = require('../index');
 var fs = require('fs');
 var input = fs.readFileSync(process.argv[2], 'utf-8');
 var gs = patel.globals();
-process.stdout.write(patel.compile(patel.parse(input), gs));
+try {
+	var ast = patel.parse(input)
+	process.stdout.write(patel.compile(ast, gs));
+} catch(ex) {
+	if(ex.name === 'SyntaxError'){
+		process.stderr.write(ex.message + '\n');
+		process.stderr.write("At Line " + ex.line + ', Column ' + ex.column + '\n');
+		var line = input.split('\n')[ex.line - 1]
+		process.stderr.write(line + '\n');
+		process.stderr.write(line.replace(/\S/g, ' ').slice(0, ex.column) + '^\n');
+	} else {
+		throw ex
+	}
+}

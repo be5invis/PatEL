@@ -59,10 +59,16 @@ parting
 qualifier
 	= "." property:identifier { return ['.quote', property] }
 	/ "." property:stringliteral { return property }
-	/ "." property: group { return property }
+	/ "." property:group { return property }
+	/ "`" property:primitive { return property }
+
+factor
+	= left:prefixOp OPTIONAL_EXPRESSION_SPACES right:parting { return [left, right] }
+	/ parting
+prefixOp = "+" / "-" / "!"
 
 term
-	= car:parting cdr:((OPTIONAL_EXPRESSION_SPACES termOp OPTIONAL_EXPRESSION_SPACES parting)*) { return buildleft(car, cdr) }
+	= car:factor cdr:((OPTIONAL_EXPRESSION_SPACES termOp OPTIONAL_EXPRESSION_SPACES factor)*) { return buildleft(car, cdr) }
 termOp = $([*/%] [\-_/+*<=>!?$%_&~^@|]*)
 
 sum
@@ -91,7 +97,7 @@ block
 indentBlockContent
 	= NEWLINE_INDENT_ADD
 	  it:blockContent
-	  INDENT_REMOVE { return it }	
+	  SPACES? INDENT_REMOVE { return it }	
 blockContent
 	= head:line rear:(NEWLINE_INDENT_SAME line)* {
 		var res = [head]
@@ -145,6 +151,7 @@ numberliteral "Numeric Literal"
 	/ decimal:$([0-9]+ ("." [0-9]+)? ([eE] [+\-]? [0-9]+)?) { return decimal - 0 }
 stringliteral "String Literal"
 	= "\"" inner:stringcharacter* "\"" { return inner.join('') }
+	/ "'" inner:singlestringchar* "'" { return inner.join('') }
 stringcharacter
 	= [^"\\\r\n]
 	/ "\\u" digits:([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9]) { 
@@ -162,6 +169,9 @@ stringcharacter
 		}
 	}
 	/ "\\" LINE_BREAK SPACE_CHARACTER_OR_NEWLINE* "\\" { return '' }
+singlestringchar
+	= [^']
+	/ "''" { return "'" }
 
 // Spaces
 SPACE_CHARACTER "Space Character"
@@ -182,6 +192,8 @@ EXPRESSION_SPACE
 	/ NEWLINE_INDENT_SAME_OR_MORE
 OPTIONAL_EXPRESSION_SPACES
 	= $(EXPRESSION_SPACE*)
+REQUIRED_EXPRESSION_SPACES
+	= $(EXPRESSION_SPACE+)
 INLINE_SPACES = $(SPACE_CHARACTER*)
 
 NEWLINE
@@ -189,13 +201,13 @@ NEWLINE
 TEXT_IN_SEGMENT_LINEBREAK "Single Newline"
 	= LINE_BREAK INDENT_SAME !(LINE_BREAK)
 NEWLINE_INDENT_ADD
-	= LINE_BREAK SPACES? NEWLINE_INDENT_ADD
-	/ LINE_BREAK INDENT_ADD
+	= SPACES? LINE_BREAK NEWLINE_INDENT_ADD
+	/ SPACES? LINE_BREAK INDENT_ADD
 NEWLINE_INDENT_SAME
-	= LINE_BREAK SPACES? NEWLINE_INDENT_SAME
-	/ LINE_BREAK INDENT_SAME
+	= SPACES? LINE_BREAK NEWLINE_INDENT_SAME
+	/ SPACES? LINE_BREAK INDENT_SAME
 NEWLINE_INDENT_SAME_OR_MORE
-	= LINE_BREAK (SPACES? LINE_BREAK)* INDENT_SAME_OR_MORE
+	= SPACES? LINE_BREAK (SPACES? LINE_BREAK)* INDENT_SAME_OR_MORE
 
 POS = { return Position(offset()) }
 

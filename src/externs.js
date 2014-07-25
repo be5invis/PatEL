@@ -1,4 +1,4 @@
-var s1_patrisika, s1_atom, s1_prim, s1_Scope, s1_Create;
+var s1_patrisika, s1_atom, s1_prim, s1_Scope, s1_Create, _s1_t0, _s1_t1, _s1_t2;
 
 s1_patrisika = require("patrisika"), s1_atom = function(s2_x) {
     var s2_x;
@@ -110,7 +110,7 @@ s1_patrisika = require("patrisika"), s1_atom = function(s2_x) {
         var s22_x;
         return !!s22_x;
     }, s4_externs.macros.put("match", function(s23_ex, s23_form, s23_env) {
-        var s23_ex, s23_form, s23_env, s23_pairs, s23_t, s23_matchQ, s23_f, s23_j, s23_any, s23_pattern, s23_guard, s23_body, s23_pat, s23_cond, s23_tc, _s23_t0, _s23_t1, _s23_t2, _s23_t3, _s23_t4, _s23_t5, _s23_t6;
+        var s23_ex, s23_form, s23_env, s23_pairs, s23_t, s23_matchQ, s23_f, s23_j, s23_any, s23_pattern, s23_guard, s23_body, s23_pat, s23_cond, s23_tc, _s23_t0, _s23_t2, _s23_t3, _s23_t4, _s23_t5, _s23_t6, _s23_t7;
         for (s23_pairs = s23_form.slice(2), s23_t = s23_env.newt(), s23_matchQ = function(s24_pattern) {
             var s24_pattern, s24_callee, s24_subpatterns, s24_ms, s24_t, s24_final, s24_whatever, s24_x, s24_id, _s24_t0;
             return _s24_t0 = s24_pattern, s24_id = _s24_t0, s1_atom(s24_id) ? {
@@ -191,12 +191,12 @@ s1_patrisika = require("patrisika"), s1_atom = function(s2_x) {
             }) : void 0;
         }, s23_f = [ ".unit" ], s23_j = s23_pairs.length - 1; s23_j >= 0; ) _s23_t0 = s23_pairs[s23_j], 
         _s23_t0 instanceof Array && 2 === _s23_t0.length ? (s23_pattern = _s23_t0[0], s23_body = _s23_t0[1], 
-        s23_pat = s23_matchQ(s23_pattern), s23_cond = s23_pat.whether(s23_t), s23_cond ? _s23_t2 = [ ".if", s23_cond, [ ".begin", s23_pat.assign(s23_t), s23_ex(s23_body, s23_env) ], s23_f ] : (_s23_t3 = [ ".begin", s23_pat.assign(s23_t), s23_ex(s23_body, s23_env) ], 
-        _s23_t2 = _s23_t3), _s23_t1 = _s23_t2) : (_s23_t0 instanceof Array && 3 === _s23_t0.length ? (s23_pattern = _s23_t0[0], 
+        s23_pat = s23_matchQ(s23_pattern), s23_cond = s23_pat.whether(s23_t), s23_cond ? _s23_t3 = [ ".if", s23_cond, [ ".begin", s23_pat.assign(s23_t), s23_ex(s23_body, s23_env) ], s23_f ] : (_s23_t4 = [ ".begin", s23_pat.assign(s23_t), s23_ex(s23_body, s23_env) ], 
+        _s23_t3 = _s23_t4), _s23_t2 = _s23_t3) : (_s23_t0 instanceof Array && 3 === _s23_t0.length ? (s23_pattern = _s23_t0[0], 
         s23_guard = _s23_t0[1], s23_body = _s23_t0[2], s23_pat = s23_matchQ(s23_pattern), 
-        s23_cond = s23_pat.whether(s23_t), s23_cond ? (s23_tc = s23_env.newt(), _s23_t5 = [ ".begin", [ ".set", s23_tc, [ ".quote", !1 ] ], [ ".if", s23_cond, [ ".begin", s23_pat.assign(s23_t), [ ".if", s23_ex(s23_guard, s23_env), [ ".set", s23_tc, [ ".quote", !0 ] ], [ ".set", s23_tc, [ ".quote", !1 ] ] ] ] ], [ ".if", s23_tc, s23_ex(s23_body, s23_env), s23_f ] ]) : (_s23_t6 = [ ".begin", s23_pat.assign(s23_t), [ ".if", s23_ex(s23_guard, s23_env), s23_ex(s23_body, s23_env), s23_f ] ], 
-        _s23_t5 = _s23_t6), _s23_t4 = _s23_t5) : (s23_any = _s23_t0, _s23_t4 = s23_f), _s23_t1 = _s23_t4), 
-        s23_f = _s23_t1, s23_j -= 1;
+        s23_cond = s23_pat.whether(s23_t), s23_cond ? (s23_tc = s23_env.newt(), _s23_t6 = [ ".begin", [ ".set", s23_tc, [ ".quote", !1 ] ], [ ".if", s23_cond, [ ".begin", s23_pat.assign(s23_t), [ ".if", s23_ex(s23_guard, s23_env), [ ".set", s23_tc, [ ".quote", !0 ] ], [ ".set", s23_tc, [ ".quote", !1 ] ] ] ] ], [ ".if", s23_tc, s23_ex(s23_body, s23_env), s23_f ] ]) : (_s23_t7 = [ ".begin", s23_pat.assign(s23_t), [ ".if", s23_ex(s23_guard, s23_env), s23_ex(s23_body, s23_env), s23_f ] ], 
+        _s23_t6 = _s23_t7), _s23_t5 = _s23_t6) : (s23_any = _s23_t0, _s23_t5 = s23_f), _s23_t2 = _s23_t5), 
+        s23_f = _s23_t2, s23_j -= 1;
         return [ ".begin", [ ".set", s23_t, s23_ex(s23_form[1], s23_env) ], s23_f ];
     }), s4_externs.macros.put("regex", function(s43_ex, s43_form) {
         var s43_form, s43_args, s43_s, s43_flag, _s43_t0;

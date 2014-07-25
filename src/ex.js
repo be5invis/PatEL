@@ -1,4 +1,4 @@
-var s1_Scope, s1_atom, s1_prim, s1_ex;
+var s1_Scope, s1_atom, s1_prim, s1_ex, _s1_t0, _s1_t1, _s1_t2, _s1_t3;
 
 s1_Scope = require("patrisika").Scope, s1_atom = function(s2_x) {
     var s2_x;
