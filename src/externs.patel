@@ -61,6 +61,9 @@ define [Create] : begin
 			locallyQ {".set" [ex {".local" id} env] [ex right env]}
 			true     {".set" [ex left env] [ex right env]}
 
+		{"local" a} : Assign ex a right env true
+		{".local" a} : Assign ex a right env true
+
 		{".list" | items} : begin
 			local t [env.newt]
 			local assignments {".begin" {".set" t [ex right env]}}
@@ -109,8 +112,7 @@ define [Create] : begin
 			{".while" [ex test env] {".begin" [ex body env] [ex step env]}}}
 
 	externs.macros.put "foreach" : lambda [ex form env] : match form
-		{"foreach" varid range body} [atom varid] : begin
-			env.declare varid
+		{"foreach" varid range body} : begin
 			local tR : env.newt
 			local t : env.newt
 			return {".begin"
@@ -118,7 +120,7 @@ define [Create] : begin
 				{".while" 
 					{"!" {"." {".set" t {{"." tR {".quote" "next"}}}} {".quote" "done"}}} 
 					{".begin"
-						{".set" varid {"." t {".quote" "value"}}}
+						[Assign ex varid {"." t {".quote" "value"}} env false]
 						[ex body env]}}}
 
 	externs.macros.put "this" {".thisp"}
