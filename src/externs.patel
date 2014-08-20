@@ -9,13 +9,17 @@ define [Create] : begin
 	set [externs.castName name] name
 	externs.declare "require"
 	externs.declare "exports"
+	externs.declare "process"
+	externs.declare "module"
 	externs.declare "Error"
 	
 	define [operatorRename op] : lambda [ex form env] [ex {op | [form.slice 1]} env]
 
 	externs.macros.put "lambda" : operatorRename ".lambda"
 	externs.macros.put "begin" : operatorRename ".begin"
-	externs.macros.put "if" : operatorRename ".if"
+	externs.macros.put "then" : operatorRename ".begin"
+	externs.macros.put "else" : operatorRename ".begin"
+;	externs.macros.put "if" : operatorRename ".if"
 	externs.macros.put "while" : operatorRename ".while"
 	externs.macros.put "try" : operatorRename ".try"
 	externs.macros.put "is" : operatorRename ".is"
@@ -31,6 +35,12 @@ define [Create] : begin
 	externs.macros.put "throw" : operatorRename ".throw"
 	externs.macros.put "list" : operatorRename ".list"
 	externs.macros.put "typeof" : operatorRename ".typeof"
+
+	externs.macros.put "if" : lambda [ex form env] : match form
+		{"if" test consequent} : ex {'.if' test consequent} env
+		{"if" test consequent alternate} : ex {'.if' test consequent alternate} env
+		{"if" test {'then' | consequents}} : ex {'.if' test {'.begin' | consequents}} env
+		{"if" test {'then' | consequents} {'else' | alternates}} : ex {'.if' test {'.begin' | consequents} {'.begin' | alternates}} env
 
 	externs.macros.put ".conslist" : lambda [ex form env]
 		return {
@@ -205,7 +215,7 @@ define [Create] : begin
 				piecewise
 					cond : begin
 						local tc : env.newt
-						# {".begin" 
+						- {".begin" 
 							{".set" tc {".quote" false}} 
 							{".if" cond {".begin" 
 								[pat.assign t]

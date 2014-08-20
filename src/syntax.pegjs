@@ -107,7 +107,7 @@ blockContent
 		return res;
 	}
 line
-	= "#" INLINE_SPACES it:parting { return it }
+	= "-" INLINE_SPACES it:parting { return it }
 	/ head:lineInvoke INLINE_SPACES ":" INLINE_SPACES rear:line { return head.concat([rear]) }
 	/ head:lineInvoke INLINE_SPACES rear:indentBlockContent { return head.concat(rear) }
 	/ lineInvoke
