@@ -66,6 +66,25 @@ define [Create] : begin
 				set f {".if" [ex pairs.(j).(0) env] [ex pairs.(j).(1) env] f}
 			return f
 
+	define [AssignWithMod ex left right mod env locallyQ] : match left
+		{"local" a} : AssignWithMod ex a left right mod env true
+		{".local" a} : AssignWithMod ex a left right mod env true
+		{".list" | items} : Assign ex left {mod right} env locallyQ
+		{".hash" | items} : Assign ex left {mod right} env locallyQ
+
+		{callee | paras} : piecewise
+			[prim callee] {".set" [ex left env] [ex {mod right} env]}
+			[atom callee] : piecewise
+				locallyQ {".set" 
+					[ex {".local" callee} env] 
+					[ex {mod {".lambda" {|paras} right}} env]}
+				true {".set" 
+					[ex callee env]
+					[ex {mod {".lambda" {|paras} right}} env]}
+			true {".set" [ex callee env] [ex {mod {".lambda" {|paras} right}} env]}
+
+		any : Assign ex left {mod right} env locallyQ
+
 	define [Assign ex left right env locallyQ] : match left
 		id [atom id] : piecewise
 			locallyQ {".set" [ex {".local" id} env] [ex right env]}
@@ -103,6 +122,7 @@ define [Create] : begin
 		any : throw [new SyntaxError "Invalid Assignment"]
 
 	externs.macros.put "define" : lambda [ex form env] : match form
+		{op modifer left right} : AssignWithMod ex left right modifer env true
 		{op left right} : Assign ex left right env true
 		{op left} [atom left] : return {".local" left}
 		any : throw [new SyntaxError "Invalid Assignment"]
