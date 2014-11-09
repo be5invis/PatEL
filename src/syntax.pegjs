@@ -1,7 +1,4 @@
 {
-	var textIndentStack = [];
-	var textIndent = "";
-
 	function composeLine(head, rear){
 		var j;
 		if(head instanceof Array && (j = head.indexOf(":")) >= 0){
@@ -26,7 +23,7 @@
 	}
 }
 
-start = it:block {
+start = __ it:blockContent __ {
 	return ['.begin'].concat(it)
 }
 // Expression
@@ -39,15 +36,11 @@ primitive
 	/ identifier
 
 group
-	= "[" OPTIONAL_EXPRESSION_SPACES "]" { return [] }
-	/ "[" OPTIONAL_EXPRESSION_SPACES it:invoke OPTIONAL_EXPRESSION_SPACES "]" { return it }
-	/ "(" OPTIONAL_EXPRESSION_SPACES it:either OPTIONAL_EXPRESSION_SPACES ")" { return it }
-	/ "{.}" { return ['.hash'] }
-	/ "{" OPTIONAL_EXPRESSION_SPACES it:propertyPairs OPTIONAL_EXPRESSION_SPACES "}" { return ['.hash'].concat(it) }
-	/ "{" OPTIONAL_EXPRESSION_SPACES "}" { return ['.list'] }
-	/ "{" OPTIONAL_EXPRESSION_SPACES "|" OPTIONAL_EXPRESSION_SPACES cdr:parting OPTIONAL_EXPRESSION_SPACES "}" { return ['.conslist', cdr] }
-	/ "{" OPTIONAL_EXPRESSION_SPACES it:invoke OPTIONAL_EXPRESSION_SPACES "|" OPTIONAL_EXPRESSION_SPACES cdr:parting OPTIONAL_EXPRESSION_SPACES "}" { return ['.conslist'].concat(it, [cdr]) }
-	/ "{" OPTIONAL_EXPRESSION_SPACES it:invoke OPTIONAL_EXPRESSION_SPACES "}" { return ['.list'].concat(it) }
+	= "[" __ "]" { return [] }
+	/ "[" __ it:invoke __ "]" { return it }
+	/ "(" __ it:cons __ ")" { return it }
+	/ "(" __ it:propertyPairs __ ")" { return ['.hash'].concat(it) }
+	
 parting
 	= head:primitive rear:(qualifier*) {
 		var res = head;
@@ -63,43 +56,55 @@ qualifier
 	/ "`" property:primitive { return property }
 
 factor
-	= left:prefixOp OPTIONAL_EXPRESSION_SPACES right:parting { return [left, right] }
+	= left:prefixOp __ right:parting { return [left, right] }
 	/ parting
 prefixOp = "+" / "-" / "!"
 
 term
-	= car:factor cdr:((OPTIONAL_EXPRESSION_SPACES termOp OPTIONAL_EXPRESSION_SPACES factor)*) { return buildleft(car, cdr) }
+	= car:factor cdr:((__ termOp __ factor)*) { return buildleft(car, cdr) }
 termOp = $([*/%] [\-_/+*<=>!?$%_&~^@|]*)
 
 sum
-	= car:term cdr:((OPTIONAL_EXPRESSION_SPACES sumOp OPTIONAL_EXPRESSION_SPACES term)*) { return buildleft(car, cdr) }
+	= car:term cdr:((__ sumOp __ term)*) { return buildleft(car, cdr) }
 sumOp = $([+\-] [\-_/+*<=>!?$%_&~^@|]*)
 
 equality
-	= car:sum cdr:((OPTIONAL_EXPRESSION_SPACES equalityOp OPTIONAL_EXPRESSION_SPACES sum)*) { return buildleft(car, cdr) }
+	= car:sum cdr:((__ equalityOp __ sum)*) { return buildleft(car, cdr) }
 equalityOp = $([=!] [\-_/+*<=>!?$%_&~^@|]+)
 
 compare
-	= car:equality cdr:((OPTIONAL_EXPRESSION_SPACES compareOp OPTIONAL_EXPRESSION_SPACES equality)*) { return buildleft(car, cdr) }
+	= car:equality cdr:((__ compareOp __ equality)*) { return buildleft(car, cdr) }
 compareOp = $([<>] [\-_/+*<=>!?$%_&~^@|]*)
 
 both
-	= car:compare cdr:((OPTIONAL_EXPRESSION_SPACES bothOp OPTIONAL_EXPRESSION_SPACES compare)*) { return buildleft(car, cdr) }
+	= car:compare cdr:((__ bothOp __ compare)*) { return buildleft(car, cdr) }
 bothOp = $([&] [\-_/+*<=>!?$%_&~^@|]*)
 
 either
-	= car:both cdr:((OPTIONAL_EXPRESSION_SPACES eitherOp OPTIONAL_EXPRESSION_SPACES both)*) { return buildleft(car, cdr) }
+	= car:both cdr:((__ eitherOp __ both)*) { return buildleft(car, cdr) }
 eitherOp = $([|] [\-_/+*<=>!?$%_&~^@|]*)
 
+list
+	= car:either cdr:((__ ([,;] __)? either)*) tail:(__ [,;])? {
+		if(!cdr.length && !tail) return car;
+		return ['.list', car].concat(cdr.map(function(x){ return x[2] }))
+	}
+
+list1
+	= car:either cdr:((__ ([,;] __)? either)+) {
+		return ['.list', car].concat(cdr.map(function(x){ return x[2] }))
+	}
+
+cons
+	= car:list1 __ "::" __ cdr:either { return ['.conslist'].concat(car.slice(1), [cdr]) }
+	/ car:either __ "::" __ cdr:either { return ['.conslist', car, cdr] }
+	/ "::" __ cdr:either { return ['.conslist', cdr] }
+	/ list
+
 block
-	= indentBlockContent
-	/ NEWLINE_INDENT_SAME? it:blockContent NEWLINE_INDENT_SAME? { return it }
-indentBlockContent
-	= NEWLINE_INDENT_ADD
-	  it:blockContent
-	  SPACES? INDENT_REMOVE { return it }	
+	= "{" __ it:blockContent __ "}" { return it }
 blockContent
-	= head:line rear:(NEWLINE_INDENT_SAME line)* {
+	= head:line rear:(STATEMENT_SEPARATOR line)* {
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
 			res.push(rear[j][1])
@@ -107,13 +112,13 @@ blockContent
 		return res;
 	}
 line
-	= "-" INLINE_SPACES it:parting { return it }
-	/ head:lineInvoke INLINE_SPACES ":" INLINE_SPACES rear:line { return head.concat([rear]) }
-	/ head:lineInvoke INLINE_SPACES rear:indentBlockContent { return head.concat(rear) }
+	= "-" _ it:parting { return it }
+	/ head:lineInvoke _ ":" _ rear:line { return head.concat([rear]) }
+	/ head:lineInvoke _ rear:block { return head.concat(rear) }
 	/ lineInvoke
 
 invoke
-	= head:parting rear:(OPTIONAL_EXPRESSION_SPACES parting)* { 
+	= head:parting rear:(__ parting)* { 
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
 			res.push(rear[j][1])
@@ -121,7 +126,7 @@ invoke
 		return res;
 	}
 propertyPairs
-	= head:propertyPair rear:(OPTIONAL_EXPRESSION_SPACES propertyPair)* { 
+	= head:propertyPair rear:(__ propertyPair)* { 
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
 			res.push(rear[j][1])
@@ -129,13 +134,13 @@ propertyPairs
 		return res;
 	}
 propertyPair
-	= "." head:stringliteral INLINE_SPACES rear:parting { return [head[1], rear]}
-	/ "." head:identifier INLINE_SPACES rear:parting { return [head, rear]}
+	= "." head:stringliteral _ rear:either { return [head[1], rear]}
+	/ "." head:identifier _ rear:either { return [head, rear]}
 lineInvoke
-	= head:parting rear:(INLINE_SPACES parting)* { 
+	= head:parting rear:(_ ([,;] _)? parting)* { 
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
-			res.push(rear[j][1])
+			res.push(rear[j][2])
 		};
 		return res;
 	}
@@ -168,7 +173,7 @@ stringcharacter
 			default: return "\\" + which
 		}
 	}
-	/ "\\" LINE_BREAK SPACE_CHARACTER_OR_NEWLINE* "\\" { return '' }
+	/ "\\" LINE_TERMINATOR SPACE_CHARACTER_OR_NEWLINE* "\\" { return '' }
 singlestringchar
 	= [^']
 	/ "''" { return "'" }
@@ -176,48 +181,32 @@ singlestringchar
 // Spaces
 SPACE_CHARACTER "Space Character"
 	= [\t\v\f \u00A0\uFEFF] / Zs
-LINE_TERMINATOR
+LINE_TERMINATOR "Line Terminator"
 	= "\r"? "\n"
 	/ "\u2028"
 	/ "\u2029"
-LINE_BREAK "Line Break"
+COMMENT "Comment"
+	= $("#" [^\r\n]* LINE_TERMINATOR)
+LINE_BREAK
 	= LINE_TERMINATOR
-	/ $(";" [^\r\n]* LINE_TERMINATOR)
+	/ COMMENT
 SPACE_CHARACTER_OR_NEWLINE "Space Character or Newline"
 	= [\r\n\u2028\u2029] / SPACE_CHARACTER
-SPACES "Space without Newline"
-	= $(SPACE_CHARACTER+)
-EXPRESSION_SPACE
-	= SPACE_CHARACTER
-	/ NEWLINE_INDENT_SAME_OR_MORE
-OPTIONAL_EXPRESSION_SPACES
-	= $(EXPRESSION_SPACE*)
-REQUIRED_EXPRESSION_SPACES
-	= $(EXPRESSION_SPACE+)
-INLINE_SPACES = $(SPACE_CHARACTER*)
+IGNORABLE
+	= SPACE_CHARACTER_OR_NEWLINE
+	/ COMMENT
+__
+	= $(IGNORABLE*)
+_   = $(SPACE_CHARACTER*)
 
 NEWLINE
-	= LINE_BREAK SPACE_CHARACTER_OR_NEWLINE*
-TEXT_IN_SEGMENT_LINEBREAK "Single Newline"
-	= LINE_BREAK INDENT_SAME !(LINE_BREAK)
-NEWLINE_INDENT_ADD
-	= SPACES? LINE_BREAK NEWLINE_INDENT_ADD
-	/ SPACES? LINE_BREAK INDENT_ADD
-NEWLINE_INDENT_SAME
-	= SPACES? LINE_BREAK NEWLINE_INDENT_SAME
-	/ SPACES? LINE_BREAK INDENT_SAME
-NEWLINE_INDENT_SAME_OR_MORE
-	= SPACES? LINE_BREAK (SPACES? LINE_BREAK)* INDENT_SAME_OR_MORE
+	= $(LINE_BREAK IGNORABLE*)
+
+STATEMENT_SEPARATOR
+	= _ NEWLINE
+	/ _ [,;] _
 
 POS = { return Position(offset()) }
-
-INDENT_CLEAR_ON  = { textIndentStack.push(textIndent); textIndent = "" }
-INDENT_CLEAR_OFF = { textIndent = textIndentStack.pop() }
-INDENT_ADD = spaces:SPACES & { return spaces.length > textIndent.length && spaces.slice(0, textIndent.length) === textIndent }
-                  { textIndentStack.push(textIndent); textIndent = spaces }
-INDENT_REMOVE = { textIndent = textIndentStack.pop() }
-INDENT_SAME = spaces:$(SPACES?) & { return spaces === textIndent }
-INDENT_SAME_OR_MORE = spaces:$(SPACES?) & { return spaces === textIndent || spaces.slice(0, textIndent.length) === textIndent }
 
 // Unicode Character Classes
 UnicodeLetter

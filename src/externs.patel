@@ -3,8 +3,8 @@ define [atom x] ([typeof x] == "string")
 define [prim x] ([atom x] && x !== "&" && x !== "&!" && (x.(0) === "." || [[regex "^\W+"].test x]))
 define Scope [require "patrisika"].Scope
 
-; This file defines built-in macros of PatEL
-define [Create] : begin
+# This file defines built-in macros of PatEL
+define [Create] : begin {
 	local externs [patrisika.DefaultExterns]
 	set [externs.castName name] name
 	externs.declare "require"
@@ -13,13 +13,13 @@ define [Create] : begin
 	externs.declare "module"
 	externs.declare "Error"
 	
-	define [operatorRename op] : lambda [ex form env] [ex {op | [form.slice 1]} env]
+	define [operatorRename op] : lambda [ex form env] [ex (op :: [form.slice 1]) env]
 
 	externs.macros.put "lambda" : operatorRename ".lambda"
 	externs.macros.put "begin" : operatorRename ".begin"
 	externs.macros.put "then" : operatorRename ".begin"
 	externs.macros.put "else" : operatorRename ".begin"
-;	externs.macros.put "if" : operatorRename ".if"
+#	externs.macros.put "if" : operatorRename ".if"
 	externs.macros.put "while" : operatorRename ".while"
 	externs.macros.put "try" : operatorRename ".try"
 	externs.macros.put "is" : operatorRename ".is"
@@ -36,224 +36,268 @@ define [Create] : begin
 	externs.macros.put "list" : operatorRename ".list"
 	externs.macros.put "typeof" : operatorRename ".typeof"
 
-	externs.macros.put "if" : lambda [ex form env] : match form
-		{"if" test consequent} : ex {'.if' test consequent} env
-		{"if" test consequent alternate} : ex {'.if' test consequent alternate} env
-		{"if" test {'then' | consequents}} : ex {'.if' test {'.begin' | consequents}} env
-		{"if" test {'then' | consequents} {'else' | alternates}} : ex {'.if' test {'.begin' | consequents} {'.begin' | alternates}} env
+	externs.macros.put "if" : lambda [ex form env] : match form {
+		("if" test consequent) : ex ('.if' test consequent) env
+		("if" test consequent alternate) : ex ('.if' test consequent alternate) env
+		("if" test ('then' :: consequents)) : ex ('.if' test ('.begin' :: consequents)) env
+		("if" test ('then' :: consequents) ('else' :: alternates)) : ex ('.if' test ('.begin' :: consequents) ('.begin' :: alternates)) env
+	}
 
-	externs.macros.put ".conslist" : lambda [ex form env]
-		return {
-			{"." [ex {".list" | [form.slice 1 (0 - 1)]} env] {".quote" "concat"}}
+	externs.macros.put ".conslist" : lambda [ex form env] {
+		return (
+			("." [ex (".list" :: [form.slice 1 (0 - 1)]) env] (".quote" "concat"))
 			[ex form.(form.length - 1) env]
-		}
+		)
+	}
 
-	externs.macros.put "let" : lambda [ex form env] : begin
+	externs.macros.put "let" : lambda [ex form env] : begin {
 		local pairs [form.slice 1 (0 - 1)]
 		local args : pairs.map : lambda [pair] pair.(0)
 		local paras : pairs.map : lambda [pair] pair.(1)
-		ex {".beta" args form.(form.length - 1) | paras} env
+		ex (".beta" args form.(form.length - 1) :: paras) env
+	}
 
-	externs.macros.put "object" : lambda [ex form env] : begin
-		local pairs : [form.slice 1].map : lambda [pair]
-			return {pair.(0) [ex pair.(1) env]}
-		return {".hash" | pairs}
+	externs.macros.put "object" : lambda [ex form env] : begin {
+		local pairs : [form.slice 1].map : lambda [pair] {
+			return (pair.(0) [ex pair.(1) env])
+		}
+		return (".hash" :: pairs)
+	}
 
-	externs.macros.put "piecewise" : lambda [ex form env] : match form
-		{"piecewise" | pairs} : begin
-			local f {".unit"}
-			for [local j (pairs.length - 1)] (j >= 0) [set j (j - 1)]
-				set f {".if" [ex pairs.(j).(0) env] [ex pairs.(j).(1) env] f}
+	externs.macros.put "piecewise" : lambda [ex form env] : match form {
+		("piecewise" :: pairs) : begin {
+			local f (".unit",)
+			for [local j (pairs.length - 1)] (j >= 0) [set j (j - 1)] {
+				set f (".if" [ex pairs.(j).(0) env] [ex pairs.(j).(1) env] f)
+			}
 			return f
+		}
+	}
 
-	define [AssignWithMod ex left right mod env locallyQ] : match left
-		{"local" a} : AssignWithMod ex a left right mod env true
-		{".local" a} : AssignWithMod ex a left right mod env true
-		{".list" | items} : Assign ex left {mod right} env locallyQ
-		{".hash" | items} : Assign ex left {mod right} env locallyQ
+	define [AssignWithMod ex left right mod env locallyQ] : match left {
+			("local" a) : AssignWithMod ex a left right mod env true
+			(".local" a) : AssignWithMod ex a left right mod env true
+			(".list" :: items) : Assign ex left (mod right) env locallyQ
+			(".hash" :: items) : Assign ex left (mod right) env locallyQ
+	
+			(callee :: paras) : piecewise {
+				[prim callee] (".set" [ex left env] [ex (mod right) env])
+				[atom callee] : piecewise {
+					locallyQ (".set" 
+						[ex (".local" callee) env] 
+						[ex (mod (".lambda" (::paras) right)) env])
+					true (".set" 
+						[ex callee env]
+						[ex (mod (".lambda" (::paras) right)) env])
+				}
+				true (".set" [ex callee env] [ex (mod (".lambda" (::paras) right)) env])
+			}
+	
+			any : Assign ex left (mod right) env locallyQ
+	}
+	define [Assign ex left right env locallyQ] : match left {
+		id [atom id] : piecewise {
+			locallyQ (".set" [ex (".local" id) env] [ex right env])
+			true     (".set" [ex left env] [ex right env])
+		}
 
-		{callee | paras} : piecewise
-			[prim callee] {".set" [ex left env] [ex {mod right} env]}
-			[atom callee] : piecewise
-				locallyQ {".set" 
-					[ex {".local" callee} env] 
-					[ex {mod {".lambda" {|paras} right}} env]}
-				true {".set" 
-					[ex callee env]
-					[ex {mod {".lambda" {|paras} right}} env]}
-			true {".set" [ex callee env] [ex {mod {".lambda" {|paras} right}} env]}
+		("local" a) : Assign ex a right env true
+		(".local" a) : Assign ex a right env true
 
-		any : Assign ex left {mod right} env locallyQ
-
-	define [Assign ex left right env locallyQ] : match left
-		id [atom id] : piecewise
-			locallyQ {".set" [ex {".local" id} env] [ex right env]}
-			true     {".set" [ex left env] [ex right env]}
-
-		{"local" a} : Assign ex a right env true
-		{".local" a} : Assign ex a right env true
-
-		{".list" | items} : begin
+		(".list" :: items) : begin {
 			local t [env.newt]
-			local assignments {".begin" {".set" t [ex right env]}}
-			for [local j 0] (j < items.length) [inc j]
-				assignments.push : Assign ex items.(j) {"." t {".quote" j}}  env locallyQ
+			local assignments (".begin" (".set" t [ex right env]))
+			for [local j 0] (j < items.length) [inc j] {
+				assignments.push : Assign ex items.(j) ("." t (".quote" j))  env locallyQ
+			}
 			assignments.push t
 			return assignments
+		}
 
-		{".hash" | items} : begin
+		(".hash" :: items) : begin {
 			local t [env.newt]
-			local assignments {".begin" {".set" t [ex right env]}}
-			for [local j 0] (j < items.length) [inc j]
-				assignments.push : Assign ex items.(j).(1) {"." t {".quote" items.(j).(0)}}  env locallyQ
+			local assignments (".begin" (".set" t [ex right env]))
+			for [local j 0] (j < items.length) [inc j] {
+				assignments.push : Assign ex items.(j).(1) ("." t (".quote" items.(j).(0)))  env locallyQ
+			}
 			assignments.push t
 			return assignments
+		}
 
-		{callee | paras} : piecewise
-			[prim callee] {".set" [ex left env] [ex right env]}
-			[atom callee] : piecewise
-				locallyQ {".set" 
-					[ex {".local" callee} env] 
-					[ex {".lambda" {|paras} right} env]}
-				true {".set" 
+		(callee :: paras) : piecewise {
+			[prim callee] (".set" [ex left env] [ex right env])
+			[atom callee] : piecewise {
+				locallyQ (".set" 
+					[ex (".local" callee) env] 
+					[ex (".lambda" (::paras) right) env])
+				true (".set" 
 					[ex callee env]
-					[ex {".lambda" {|paras} right} env]}
-			true {".set" [ex callee env] [ex {".lambda" {|paras} right} env]}
+					[ex (".lambda" (::paras) right) env])
+			}
+			true (".set" [ex callee env] [ex (".lambda" (::paras) right) env])
+		}
 		any : throw [new SyntaxError "Invalid Assignment"]
+	}
 
-	externs.macros.put "define" : lambda [ex form env] : match form
-		{op modifer left right} : AssignWithMod ex left right modifer env true
-		{op left right} : Assign ex left right env true
-		{op left} [atom left] : return {".local" left}
+	externs.macros.put "define" : lambda [ex form env] : match form {
+		(op modifer left right) : AssignWithMod ex left right modifer env true
+		(op left right) : Assign ex left right env true
+		(op left) [atom left] : return (".local" left)
 		any : throw [new SyntaxError "Invalid Assignment"]
+	}
 	externs.macros.put "local" : externs.macros.get "define"
-	externs.macros.put "set" : lambda [ex form env] : match form
-		{op left right} : Assign ex left right env false
+	externs.macros.put "set" : lambda [ex form env] : match form {
+		(op left right) : Assign ex left right env false
 		any : throw [new SyntaxError "Invalid Assignment"]
+	}
 
-	externs.macros.put "inc" : lambda [ex form env]
-		return {".set" [ex form.(1) env] {"+" [ex form.(1) env] {".quote" 1}}}
-	externs.macros.put "dec" : lambda [ex form env]
-		return {".set" [ex form.(1) env] {"-" [ex form.(1) env] {".quote" 1}}}
+	externs.macros.put "inc" : lambda [ex form env] {
+		return (".set" [ex form.(1) env] ("+" [ex form.(1) env] (".quote" 1)))
+	}
+	externs.macros.put "dec" : lambda [ex form env] {
+		return (".set" [ex form.(1) env] ("-" [ex form.(1) env] (".quote" 1)))
+	}
 
-	externs.macros.put "for" : lambda [ex form env] : match form
-		{"for" init test step body} {".begin"
+	externs.macros.put "for" : lambda [ex form env] : match form {
+		("for" init test step body) (".begin"
 			[ex init env]
-			{".while" [ex test env] {".begin" [ex body env] [ex step env]}}}
+			(".while" [ex test env] (".begin" [ex body env] [ex step env])))
+	}
 
-	externs.macros.put "foreach" : lambda [ex form env] : match form
-		{"foreach" varid range body} : begin
-			local tR : env.newt
-			local t : env.newt
-			return {".begin"
-				{".set" tR [ex range env]}
-				{".while" 
-					{"!" {"." {".set" t {{"." tR {".quote" "next"}}}} {".quote" "done"}}} 
-					{".begin"
-						[Assign ex varid {"." t {".quote" "value"}} env false]
-						[ex body env]}}}
+	externs.macros.put "foreach" : lambda [ex form env] : match form {
+		("foreach" varid range body) : begin {
+			local tR [env.newt]
+			local t  [env.newt]
+			return (".begin"
+				(".set" tR [ex range env])
+				(".while" 
+					("!" ("." (".set" t (("." tR (".quote" "next")),)) (".quote" "done"))) 
+					(".begin"
+						[Assign ex varid ("." t (".quote" "value")) env false]
+						[ex body env])))
+		}
+	}
 
-	externs.macros.put "this" {".thisp"}
-	externs.macros.put "arguments" {".argsp"}
-	externs.macros.put "nothing" {".unit"}
-	externs.macros.put "undefined" {".unit"}
-	externs.macros.put "null" {".quote" null}
-	externs.macros.put "true" {".quote" true}
-	externs.macros.put "false" {".quote" false}
+	externs.macros.put "this" (".thisp",)
+	externs.macros.put "arguments" (".argsp",)
+	externs.macros.put "nothing" (".unit",)
+	externs.macros.put "undefined" (".unit",)
+	externs.macros.put "null" (".quote" null)
+	externs.macros.put "true" (".quote" true)
+	externs.macros.put "false" (".quote" false)
 
 	define [boole x] [not [not x]]
-	externs.macros.put "match" : lambda [ex form env] : begin
+	externs.macros.put "match" : lambda [ex form env] : begin {
 		local pairs [form.slice 2]
 		local t [env.newt]
 
-		define [matchQ pattern] : match pattern
-			id [atom id] : object
+		define [matchQ pattern] : match pattern {
+			id [atom id] : object {
 				whether : lambda [x] null
-				assign : lambda [x] {".set" [ex {".local" pattern} env] x}
-			{".quote" x} : object
-				whether : lambda [x] {"===" pattern x}
-				assign  : lambda [x] {".unit"}
-			{"." | whatever} : object
+				assign : lambda [x] (".set" [ex (".local" pattern) env] x)
+			}
+			(".quote" x) : object {
+				whether : lambda [x] ("===" pattern x)
+				assign  : lambda [x] (".unit",)
+			}
+			("." :: whatever) : object {
 				whether : lambda [x] null
-				assign : lambda [x] {".set" [ex pattern env] x}
-			{".list" | subpatterns} : begin
+				assign : lambda [x] (".set" [ex pattern env] x)
+			}
+			(".list" :: subpatterns) : begin {
 				local ms : subpatterns.map matchQ
-				return : object
+				return : object {
 					whether : lambda [x] [
-						{"&&" 
-							{".is" x [externs.use "Array"]} 
-							{"===" {"." x {".quote" "length"}} {".quote" ms.length}} 
-							| [ms.map [lambda [p j] 
-								[p.whether {"." x {".quote" j}}]]]
-						}.filter boole]
-					assign : lambda [x] {".begin" | [ms.map [lambda [p j] 
-						[p.assign {"." x {".quote" j}}]]] }
-			{".conslist" | subpatterns} : begin
+						("&&" 
+							(".is" x [externs.use "Array"]) 
+							("===" ("." x (".quote" "length")) (".quote" ms.length)) 
+							:: [ms.map [lambda [p j] 
+								[p.whether ("." x (".quote" j))]]]
+						).filter boole]
+					assign : lambda [x] (".begin" :: [ms.map [lambda [p j] 
+						[p.assign ("." x (".quote" j))]]] )
+				}
+			}
+			(".conslist" :: subpatterns) : begin {
 				local ms : [pattern.slice 1 (0 - 1)].map matchQ
 				local final : matchQ pattern.(pattern.length - 1)
-				return : object
+				return : object {
 					whether : lambda [x] [
-						{"&&" 
-							{".is" x [externs.use "Array"]} 
-							{">=" {"." x {".quote" "length"}} {".quote" ms.length}} 
-							| [
+						("&&" 
+							(".is" x [externs.use "Array"]) 
+							(">=" ("." x (".quote" "length")) (".quote" ms.length)) 
+							:: [
 								[ms.map [lambda [p j] 
-									[p.whether {"." x {".quote" j}}]]].concat
-								{[final.whether {{"." x {".quote" "slice"}} {".quote" j}}]}]
-						}.filter boole]
-					assign : lambda [x] [{".begin"
-						| [ms.map [lambda [p j] 
-							[p.assign {"." x {".quote" j}}]]] 
-						}.concat {[final.assign 
-							{{"." x {".quote" "slice"}} {".quote" ms.length}}]}]
-			{callee | subpatterns} : begin
+									[p.whether ("." x (".quote" j))]]].concat
+								[list [final.whether (("." x (".quote" "slice")) (".quote" j))]]]
+						).filter boole]
+					assign : lambda [x] [(".begin"
+						:: [ms.map [lambda [p j] 
+							[p.assign ("." x (".quote" j))]]] 
+						).concat [list [final.assign 
+							(("." x (".quote" "slice")) (".quote" ms.length))]]]
+				}
+			}
+			(callee :: subpatterns) : begin {
 				local ms : subpatterns.map matchQ
 				local t : env.newt
-				return : object
+				return : object {
 					whether : lambda [x] [
-						{"&&" 
-							{".set" t 
-								{{"." [ex callee env] {".quote" "unapply"}}
-									x {".quote" ms.length}}}
-							| [ms.map [lambda [p j] 
-								[p.whether {"." t {".quote" j}}]]]
-						}.filter boole]
-					assign : lambda [x] {".begin" | [ms.map [lambda [p j]
-						[p.assign {"." t {".quote" j}}]]] }
+						("&&" 
+							(".set" t 
+								(("." [ex callee env] (".quote" "unapply"))
+									x (".quote" ms.length)))
+							:: [ms.map [lambda [p j] 
+								[p.whether ("." t (".quote" j))]]]
+						).filter boole]
+					assign : lambda [x] (".begin" :: [ms.map [lambda [p j]
+						[p.assign ("." t (".quote" j))]]] )
+				}
+			}
+		}
 
-		local f {".unit"}
-		for [local j (pairs.length - 1)] (j >= 0) [dec j] : set f : match pairs.(j)
-			{pattern body} : begin
+		local f (".unit",)
+		for [local j (pairs.length - 1)] (j >= 0) [dec j] : set f : match pairs.(j) {
+			(pattern body) : begin {
 				local pat : matchQ pattern
 				local cond : pat.whether t
-				piecewise
-					cond {".if" cond {".begin" [pat.assign t] [ex body env]} f}
-					true {".begin" [pat.assign t] [ex body env]}
-			{pattern guard body} : begin
+				piecewise {
+					cond (".if" cond (".begin" [pat.assign t] [ex body env]) f)
+					true (".begin" [pat.assign t] [ex body env])
+				}
+			}
+			(pattern guard body) : begin {
 				local pat : matchQ pattern
 				local cond : pat.whether t
-				piecewise
-					cond : begin
+				piecewise {
+					cond : begin {
 						local tc : env.newt
-						- {".begin" 
-							{".set" tc {".quote" false}} 
-							{".if" cond {".begin" 
+						- (".begin" 
+							(".set" tc (".quote" false)) 
+							(".if" cond (".begin" 
 								[pat.assign t]
-								{".if" [ex guard env] 
-									{".set" tc {".quote" true}} 
-									{".set" tc {".quote" false}}}}}
-							{".if" tc [ex body env] f}}
-					true {".begin" 
+								(".if" [ex guard env] 
+									(".set" tc (".quote" true)) 
+									(".set" tc (".quote" false)))))
+							(".if" tc [ex body env] f))
+					}
+					true (".begin" 
 						[pat.assign t] 
-						{".if" [ex guard env] [ex body env] f }}
+						(".if" [ex guard env] [ex body env] f ))
+				}
+			}
 			any f
-		return {".begin" {".set" t [ex form.(1) env]} f}
+		}
+		return (".begin" (".set" t [ex form.(1) env]) f)
+	}
 
-	externs.macros.put "regex" : lambda [ex form env] : match form
-		{"regex" {".quote" s}} {".quote" [new RegExp s]}
-		{"regex" {".quote" s} {".quote" flag}} {".quote" [new RegExp s flag]}
-		{"regex" | args} {".new" [externs.use "RegExp"] | args}
+	externs.macros.put "regex" : lambda [ex form env] : match form {
+		("regex" (".quote" s)) (".quote" [new RegExp s])
+		("regex" (".quote" s) (".quote" flag)) (".quote" [new RegExp s flag])
+		("regex" :: args) (".new" [externs.use "RegExp"] :: args)
+	}
 
 	return externs
+}
 
 define exports.Create Create

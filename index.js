@@ -1,4 +1,4 @@
-var parse = require('./src/syntax').parse;
+var parse = require('./src/syntax.js').parse;
 var fs = require('fs');
 var util = require('util');
 var patrisika = require('patrisika');

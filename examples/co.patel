@@ -3,13 +3,14 @@ define thunkify [require "thunkify"]
 define request [require "request"]
 define get [thunkify request.get]
 
-define [GeneratorFunction fn] : begin
-	set fn.constructor {.name "GeneratorFunction"}
+define [GeneratorFunction fn] : begin {
+	set fn.constructor (.name "GeneratorFunction")
 	fn
+}
 
 define trace console.log
 
-define GeneratorFunction [sequent] : begin
+define GeneratorFunction [sequent] : begin {
 	trace "Google"
 	local a : yield [get 'http://www.google.com']
 	trace "Yahoo"
@@ -19,21 +20,26 @@ define GeneratorFunction [sequent] : begin
 	trace a`0.statusCode
 	trace b`0.statusCode
 	trace c`0.statusCode
+}
 
-define GeneratorFunction [parallel] : begin
+define GeneratorFunction [parallel] : begin {
 	local a : get 'http://www.google.com'
 	local b : get 'http://yahoo.com'
 	local c : get 'http://cloudup.com'
-	local res : yield {a b c}
+	local res : yield (a, b, c)
 	trace res
+}
 
-define GeneratorFunction [somethingWrong] : begin
-	try
-		begin
+define GeneratorFunction [somethingWrong] : begin {
+	try {
+		begin {
 			local res : yield [get "http://badhost.invalid"]
 			trace res
+		}
 		ex
 		begin : trace ex.code
+	}
+}
 
 [co sequent]
 [co parallel]
