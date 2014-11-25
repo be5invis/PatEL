@@ -38,6 +38,7 @@ primitive
 group
 	= "[" __ "]" { return [] }
 	/ "[" __ it:invoke __ "]" { return it }
+	/ "[" __ it:either __ "]" { return it }
 	/ "(" __ it:cons __ ")" { return it }
 	/ "(" __ it:propertyPairs __ ")" { return ['.hash'].concat(it) }
 	
@@ -85,20 +86,13 @@ either
 eitherOp = $([|] [\-_/+*<=>!?$%_&~^@|]*)
 
 list
-	= car:either cdr:((__ ([,;] __)? either)*) tail:(__ [,;])? {
-		if(!cdr.length && !tail) return car;
-		return ['.list', car].concat(cdr.map(function(x){ return x[2] }))
-	}
-
-list1
-	= car:either cdr:((__ ([,;] __)? either)+) {
+	= car:parting cdr:((__ ([,;] __)? parting)*) tail:(__ [,;])? {
 		return ['.list', car].concat(cdr.map(function(x){ return x[2] }))
 	}
 
 cons
-	= car:list1 __ "::" __ cdr:either { return ['.conslist'].concat(car.slice(1), [cdr]) }
-	/ car:either __ "::" __ cdr:either { return ['.conslist', car, cdr] }
-	/ "::" __ cdr:either { return ['.conslist', cdr] }
+	= car:list __ "::" __ cdr:parting { return ['.conslist'].concat(car.slice(1), [cdr]) }
+	/ "::" __ cdr:parting { return ['.conslist', cdr] }
 	/ list
 
 block

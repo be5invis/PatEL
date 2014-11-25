@@ -15,8 +15,8 @@ define GeneratorFunction [sequent] : begin {
 	local a : yield [get 'http://www.google.com']
 	trace "Yahoo"
 	local b : yield [get 'http://yahoo.com']
-	trace "CloudUp"
-	local c : yield [get 'http://cloudup.com']
+	trace "baidu"
+	local c : yield [get 'http://baidu.com']
 	trace a`0.statusCode
 	trace b`0.statusCode
 	trace c`0.statusCode
@@ -25,7 +25,7 @@ define GeneratorFunction [sequent] : begin {
 define GeneratorFunction [parallel] : begin {
 	local a : get 'http://www.google.com'
 	local b : get 'http://yahoo.com'
-	local c : get 'http://cloudup.com'
+	local c : get 'http://baidu.com'
 	local res : yield (a, b, c)
 	trace res
 }

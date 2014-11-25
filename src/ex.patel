@@ -1,6 +1,6 @@
 define Scope [require "patrisika"].Scope
-define [atom x] ([typeof x] == "string")
-define [prim x] ([atom x] && x !== "&" && x !== "&!" && (x.(0) === "." || [[regex "^\W+"].test x]))
+define [atom x] [[typeof x] == "string"]
+define [prim x] [[atom x] && x !== "&" && x !== "&!" && [x`0 === "." || [[regex "^\W+"].test x]]]
 
 # Function [ex form env]: Expand macros and do scoping
 define [ex form env]: match form {
@@ -9,31 +9,31 @@ define [ex form env]: match form {
 	(".t" :: x) : return form
 	(".lambda" (::args) body) : begin {
 		define derived [new Scope env]
-		for [local j 0] (j < args.length) [inc j] : begin {
-			derived.declare args.(j) true
-			set args.(j) : derived.use args.(j)
+		for [local j 0] [j < args.length] [inc j] : begin {
+			derived.declare args`j true
+			set args`j : derived.use args`j
 		}
 		return (".lambda.scoped" args [ex body derived] derived)
 	}
 	(".beta" (::args) body :: params) : begin {
 		define derived [new Scope env]
-		for [local j 0] (j < args.length) [inc j] : begin {
-			derived.declare args.(j) true
-			set args.(j) : derived.use args.(j)
+		for [local j 0] [j < args.length] [inc j] : begin {
+			derived.declare args`j true
+			set args`j : derived.use args`j
 		}
-		for [local j 0] (j < args.length) [inc j] : begin {
-			set params.(j) [ex params.(j) env]
+		for [local j 0] [j < args.length] [inc j] : begin {
+			set params`j [ex params`j env]
 		}
 		return (".beta.scoped" args [ex body derived] derived :: params)
 	}
 	(".try" block (param,) handler) : begin {
 		env.declare param
-		return (".try" [ex block env] ([env.use param],) [ex handler env])
+		return (".try" [ex block env] ([env.use param]) [ex handler env])
 	}
 	(".hash" :: args) : begin {
 		local a [list ".hash"]
-		for [local j 1] (j < form.length) [inc j] : begin {
-			set a.(j) (form.(j).(0) [ex form.(j).(1) env])
+		for [local j 1] [j < form.length] [inc j] : begin {
+			set a`j (form`j`0 [ex form`j`1 env])
 		}
 		return a
 	}
@@ -46,13 +46,13 @@ define [ex form env]: match form {
 			return [[env.macros.get callee] ex form env]
 		}
 		if [not [prim callee]] : set callee [ex callee env]
-		local a (callee,)
-		for [local j 1] (j < form.length) [inc j] : begin {
-			set a.(j) [ex form.(j) env]
+		local a (callee)
+		for [local j 1] [j < form.length] [inc j] : begin {
+			set a`j [ex form`j env]
 		}
 		return a
 	}
-	x ([atom x] && [env.macros.has x] && [not ([env.macros.get x] <@ Function)]) : return [env.macros.get x]
+	x [[atom x] && [env.macros.has x] && [not [[env.macros.get x] <@ Function]]] : return [env.macros.get x]
 	x [prim x] : return x
 	x [atom x] : return [env.use x]
 	any : return any
