@@ -3,10 +3,10 @@ var patel = require('../index');
 var fs = require('fs');
 var input = fs.readFileSync(process.argv[2], 'utf-8');
 var gs = patel.globals();
-try {
-	var ast = patel.parse(input)
+//try {
+	var ast = patel.parse(input);
 	process.stdout.write(patel.compile(ast, gs));
-} catch(ex) {
+/*} catch(ex) {
 	if(ex.name === 'SyntaxError'){
 		process.stderr.write(ex.message + '\n');
 		process.stderr.write("At Line " + ex.line + ', Column ' + ex.column + '\n');
@@ -16,4 +16,4 @@ try {
 	} else {
 		throw ex
 	}
-}
+}*/

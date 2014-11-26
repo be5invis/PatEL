@@ -39,6 +39,8 @@ group
 	= "[" __ "]" { return [] }
 	/ "[" __ it:invoke __ "]" { return it }
 	/ "[" __ it:either __ "]" { return it }
+	/ "(" __ ")" { return ['.list'] }
+	/ "(" __ "." __ ")" { return ['.hash'] }
 	/ "(" __ it:cons __ ")" { return it }
 	/ "(" __ it:propertyPairs __ ")" { return ['.hash'].concat(it) }
 	
@@ -52,7 +54,7 @@ parting
 	}
 qualifier
 	= "." property:identifier { return ['.quote', property] }
-	/ "." property:stringliteral { return property }
+	/ "." property:stringliteral { return ['.quote', property] }
 	/ "." property:group { return property }
 	/ "`" property:primitive { return property }
 
@@ -119,6 +121,16 @@ invoke
 		};
 		return res;
 	}
+lineInvoke
+	= head:parting rear:(_ ([,;] _)? parting)* { 
+		var res = [head]
+		for(var j = 0; j < rear.length; j++){
+			res.push(rear[j][2])
+		};
+		return res;
+	}
+
+
 propertyPairs
 	= head:propertyPair rear:(__ propertyPair)* { 
 		var res = [head]
@@ -130,14 +142,7 @@ propertyPairs
 propertyPair
 	= "." head:stringliteral _ rear:either { return [head[1], rear]}
 	/ "." head:identifier _ rear:either { return [head, rear]}
-lineInvoke
-	= head:parting rear:(_ ([,;] _)? parting)* { 
-		var res = [head]
-		for(var j = 0; j < rear.length; j++){
-			res.push(rear[j][2])
-		};
-		return res;
-	}
+
 
 // Tokens
 identifier "Identifier"
