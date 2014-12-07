@@ -1,19 +1,20 @@
 #!/usr/bin/env node
 var patel = require('../index');
 var fs = require('fs');
-var input = fs.readFileSync(process.argv[2], 'utf-8');
-var gs = patel.globals();
-//try {
+var yargs = require('yargs')
+	.alias('o', 'output-into')
+	.alias('?', 'help')
+	.describe('help', 'Displays this help.')
+	.describe('o', 'Output sfd path. When absent, the result sfd is written to STDOUT.');
+
+var argv = yargs.argv;
+var instream = argv._[0] ? fs.createReadStream(argv._[0]): process.stdin;
+var outstream = argv.o ? fs.createWriteStream(argv.o, { encoding: 'utf-8' }): process.stdout;
+
+var input = '';
+instream.on('data', function(buf){ input += buf.toString() })
+instream.on('end', function(){
+	var gs = patel.globals();
 	var ast = patel.parse(input);
-	process.stdout.write(patel.compile(ast, gs));
-/*} catch(ex) {
-	if(ex.name === 'SyntaxError'){
-		process.stderr.write(ex.message + '\n');
-		process.stderr.write("At Line " + ex.line + ', Column ' + ex.column + '\n');
-		var line = input.split('\n')[ex.line - 1]
-		process.stderr.write(line + '\n');
-		process.stderr.write(line.replace(/\S/g, ' ').slice(0, ex.column) + '^\n');
-	} else {
-		throw ex
-	}
-}*/
+	outstream.write(patel.compile(ast, gs));
+});

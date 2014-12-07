@@ -150,8 +150,7 @@ identifier "Identifier"
 	/ $("(" [\-_/+*<=>!?$%_&~^@|]+ ")")
 	/ "." !("}" / UnicodeLetter)
 numberliteral "Numeric Literal"
-	= '-' positive:numberliteral { return -positive }
-	/ ("0x" / "0X") hexdigits:$([0-9a-fA-F]+) { return parseInt(hexdigits, 16) }
+	= ("0x" / "0X") hexdigits:$([0-9a-fA-F]+) { return parseInt(hexdigits, 16) }
 	/ decimal:$([0-9]+ ("." [0-9]+)? ([eE] [+\-]? [0-9]+)?) { return decimal - 0 }
 stringliteral "String Literal"
 	= "\"" inner:stringcharacter* "\"" { return inner.join('') }
