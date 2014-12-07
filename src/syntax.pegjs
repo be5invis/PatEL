@@ -37,7 +37,7 @@ primitive
 
 group
 	= "[" __ "]" { return [] }
-	/ "[" __ it:invoke __ "]" { return it }
+	/ "[" __ it:invokeWithOptionalBlock __ "]" { return it }
 	/ "[" __ it:either __ "]" { return it }
 	/ "(" __ ")" { return ['.list'] }
 	/ "(" __ "." __ ")" { return ['.hash'] }
@@ -108,11 +108,13 @@ blockContent
 		return res;
 	}
 line
-	= "-" _ it:parting { return it }
+	= "*" _ it:parting { return it }
 	/ head:lineInvoke _ ":" _ rear:line { return head.concat([rear]) }
 	/ head:lineInvoke _ rear:block { return head.concat(rear) }
 	/ lineInvoke
-
+invokeWithOptionalBlock
+	= head:invoke __ rear:block { return head.concat(rear) }
+	/ invoke
 invoke
 	= head:parting rear:(__ parting)* { 
 		var res = [head]
@@ -132,10 +134,10 @@ lineInvoke
 
 
 propertyPairs
-	= head:propertyPair rear:(__ propertyPair)* { 
+	= head:propertyPair rear:((__ ([,;] __)? propertyPair)*) { 
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
-			res.push(rear[j][1])
+			res.push(rear[j][2])
 		};
 		return res;
 	}

@@ -52,7 +52,7 @@ define [Create] : begin {
 
 	externs.macros.put ".conslist" : lambda [ex form env] {
 		return (
-			("." [ex (".list" :: [form.slice 1 [0 - 1]]) env] (".quote" "concat"))
+			("." [ex (".list" :: [form.slice 1 [-1]]) env] (".quote" "concat"))
 			[ex form.[form.length - 1] env]
 		)
 	}
@@ -279,7 +279,7 @@ define [Create] : begin {
 				piecewise {
 					cond : begin {
 						local tc : env.newt
-						- (".begin" 
+						* (".begin" 
 							(".set" tc (".quote" false)) 
 							(".if" cond (".begin" 
 								[pat.assign t]
