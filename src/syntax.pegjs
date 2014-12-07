@@ -122,10 +122,10 @@ invoke
 		return res;
 	}
 lineInvoke
-	= head:parting rear:(_ ([,;] _)? parting)* { 
+	= head:parting rear:(_ parting)* { 
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
-			res.push(rear[j][2])
+			res.push(rear[j][1])
 		};
 		return res;
 	}
@@ -148,7 +148,6 @@ propertyPair
 identifier "Identifier"
 	= $((UnicodeLetter / [_$@]) (UnicodeLetter / UnicodeCombiningMark / UnicodeDigit / UnicodeConnectorPunctuation / [\-_$@])*)
 	/ $("(" [\-_/+*<=>!?$%_&~^@|]+ ")")
-	/ "." !("}" / UnicodeLetter)
 numberliteral "Numeric Literal"
 	= ("0x" / "0X") hexdigits:$([0-9a-fA-F]+) { return parseInt(hexdigits, 16) }
 	/ decimal:$([0-9]+ ("." [0-9]+)? ([eE] [+\-]? [0-9]+)?) { return decimal - 0 }

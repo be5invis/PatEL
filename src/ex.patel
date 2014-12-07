@@ -26,7 +26,7 @@ define [ex form env]: match form {
 		}
 		return (".beta.scoped" args [ex body derived] derived :: params)
 	}
-	(".try" block (param,) handler) : begin {
+	(".try" block (param) handler) : begin {
 		env.declare param
 		return (".try" [ex block env] ([env.use param]) [ex handler env])
 	}

@@ -15,11 +15,11 @@ define [Create] : begin {
 	
 	define [operatorRename op] : lambda [ex form env] [ex (op :: [form.slice 1]) env]
 
-	externs.macros.put "lambda" : operatorRename ".lambda"
+	#externs.macros.put "lambda" : operatorRename ".lambda"
 	externs.macros.put "begin" : operatorRename ".begin"
 	externs.macros.put "then" : operatorRename ".begin"
 	externs.macros.put "else" : operatorRename ".begin"
-#	externs.macros.put "if" : operatorRename ".if"
+	#externs.macros.put "if" : operatorRename ".if"
 	externs.macros.put "while" : operatorRename ".while"
 	externs.macros.put "try" : operatorRename ".try"
 	externs.macros.put "is" : operatorRename ".is"
@@ -36,11 +36,18 @@ define [Create] : begin {
 	externs.macros.put "list" : operatorRename ".list"
 	externs.macros.put "typeof" : operatorRename ".typeof"
 
+	externs.macros.put "lambda" : lambda [ex form env] : match form {
+		(car parameters body)	: ex ('.lambda' parameters body) env
+		(car body)           	: ex ('.lambda' () body) env
+		(car)                	: ex ('.lambda' () ('.unit')) body
+	}
+	externs.macros.put "function" : externs.macros.get "lambda"
+
 	externs.macros.put "if" : lambda [ex form env] : match form {
-		("if" test consequent) : ex ('.if' test consequent) env
-		("if" test consequent alternate) : ex ('.if' test consequent alternate) env
-		("if" test ('then' :: consequents)) : ex ('.if' test ('.begin' :: consequents)) env
-		("if" test ('then' :: consequents) ('else' :: alternates)) : ex ('.if' test ('.begin' :: consequents) ('.begin' :: alternates)) env
+		("if" test consequent)                                    	: ex ('.if' test consequent) env
+		("if" test consequent alternate)                          	: ex ('.if' test consequent alternate) env
+		("if" test ('then' :: consequents))                       	: ex ('.if' test ('.begin' :: consequents)) env
+		("if" test ('then' :: consequents) ('else' :: alternates))	: ex ('.if' test ('.begin' :: consequents) ('.begin' :: alternates)) env
 	}
 
 	externs.macros.put ".conslist" : lambda [ex form env] {
@@ -66,7 +73,7 @@ define [Create] : begin {
 
 	externs.macros.put "piecewise" : lambda [ex form env] : match form {
 		("piecewise" :: pairs) : begin {
-			local f (".unit",)
+			local f (".unit")
 			for [local j [pairs.length - 1]] [j >= 0] [set j [j - 1]] {
 				set f (".if" [ex pairs`j`0 env] [ex pairs`j`1 env] f)
 			}
@@ -75,10 +82,10 @@ define [Create] : begin {
 	}
 
 	define [AssignWithMod ex left right mod env locallyQ] : match left {
-			("local" a) : AssignWithMod ex a left right mod env true
-			(".local" a) : AssignWithMod ex a left right mod env true
-			(".list" :: items) : Assign ex left (mod right) env locallyQ
-			(".hash" :: items) : Assign ex left (mod right) env locallyQ
+			("local" a)       	: AssignWithMod ex a left right mod env true
+			(".local" a)      	: AssignWithMod ex a left right mod env true
+			(".list" :: items)	: Assign ex left (mod right) env locallyQ
+			(".hash" :: items)	: Assign ex left (mod right) env locallyQ
 	
 			(callee :: paras) : piecewise {
 				[prim callee] (".set" [ex left env] [ex (mod right) env])
@@ -171,17 +178,17 @@ define [Create] : begin {
 			return (".begin"
 				(".set" tR [ex range env])
 				(".while" 
-					("!" ("." (".set" t (("." tR (".quote" "next")),)) (".quote" "done"))) 
+					("!" ("." (".set" t (("." tR (".quote" "next")))) (".quote" "done"))) 
 					(".begin"
 						[Assign ex varid ("." t (".quote" "value")) env false]
 						[ex body env])))
 		}
 	}
 
-	externs.macros.put "this" (".thisp",)
-	externs.macros.put "arguments" (".argsp",)
-	externs.macros.put "nothing" (".unit",)
-	externs.macros.put "undefined" (".unit",)
+	externs.macros.put "this" (".thisp")
+	externs.macros.put "arguments" (".argsp")
+	externs.macros.put "nothing" (".unit")
+	externs.macros.put "undefined" (".unit")
 	externs.macros.put "null" (".quote" null)
 	externs.macros.put "true" (".quote" true)
 	externs.macros.put "false" (".quote" false)
@@ -198,7 +205,7 @@ define [Create] : begin {
 			}
 			(".quote" x) : object {
 				whether : lambda [x] ("===" pattern x)
-				assign  : lambda [x] (".unit",)
+				assign  : lambda [x] (".unit")
 			}
 			("." :: whatever) : object {
 				whether : lambda [x] null
@@ -256,7 +263,7 @@ define [Create] : begin {
 			}
 		}
 
-		local f (".unit",)
+		local f (".unit")
 		for [local j [pairs.length - 1]] [j >= 0] [dec j] : set f : match pairs`j {
 			(pattern body) : begin {
 				local pat : matchQ pattern

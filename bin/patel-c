@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 var patel = require('../index');
 var fs = require('fs');
+var util = require('util');
 var yargs = require('yargs')
 	.alias('o', 'output-into')
 	.alias('?', 'help')
