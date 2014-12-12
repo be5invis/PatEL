@@ -113,11 +113,17 @@ s1_patrisika = require("patrisika"), s1_atom = function(s2_x) {
         s20_left = _s20_t0[1], s20_right = _s20_t0[2], s4_Assign(s20_ex, s20_left, s20_right, s20_env, !1);
         throw s20_any = _s20_t0, new s20_SyntaxError("Invalid Assignment");
     }), s4_externs.macros.put("inc", function(s21_ex, s21_form, s21_env) {
-        var s21_ex, s21_form, s21_env;
-        return [ ".set", s21_ex(s21_form[1], s21_env), [ "+", s21_ex(s21_form[1], s21_env), [ ".quote", 1 ] ] ];
+        var s21_ex, s21_form, s21_env, s21_op, s21_id, s21_shift, _s21_t0;
+        return _s21_t0 = s21_form, _s21_t0 instanceof Array && 2 === _s21_t0.length ? (s21_op = _s21_t0[0], 
+        s21_id = _s21_t0[1], s4_Assign(s21_ex, s21_id, [ "+", s21_id, [ ".quote", 1 ] ], s21_env, !1)) : _s21_t0 instanceof Array && 3 === _s21_t0.length ? (s21_op = _s21_t0[0], 
+        s21_id = _s21_t0[1], s21_shift = _s21_t0[2], s4_Assign(s21_ex, s21_id, [ "+", s21_id, s21_shift ], s21_env, !1)) : _s21_t0 instanceof Array && 4 === _s21_t0.length && "by" === _s21_t0[2] ? (s21_op = _s21_t0[0], 
+        s21_id = _s21_t0[1], s21_shift = _s21_t0[3], s4_Assign(s21_ex, s21_id, [ "+", s21_id, s21_shift ], s21_env, !1)) : void 0;
     }), s4_externs.macros.put("dec", function(s22_ex, s22_form, s22_env) {
-        var s22_ex, s22_form, s22_env;
-        return [ ".set", s22_ex(s22_form[1], s22_env), [ "-", s22_ex(s22_form[1], s22_env), [ ".quote", 1 ] ] ];
+        var s22_ex, s22_form, s22_env, s22_op, s22_id, s22_shift, _s22_t0;
+        return _s22_t0 = s22_form, _s22_t0 instanceof Array && 2 === _s22_t0.length ? (s22_op = _s22_t0[0], 
+        s22_id = _s22_t0[1], s4_Assign(s22_ex, s22_id, [ "-", s22_id, [ ".quote", 1 ] ], s22_env, !1)) : _s22_t0 instanceof Array && 3 === _s22_t0.length ? (s22_op = _s22_t0[0], 
+        s22_id = _s22_t0[1], s22_shift = _s22_t0[2], s4_Assign(s22_ex, s22_id, [ "-", s22_id, s22_shift ], s22_env, !1)) : _s22_t0 instanceof Array && 4 === _s22_t0.length && "by" === _s22_t0[2] ? (s22_op = _s22_t0[0], 
+        s22_id = _s22_t0[1], s22_shift = _s22_t0[3], s4_Assign(s22_ex, s22_id, [ "-", s22_id, s22_shift ], s22_env, !1)) : void 0;
     }), s4_externs.macros.put("for", function(s23_ex, s23_form, s23_env) {
         var s23_ex, s23_form, s23_env, s23_init, s23_test, s23_step, s23_body, _s23_t0;
         return _s23_t0 = s23_form, _s23_t0 instanceof Array && 5 === _s23_t0.length && "for" === _s23_t0[0] ? (s23_init = _s23_t0[1], 

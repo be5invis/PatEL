@@ -158,11 +158,15 @@ define [Create] : begin {
 		any : throw [new SyntaxError "Invalid Assignment"]
 	}
 
-	externs.macros.put "inc" : lambda [ex form env] {
-		return (".set" [ex form`1 env] ("+" [ex form`1 env] (".quote" 1)))
+	externs.macros.put "inc" : lambda [ex form env] : match form {
+		(op id)           	[Assign ex id ("+" id (".quote" 1)) env false]
+		(op id shift)     	[Assign ex id ("+" id shift) env false]
+		(op id "by" shift)	[Assign ex id ("+" id shift) env false]
 	}
-	externs.macros.put "dec" : lambda [ex form env] {
-		return (".set" [ex form`1 env] ("-" [ex form`1 env] (".quote" 1)))
+	externs.macros.put "dec" : lambda [ex form env] : match form {
+		(op id)           	[Assign ex id ("-" id (".quote" 1)) env false]
+		(op id shift)     	[Assign ex id ("-" id shift) env false]
+		(op id "by" shift)	[Assign ex id ("-" id shift) env false]
 	}
 
 	externs.macros.put "for" : lambda [ex form env] : match form {
