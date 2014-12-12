@@ -16,6 +16,18 @@ var input = '';
 instream.on('data', function(buf){ input += buf.toString() })
 instream.on('end', function(){
 	var gs = patel.globals();
-	var ast = patel.parse(input);
-	outstream.write(patel.compile(ast, gs));
+	try {
+		var ast = patel.parse(input);
+		try {
+			outstream.write(patel.compile(ast, gs));
+		} catch(ex) {
+			process.stderr.write(util.inspect(ex) + '\n')
+		}
+	} catch(ex) {
+		process.stderr.write(ex.message + '\n');
+		process.stderr.write("At Line " + ex.line + ', Column ' + ex.column + '\n');
+		var line = input.split('\n')[ex.line - 1]
+		process.stderr.write(line + '\n');
+		process.stderr.write(line.replace(/\S/g, ' ').slice(0, ex.column) + '^\n');
+	}
 });

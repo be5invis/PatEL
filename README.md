@@ -11,5 +11,5 @@ Install
 Semantics
 ---------
 
-- `[.if ,test ,consequent ,alternate]` Branching
-- `[.if ,test ,consequent]` Identical to `[.if ,test ,consequent [.unit]]`
+- `[if ,test ,consequent ,alternate]` Branching
+- `[if ,test ,consequent]` Identical to `[.if ,test ,consequent [.unit]]`

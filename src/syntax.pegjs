@@ -108,10 +108,9 @@ blockContent
 		return res;
 	}
 line
-	= "*" _ it:parting { return it }
-	/ head:lineInvoke _ ":" _ rear:line { return head.concat([rear]) }
-	/ head:lineInvoke _ rear:block { return head.concat(rear) }
-	/ lineInvoke
+	= head:linePart _ ":" _ rear:line { return head.concat([rear]) }
+	/ head:linePart _ rear:block { return head.concat(rear) }
+	/ linePart
 invokeWithOptionalBlock
 	= head:invoke __ rear:block { return head.concat(rear) }
 	/ invoke
@@ -123,8 +122,24 @@ invoke
 		};
 		return res;
 	}
+
+linePart
+	= head:lineInvoke rear:(_ pipeRear)* { 
+		var res = head
+		for(var j = 0; j < rear.length; j++) {
+			if(rear[j][1].qualifier) res = [[".", res, rear[j][1].qualifier]].concat(rear[j][1].rear || [])
+			else res = [rear[j][1].rear[0]].concat([res], rear[j][1].rear.slice(1))
+		};
+		return res;
+	}
+
+pipeRear
+	= "|>" _ it:lineInvoke { return {type: 'pipe', rear: it} }
+	/ "|" q:qualifier _ it:lineInvoke? { return {type:'pipe', rear: it, qualifier:q} }
+
 lineInvoke
-	= head:parting rear:(_ parting)* { 
+	= "*" _ it:parting { return it }
+	/ head:parting rear:(_ parting)* { 
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
 			res.push(rear[j][1])
@@ -149,7 +164,7 @@ propertyPair
 // Tokens
 identifier "Identifier"
 	= $((UnicodeLetter / [_$@]) (UnicodeLetter / UnicodeCombiningMark / UnicodeDigit / UnicodeConnectorPunctuation / [\-_$@])*)
-	/ $("(" [\-_/+*<=>!?$%_&~^@|]+ ")")
+	/ "(" it:$([\-_/+*<=>!?$%_&~^@|]+) ")" { return it }
 numberliteral "Numeric Literal"
 	= ("0x" / "0X") hexdigits:$([0-9a-fA-F]+) { return parseInt(hexdigits, 16) }
 	/ decimal:$([0-9]+ ("." [0-9]+)? ([eE] [+\-]? [0-9]+)?) { return decimal - 0 }
