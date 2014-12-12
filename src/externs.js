@@ -1,4 +1,4 @@
-var s1_patrisika, s1_atom, s1_prim, s1_Scope, s1_FormInvalidError, s1_Create, _s1_t0, _s1_t1, _s1_t2, _s1_t3;
+var s1_patrisika, s1_atom, s1_prim, s1_Scope, s1_escodegen, s1_util, s1_FormInvalidError, s1_Create, _s1_t0, _s1_t1, _s1_t2, _s1_t3;
 
 s1_patrisika = require("patrisika"), s1_atom = function(s2_x) {
     var s2_x;
@@ -6,7 +6,8 @@ s1_patrisika = require("patrisika"), s1_atom = function(s2_x) {
 }, s1_prim = function(s3_x) {
     var s3_x;
     return s1_atom(s3_x) && "&" !== s3_x && "&!" !== s3_x && ("." === s3_x[0] || /^\W+/.test(s3_x));
-}, s1_Scope = require("patrisika").Scope, s1_FormInvalidError = function(s4_form, s4_reason) {
+}, s1_Scope = require("patrisika").Scope, s1_escodegen = require("escodegen"), s1_util = require("util"), 
+s1_FormInvalidError = function(s4_form, s4_reason) {
     var s4_form, s4_reason, _s4_t0, _s4_t1;
     return _s4_t0 = this, _s4_t0.reason = s4_reason, _s4_t0.message = s4_reason, _s4_t0.relatedForm = s4_form, 
     s4_form && s4_form.begins >= 0 && s4_form.ends >= 0 ? (_s4_t0.begins = s4_form.begins, 
@@ -243,5 +244,19 @@ s1_patrisika = require("patrisika"), s1_atom = function(s2_x) {
         [ ".quote", new RegExp(s48_s) ]) : _s48_t0 instanceof Array && 3 === _s48_t0.length && "regex" === _s48_t0[0] && _s48_t0[1] instanceof Array && 2 === _s48_t0[1].length && ".quote" === _s48_t0[1][0] && _s48_t0[2] instanceof Array && 2 === _s48_t0[2].length && ".quote" === _s48_t0[2][0] ? (s48_s = _s48_t0[1][1], 
         s48_flag = _s48_t0[2][1], [ ".quote", new RegExp(s48_s, s48_flag) ]) : _s48_t0 instanceof Array && _s48_t0.length >= 1 && "regex" === _s48_t0[0] ? (s48_args = _s48_t0.slice(1), 
         [ ".new", s5_externs.use("RegExp") ].concat(s48_args)) : void 0;
+    }), s5_externs.macros.put("with-semantics", function(s49_ex, s49_form, s49_env) {
+        var s49_ex, s49_form, s49_env, s49_body, s49_derived, s49_j, s49_macroBodyScope, s49_macroName, s49_macroBody, s49_bodyCode, s49_macroFn;
+        for (s49_body = s49_form[s49_form.length - 1], s49_derived = new s1_Scope(s49_env), 
+        s49_j = 1; s49_j < s49_form.length - 1; ) s49_macroBodyScope = new s1_Scope(s1_Create()), 
+        s49_macroBodyScope.declare("Assign", !0), s49_macroBodyScope.declare("externalMacros", !0), 
+        s49_macroBodyScope.declare("atom", !0), s49_macroBodyScope.declare("prim", !0), 
+        s49_macroBodyScope.declare("top", !0), s49_macroName = s49_form[s49_j][0], s49_macroBody = s49_form[s49_j][1], 
+        s49_bodyCode = s1_escodegen.generate(s1_patrisika.generate([ ".return", s49_ex(s49_macroBody, s49_macroBodyScope) ], s49_macroBodyScope, function(s50_form) {
+            var s50_form;
+            return [ ".return", s50_form ];
+        })), s49_macroFn = new Function(s49_macroBodyScope.castName("Assign"), s49_macroBodyScope.castName("externalMacros"), s49_macroBodyScope.castName("atom"), s49_macroBodyScope.castName("prim"), s49_macroBodyScope.castName("top"), s49_bodyCode), 
+        s49_derived.macros.put(s49_macroName, s49_macroFn(s5_Assign, s49_env.macros, s1_atom, s1_prim, s5_externs)), 
+        s49_j += 1;
+        return s49_ex(s49_body, s49_derived);
     }), s5_externs;
 }, exports.Create = s1_Create;

@@ -2,6 +2,8 @@ define patrisika [require "patrisika"]
 define [atom x] [[typeof x] == "string"]
 define [prim x] [[atom x] && x !== "&" && x !== "&!" && [x`0 === "." || [[regex "^\W+"].test x]]]
 define Scope [require "patrisika"].Scope
+define escodegen [require "escodegen"]
+define util [require "util"]
 
 define [FormInvalidError form reason] : begin {
 	set this.reason reason
@@ -321,6 +323,32 @@ define [Create] : begin {
 		("regex" (".quote" s)) (".quote" [new RegExp s])
 		("regex" (".quote" s) (".quote" flag)) (".quote" [new RegExp s flag])
 		("regex" :: args) (".new" [externs.use "RegExp"] :: args)
+	}
+
+	externs.macros.put "with-semantics" : lambda [ex form env] : begin {
+		local body form`[form.length - 1]
+		local derived [new Scope env]
+		for [local j 1] [j < form.length - 1] [inc j by 1] : begin {
+			local macroBodyScope [new Scope [Create]]
+			macroBodyScope.declare "Assign" true
+			macroBodyScope.declare "externalMacros" true
+			macroBodyScope.declare "atom" true
+			macroBodyScope.declare "prim" true
+			macroBodyScope.declare "top" true
+			local macroName form`j`0
+			local macroBody form`j`1
+			local bodyCode : escodegen.generate : patrisika.generate (".return" [ex macroBody macroBodyScope]) macroBodyScope [lambda [form] (".return" form)]
+			local macroFn : new Function {
+				macroBodyScope.castName "Assign"
+				macroBodyScope.castName "externalMacros"
+				macroBodyScope.castName "atom"
+				macroBodyScope.castName "prim"
+				macroBodyScope.castName "top"
+				* bodyCode
+			}
+			derived.macros.put macroName [macroFn Assign env.macros atom prim externs]
+		}
+		return : ex body derived
 	}
 
 	return externs
