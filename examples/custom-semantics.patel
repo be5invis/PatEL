@@ -1,0 +1,9 @@
+with-semantics {
+	export : lambda [evaluate form env] : match form {
+		("export" id) (atom id) : Assign evaluate ("." [top.use "exports"] (".quote" id)) [env.use id] env false
+	}
+	begin {
+		define [greet] [console.log "greet"]
+		export greet
+	}
+}
