@@ -17,7 +17,7 @@ instream.on('data', function(buf){ input += buf.toString() })
 instream.on('end', function(){
 	var gs = patel.globals();
 	try {
-		var ast = patel.parse(input);
+		var ast = patel.parse(input + "\n\n");
 		try {
 			outstream.write(patel.compile(ast, gs));
 		} catch(ex) {
