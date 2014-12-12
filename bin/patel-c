@@ -56,8 +56,8 @@ instream.on('end', function(){
 				outstream.write(result.code + '\n');
 			}
 		} catch(ex) {
-			util.error(ex)
 			if(ex.begins >= 0 && ex.ends >= 0) {
+				util.error(ex);
 				var ljBegins = lcmap.line[ex.begins] - 1
 				var ljEnds = lcmap.line[ex.ends] - 1
 				if(ljEnds - ljBegins < 3) {
@@ -67,7 +67,9 @@ instream.on('end', function(){
 					process.stderr.write("......\n");
 					process.stderr.write(lines.slice(ljEnds - 1, ljEnds + 1).map(function(line, k){ return '  ' + (ljEnds - 1 + k + 1) + '\t| ' + line}).join('\n') + '\n');
 				}
-			};
+			} else {
+				util.error(ex.stack || ex);
+			}
 			return;
 		}
 	} catch(ex) {
