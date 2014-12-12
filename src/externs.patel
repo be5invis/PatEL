@@ -3,6 +3,19 @@ define [atom x] [[typeof x] == "string"]
 define [prim x] [[atom x] && x !== "&" && x !== "&!" && [x`0 === "." || [[regex "^\W+"].test x]]]
 define Scope [require "patrisika"].Scope
 
+define [FormInvalidError form reason] : begin {
+	set this.reason reason
+	set this.message reason
+	set this.relatedForm form
+	if [form && form.begins >= 0 && form.ends >= 0] : begin {
+		set this.begins form.begins
+		set this.ends form.ends
+		inc this.message by ["\nAround (" + this.begins + " -- " + this.ends + ")"]
+	}
+	return null
+}
+set FormInvalidError.prototype : Object.create Error.prototype
+
 # This file defines built-in macros of PatEL
 define [Create] : begin {
 	local externs [patrisika.DefaultExterns]
@@ -14,6 +27,7 @@ define [Create] : begin {
 	externs.declare "Error"
 	
 	define [operatorRename op] : lambda [ex form env] [ex (op :: [form.slice 1]) env]
+	define [reportInvalid form reason] : throw : new FormInvalidError form reason
 
 	#externs.macros.put "lambda" : operatorRename ".lambda"
 	externs.macros.put "begin" : operatorRename ".begin"
@@ -40,6 +54,7 @@ define [Create] : begin {
 		(car parameters body)	: ex ('.lambda' parameters body) env
 		(car body)           	: ex ('.lambda' () body) env
 		(car)                	: ex ('.lambda' () ('.unit')) body
+		otherwise            	: reportInvalid otherwise "Invalid Lambda Formation"
 	}
 	externs.macros.put "function" : externs.macros.get "lambda"
 

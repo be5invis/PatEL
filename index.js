@@ -17,4 +17,8 @@ var compile = function(ast, globals){
 
 exports.globals = globals;
 exports.parse = parse;
+exports.ex = ex;
+exports.regularize = patrisika.regularize;
+exports.pat2esc = patrisika.pat2esc;
+exports.generateCode = escodegen.generate;
 exports.compile = compile;

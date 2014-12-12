@@ -21,6 +21,13 @@
 		};
 		return form;
 	}
+	function BeginsEndsWith(form, begins, ends) {
+		if(form instanceof Array) {
+			form.begins = begins;
+			form.ends = ends;
+		}
+		return form
+	}
 }
 
 start = __ it:blockContent __ {
@@ -36,13 +43,13 @@ primitive
 	/ identifier
 
 group
-	= "[" __ "]" { return [] }
-	/ "[" __ it:invokeWithOptionalBlock __ "]" { return it }
-	/ "[" __ it:either __ "]" { return it }
-	/ "(" __ ")" { return ['.list'] }
-	/ "(" __ "." __ ")" { return ['.hash'] }
-	/ "(" __ it:cons __ ")" { return it }
-	/ "(" __ it:propertyPairs __ ")" { return ['.hash'].concat(it) }
+	= begins: POS "[" __ "]" ends: POS                              	{ return BeginsEndsWith([], begins, ends) }
+	/ begins: POS "[" __ it:invokeWithOptionalBlock __ "]" ends: POS	{ return BeginsEndsWith(it, begins, ends) }
+	/ begins: POS "[" __ it:either __ "]" ends: POS                 	{ return BeginsEndsWith(it, begins, ends) }
+	/ begins: POS "(" __ ")" ends: POS                              	{ return BeginsEndsWith(['.list'], begins, ends) }
+	/ begins: POS "(" __ "." __ ")" ends: POS                       	{ return BeginsEndsWith(['.hash'], begins, ends) }
+	/ begins: POS "(" __ it:cons __ ")" ends: POS                   	{ return BeginsEndsWith(it, begins, ends) }
+	/ begins: POS "(" __ it:propertyPairs __ ")" ends: POS          	{ return BeginsEndsWith(['.hash'].concat(it), begins, ends) }
 	
 parting
 	= head:primitive rear:(qualifier*) {
@@ -108,8 +115,8 @@ blockContent
 		return res;
 	}
 line
-	= head:linePart _ ":" _ rear:line { return head.concat([rear]) }
-	/ head:linePart _ rear:block { return head.concat(rear) }
+	= begins:POS head:linePart _ ":" _ rear:line ends:POS { return BeginsEndsWith(head.concat([rear]), begins, ends) }
+	/ begins:POS head:linePart _ rear:block ends:POS { return BeginsEndsWith(head.concat(rear), begins, ends) }
 	/ linePart
 invokeWithOptionalBlock
 	= head:invoke __ rear:block { return head.concat(rear) }
@@ -124,13 +131,13 @@ invoke
 	}
 
 linePart
-	= head:lineInvoke rear:(_ pipeRear)* { 
+	= begins:POS head:lineInvoke rear:(_ pipeRear)* ends:POS  { 
 		var res = head
 		for(var j = 0; j < rear.length; j++) {
 			if(rear[j][1].qualifier) res = [[".", res, rear[j][1].qualifier]].concat(rear[j][1].rear || [])
 			else res = [rear[j][1].rear[0]].concat([res], rear[j][1].rear.slice(1))
 		};
-		return res;
+		return BeginsEndsWith(res, begins, ends);
 	}
 
 pipeRear
@@ -138,13 +145,13 @@ pipeRear
 	/ "|" q:qualifier _ it:lineInvoke? { return {type:'pipe', rear: it, qualifier:q} }
 
 lineInvoke
-	= "*" _ it:parting { return it }
-	/ head:parting rear:(_ parting)* { 
+	= begins:POS "*" _ it:parting ends:POS { return BeginsEndsWith(it, begins, ends) }
+	/ begins:POS head:parting rear:(_ parting)* ends:POS { 
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
 			res.push(rear[j][1])
 		};
-		return res;
+		return BeginsEndsWith(res, begins, ends);
 	}
 
 
@@ -220,7 +227,7 @@ STATEMENT_SEPARATOR
 	= _ NEWLINE
 	/ _ [,;] _
 
-POS = { return Position(offset()) }
+POS = { return offset() }
 
 // Unicode Character Classes
 UnicodeLetter

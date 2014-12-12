@@ -2,8 +2,15 @@ define Scope [require "patrisika"].Scope
 define [atom x] [[typeof x] == "string"]
 define [prim x] [[atom x] && x !== "&" && x !== "&!" && [x`0 === "." || [[regex "^\W+"].test x]]]
 
+define [NodeTranslation fn] : lambda [form] : begin {
+	local res : fn.apply this arguments
+	if [form && form.begins >= 0] : set res.begins form.begins
+	if [form && form.ends >= 0] : set res.ends form.ends
+	return res
+}
+
 # Function [ex form env]: Expand macros and do scoping
-define [ex form env]: match form {
+define ex : NodeTranslation : lambda [form env] : match form {
 	(".quote" :: x) : return form
 	(".id" :: x) : return form
 	(".t" :: x) : return form
