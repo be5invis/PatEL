@@ -34,48 +34,48 @@ function generateLineAndColumnMap(input){
 var input = '';
 instream.on('data', function(buf){ input += buf.toString() })
 instream.on('end', function(){
-  	input += '\n\n\n';
-  	var lcmap = generateLineAndColumnMap(input);
-  	var lines = input.split('\n');
-  	var gs = patel.globals();
-//	try {
-  		var ast = patel.parse(input);
-//		try {
-  			if(argv.astinfo) { outstream.write(util.inspect(ast, {depth: null}) + '\n'); return }
-  			var xast = patel.ex(ast, gs);
-  			if(argv.xastinfo) { outstream.write(util.inspect(xast, {depth: null}) + '\n'); return }
-  			var rast = patel.regularize(xast, gs);
-  			if(argv.rastinfo) { outstream.write(util.inspect(rast, {depth: null}) + '\n'); return }
-  			var east = patel.pat2esc(rast, gs, lcmap);
-  			if(argv.eastinfo) { outstream.write(util.inspect(east, {depth: null}) + '\n'); return }
+	input += '\n\n\n';
+	var lcmap = generateLineAndColumnMap(input);
+	var lines = input.split('\n');
+	var gs = patel.globals();
+	try {
+		var ast = patel.parse(input);
+		try {
+			if(argv.astinfo) { outstream.write(util.inspect(ast, {depth: null}) + '\n'); return }
+			var xast = patel.ex(ast, gs);
+			if(argv.xastinfo) { outstream.write(util.inspect(xast, {depth: null}) + '\n'); return }
+			var rast = patel.regularize(xast, gs);
+			if(argv.rastinfo) { outstream.write(util.inspect(rast, {depth: null}) + '\n'); return }
+			var east = patel.pat2esc(rast, gs, lcmap);
+			if(argv.eastinfo) { outstream.write(util.inspect(east, {depth: null}) + '\n'); return }
 
-  			var result = patel.generateCode(east, {sourceMap: argv._[0] || '(stdin)', sourceMapWithCode: true})
-  			if(argv.source_map) {
-  				outstream.write(result.map.toString() + '\n');
-  			} else {
-  				outstream.write(result.code + '\n');
-  			}
-/*		} catch(ex) {
-  			util.error(ex)
-  			if(ex.begins >= 0 && ex.ends >= 0) {
-  				var ljBegins = lcmap.line[ex.begins] - 1
-  				var ljEnds = lcmap.line[ex.ends] - 1
-  				if(ljEnds - ljBegins < 3) {
-  					process.stderr.write(lines.slice(ljBegins, ljEnds + 1).map(function(line, k){ return '  ' + (ljBegins + k + 1) + '\t| ' + line}).join('\n') + '\n')
-  				} else {
-  					process.stderr.write(lines.slice(ljBegins, ljBegins + 2).map(function(line, k){ return '  ' + (ljBegins + k + 1) + '\t| ' + line}).join('\n') + '\n');
-  					process.stderr.write("......\n");
-  					process.stderr.write(lines.slice(ljEnds - 1, ljEnds + 1).map(function(line, k){ return '  ' + (ljEnds - 1 + k + 1) + '\t| ' + line}).join('\n') + '\n');
-  				}
-  			};
-  			return;
-  		}
-  	} catch(ex) {
-  		process.stderr.write(ex.message + '\n');
-  		process.stderr.write("At Line " + ex.line + ', Column ' + ex.column + '\n');
-  		var line = input.split('\n')[ex.line - 1]
-  		process.stderr.write(line + '\n');
-  		process.stderr.write(line.replace(/\S/g, ' ').slice(0, ex.column) + '^\n');
-  		return;
-  	}*/
+			var result = patel.generateCode(east, {sourceMap: argv._[0] || '(stdin)', sourceMapWithCode: true})
+			if(argv.source_map) {
+				outstream.write(result.map.toString() + '\n');
+			} else {
+				outstream.write(result.code + '\n');
+			}
+		} catch(ex) {
+			util.error(ex)
+			if(ex.begins >= 0 && ex.ends >= 0) {
+				var ljBegins = lcmap.line[ex.begins] - 1
+				var ljEnds = lcmap.line[ex.ends] - 1
+				if(ljEnds - ljBegins < 3) {
+					process.stderr.write(lines.slice(ljBegins, ljEnds + 1).map(function(line, k){ return '  ' + (ljBegins + k + 1) + '\t| ' + line}).join('\n') + '\n')
+				} else {
+					process.stderr.write(lines.slice(ljBegins, ljBegins + 2).map(function(line, k){ return '  ' + (ljBegins + k + 1) + '\t| ' + line}).join('\n') + '\n');
+					process.stderr.write("......\n");
+					process.stderr.write(lines.slice(ljEnds - 1, ljEnds + 1).map(function(line, k){ return '  ' + (ljEnds - 1 + k + 1) + '\t| ' + line}).join('\n') + '\n');
+				}
+			};
+			return;
+		}
+	} catch(ex) {
+		process.stderr.write(ex.message + '\n');
+		process.stderr.write("At Line " + ex.line + ', Column ' + ex.column + '\n');
+		var line = input.split('\n')[ex.line - 1]
+		process.stderr.write(line + '\n');
+		process.stderr.write(line.replace(/\S/g, ' ').slice(0, ex.column) + '^\n');
+		return;
+	}
 });
