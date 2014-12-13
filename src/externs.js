@@ -248,14 +248,14 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
         var s49_form, s49_env, s49_body, s49_derived, s49_j, s49_macroBodyScope, s49_macroName, s49_macroBody, s49_bodyCode, s49_macroFn;
         for (s49_body = s49_form[s49_form.length - 1], s49_derived = new s1_Scope(s49_env), 
         s49_j = 1; s49_j < s49_form.length - 1; ) s49_macroBodyScope = new s1_Scope(s1_Create()), 
-        s49_macroBodyScope.declare("Assign", !0), s49_macroBodyScope.declare("externalMacros", !0), 
-        s49_macroBodyScope.declare("atom", !0), s49_macroBodyScope.declare("prim", !0), 
-        s49_macroBodyScope.declare("top", !0), s49_macroName = s49_form[s49_j][0], s49_macroBody = s49_form[s49_j][1], 
-        s49_bodyCode = s1_escodegen.generate(s1_patrisika.generate([ ".return", s1_ex(s49_macroBody, s49_macroBodyScope) ], s49_macroBodyScope, function(s50_form) {
+        s49_macroBodyScope.declare("evaluate", !0), s49_macroBodyScope.declare("Assign", !0), 
+        s49_macroBodyScope.declare("externalMacros", !0), s49_macroBodyScope.declare("atom", !0), 
+        s49_macroBodyScope.declare("prim", !0), s49_macroBodyScope.declare("top", !0), s49_macroName = s49_form[s49_j][0], 
+        s49_macroBody = s49_form[s49_j][1], s49_bodyCode = s1_escodegen.generate(s1_patrisika.generate([ ".return", s1_ex(s49_macroBody, s49_macroBodyScope) ], s49_macroBodyScope, function(s50_form) {
             var s50_form;
             return [ ".return", s50_form ];
-        })), s49_macroFn = new Function(s49_macroBodyScope.castName("Assign"), s49_macroBodyScope.castName("externalMacros"), s49_macroBodyScope.castName("atom"), s49_macroBodyScope.castName("prim"), s49_macroBodyScope.castName("top"), s49_bodyCode), 
-        s49_derived.macros.put(s49_macroName, s49_macroFn(s5_Assign, s49_env.macros, s1_atom, s1_prim, s5_externs)), 
+        })), s49_macroFn = new Function(s49_macroBodyScope.castName("evaluate"), s49_macroBodyScope.castName("Assign"), s49_macroBodyScope.castName("externalMacros"), s49_macroBodyScope.castName("atom"), s49_macroBodyScope.castName("prim"), s49_macroBodyScope.castName("top"), s49_bodyCode), 
+        s49_derived.macros.put(s49_macroName, s1_ex(s49_macroFn, s5_Assign, s49_env.macros, s1_atom, s1_prim, s5_externs)), 
         s49_j += 1;
         return s1_ex(s49_body, s49_derived);
     }), s5_externs;
