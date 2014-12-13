@@ -50,7 +50,7 @@ define ex : NodeTranslation : lambda [form env] : match form {
 	}
 	(callee :: args) : begin {
 		if [and [atom callee] [env.macros.has callee]] : begin {
-			return [[env.macros.get callee] ex form env]
+			return [[env.macros.get callee] form env]
 		}
 		if [not [prim callee]] : set callee [ex callee env]
 		local a (callee)

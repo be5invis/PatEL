@@ -4,6 +4,7 @@ define [prim x] [[atom x] && x !== "&" && x !== "&!" && [x`0 === "." || [[regex 
 define Scope [require "patrisika"].Scope
 define escodegen [require "escodegen"]
 define util [require "util"]
+define ex [require "./ex"].ex
 
 define [FormInvalidError form reason] : begin {
 	set this.reason reason
@@ -28,7 +29,7 @@ define [Create] : begin {
 	externs.declare "module"
 	externs.declare "Error"
 	
-	define [operatorRename op] : lambda [ex form env] [ex (op :: [form.slice 1]) env]
+	define [operatorRename op] : lambda [form env] [ex (op :: [form.slice 1]) env]
 	define [reportInvalid form reason] : throw : new FormInvalidError form reason
 
 	#externs.macros.put "lambda" : operatorRename ".lambda"
@@ -52,7 +53,7 @@ define [Create] : begin {
 	externs.macros.put "list" : operatorRename ".list"
 	externs.macros.put "typeof" : operatorRename ".typeof"
 
-	externs.macros.put "lambda" : lambda [ex form env] : match form {
+	externs.macros.put "lambda" : lambda [form env] : match form {
 		(car parameters body)	: ex ('.lambda' parameters body) env
 		(car body)           	: ex ('.lambda' () body) env
 		(car)                	: ex ('.lambda' () ('.unit')) body
@@ -60,35 +61,35 @@ define [Create] : begin {
 	}
 	externs.macros.put "function" : externs.macros.get "lambda"
 
-	externs.macros.put "if" : lambda [ex form env] : match form {
+	externs.macros.put "if" : lambda [form env] : match form {
 		("if" test consequent)                                    	: ex ('.if' test consequent) env
 		("if" test consequent alternate)                          	: ex ('.if' test consequent alternate) env
 		("if" test ('then' :: consequents))                       	: ex ('.if' test ('.begin' :: consequents)) env
 		("if" test ('then' :: consequents) ('else' :: alternates))	: ex ('.if' test ('.begin' :: consequents) ('.begin' :: alternates)) env
 	}
 
-	externs.macros.put ".conslist" : lambda [ex form env] {
+	externs.macros.put ".conslist" : lambda [form env] {
 		return (
 			("." [ex (".list" :: [form.slice 1 [-1]]) env] (".quote" "concat"))
 			[ex form.[form.length - 1] env]
 		)
 	}
 
-	externs.macros.put "let" : lambda [ex form env] : begin {
+	externs.macros.put "let" : lambda [form env] : begin {
 		local pairs [form.slice 1 [0 - 1]]
 		local args : pairs.map : lambda [pair] pair`0
 		local paras : pairs.map : lambda [pair] pair`1
 		ex (".beta" args form.[form.length - 1] :: paras) env
 	}
 
-	externs.macros.put "object" : lambda [ex form env] : begin {
+	externs.macros.put "object" : lambda [form env] : begin {
 		local pairs : [form.slice 1].map : lambda [pair] {
 			return (pair`0 [ex pair`1 env])
 		}
 		return (".hash" :: pairs)
 	}
 
-	externs.macros.put "piecewise" : lambda [ex form env] : match form {
+	externs.macros.put "piecewise" : lambda [form env] : match form {
 		("piecewise" :: pairs) : begin {
 			local f (".unit")
 			for [local j [pairs.length - 1]] [j >= 0] [set j [j - 1]] {
@@ -98,11 +99,11 @@ define [Create] : begin {
 		}
 	}
 
-	define [AssignWithMod ex left right mod env locallyQ] : match left {
-			("local" a)       	: AssignWithMod ex a left right mod env true
-			(".local" a)      	: AssignWithMod ex a left right mod env true
-			(".list" :: items)	: Assign ex left (mod right) env locallyQ
-			(".hash" :: items)	: Assign ex left (mod right) env locallyQ
+	define [AssignWithMod left right mod env locallyQ] : match left {
+			("local" a)       	: AssignWithMod a left right mod env true
+			(".local" a)      	: AssignWithMod a left right mod env true
+			(".list" :: items)	: Assign left (mod right) env locallyQ
+			(".hash" :: items)	: Assign left (mod right) env locallyQ
 	
 			(callee :: paras) : piecewise {
 				[prim callee] (".set" [ex left env] [ex (mod right) env])
@@ -119,20 +120,20 @@ define [Create] : begin {
 	
 			any : Assign ex left (mod right) env locallyQ
 	}
-	define [Assign ex left right env locallyQ] : match left {
+	define [Assign left right env locallyQ] : match left {
 		id [atom id] : piecewise {
 			locallyQ (".set" [ex (".local" id) env] [ex right env])
 			true     (".set" [ex left env] [ex right env])
 		}
 
-		("local" a) : Assign ex a right env true
-		(".local" a) : Assign ex a right env true
+		("local" a) : Assign a right env true
+		(".local" a) : Assign a right env true
 
 		(".list" :: items) : begin {
 			local t [env.newt]
 			local assignments (".begin" (".set" t [ex right env]))
 			for [local j 0] [j < items.length] [inc j] {
-				assignments.push : Assign ex items`j ("." t (".quote" j)) env locallyQ
+				assignments.push : Assign items`j ("." t (".quote" j)) env locallyQ
 			}
 			assignments.push t
 			return assignments
@@ -142,7 +143,7 @@ define [Create] : begin {
 			local t [env.newt]
 			local assignments (".begin" (".set" t [ex right env]))
 			for [local j 0] [j < items.length] [inc j] {
-				assignments.push : Assign ex items`j`1 ("." t (".quote" items`j`0))  env locallyQ
+				assignments.push : Assign items`j`1 ("." t (".quote" items`j`0))  env locallyQ
 			}
 			assignments.push t
 			return assignments
@@ -163,36 +164,36 @@ define [Create] : begin {
 		any : throw [new SyntaxError "Invalid Assignment"]
 	}
 
-	externs.macros.put "define" : lambda [ex form env] : match form {
-		(op modifer left right) : AssignWithMod ex left right modifer env true
-		(op left right) : Assign ex left right env true
+	externs.macros.put "define" : lambda [form env] : match form {
+		(op modifer left right) : AssignWithMod left right modifer env true
+		(op left right) : Assign left right env true
 		(op left) [atom left] : return (".local" left)
 		any : throw [new SyntaxError "Invalid Assignment"]
 	}
 	externs.macros.put "local" : externs.macros.get "define"
-	externs.macros.put "set" : lambda [ex form env] : match form {
-		(op left right) : Assign ex left right env false
+	externs.macros.put "set" : lambda [form env] : match form {
+		(op left right) : Assign left right env false
 		any : throw [new SyntaxError "Invalid Assignment"]
 	}
 
-	externs.macros.put "inc" : lambda [ex form env] : match form {
-		(op id)           	[Assign ex id ("+" id (".quote" 1)) env false]
-		(op id shift)     	[Assign ex id ("+" id shift) env false]
-		(op id "by" shift)	[Assign ex id ("+" id shift) env false]
+	externs.macros.put "inc" : lambda [form env] : match form {
+		(op id)           	[Assign id ("+" id (".quote" 1)) env false]
+		(op id shift)     	[Assign id ("+" id shift) env false]
+		(op id "by" shift)	[Assign id ("+" id shift) env false]
 	}
-	externs.macros.put "dec" : lambda [ex form env] : match form {
-		(op id)           	[Assign ex id ("-" id (".quote" 1)) env false]
-		(op id shift)     	[Assign ex id ("-" id shift) env false]
-		(op id "by" shift)	[Assign ex id ("-" id shift) env false]
+	externs.macros.put "dec" : lambda [form env] : match form {
+		(op id)           	[Assign id ("-" id (".quote" 1)) env false]
+		(op id shift)     	[Assign id ("-" id shift) env false]
+		(op id "by" shift)	[Assign id ("-" id shift) env false]
 	}
 
-	externs.macros.put "for" : lambda [ex form env] : match form {
+	externs.macros.put "for" : lambda [form env] : match form {
 		("for" init test step body) (".begin"
 			[ex init env]
 			(".while" [ex test env] (".begin" [ex body env] [ex step env])))
 	}
 
-	externs.macros.put "foreach" : lambda [ex form env] : match form {
+	externs.macros.put "foreach" : lambda [form env] : match form {
 		("foreach" varid range body) : begin {
 			local tR [env.newt]
 			local t  [env.newt]
@@ -215,7 +216,7 @@ define [Create] : begin {
 	externs.macros.put "false" (".quote" false)
 
 	define [boole x] [not [not x]]
-	externs.macros.put "match" : lambda [ex form env] : begin {
+	externs.macros.put "match" : lambda [form env] : begin {
 		local pairs [form.slice 2]
 		local t [env.newt]
 
@@ -319,13 +320,13 @@ define [Create] : begin {
 		return (".begin" (".set" t [ex form`1 env]) f)
 	}
 
-	externs.macros.put "regex" : lambda [ex form env] : match form {
+	externs.macros.put "regex" : lambda [form env] : match form {
 		("regex" (".quote" s)) (".quote" [new RegExp s])
 		("regex" (".quote" s) (".quote" flag)) (".quote" [new RegExp s flag])
 		("regex" :: args) (".new" [externs.use "RegExp"] :: args)
 	}
 
-	externs.macros.put "with-semantics" : lambda [ex form env] : begin {
+	externs.macros.put "with-semantics" : lambda [form env] : begin {
 		local body form`[form.length - 1]
 		local derived [new Scope env]
 		for [local j 1] [j < form.length - 1] [inc j by 1] : begin {
