@@ -4,6 +4,7 @@ var util = require('util');
 var patrisika = require('patrisika');
 var escodegen = require('escodegen');
 var ex = require('./active/ex').pass;
+var checkEvaluated = require('./active/ex').checkEvaluated;
 var exm = require('./active/externs');
 
 function trace(s){ process.stderr.write(s + '\n') };
@@ -22,3 +23,4 @@ exports.regularize = patrisika.regularize;
 exports.pat2esc = patrisika.pat2esc;
 exports.generateCode = escodegen.generate;
 exports.compile = compile;
+exports.checkEvaluated = checkEvaluated;

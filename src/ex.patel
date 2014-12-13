@@ -2,6 +2,19 @@ define Scope [require "patrisika"].Scope
 define [atom x] [[typeof x] == "string"]
 define [prim x] [[atom x] && x !== "&" && x !== "&!" && [x`0 === "." || [[regex "^\W+"].test x]]]
 
+define [FormInvalidError form reason] : begin {
+	set this.reason reason
+	set this.message reason
+	set this.relatedForm form
+	if [form && form.begins >= 0 && form.ends >= 0] : begin {
+		set this.begins form.begins
+		set this.ends form.ends
+		inc this.message by ["\nAround (" + this.begins + " -- " + this.ends + ")"]
+	}
+	return null
+}
+set FormInvalidError.prototype : Object.create Error.prototype
+
 define [NodeTranslation fn] : lambda [form] : begin {
 	local res : fn.apply this arguments
 	if [form && form.begins >= 0] : set res.begins form.begins
@@ -11,9 +24,9 @@ define [NodeTranslation fn] : lambda [form] : begin {
 
 # Function [ex form env]: Expand macros and do scoping
 define ex : NodeTranslation : lambda [form env] : match form {
-	(".quote" :: x) : return form
-	(".id" :: x) : return form
-	(".t" :: x) : return form
+	(".quote" :: x) : return (".quote" :: x)
+	(".id" :: x) : return (".id" :: x)
+	(".t" :: x) : return (".t" :: x)
 	(".lambda" (::args) body) : begin {
 		define derived [new Scope env]
 		for [local j 0] [j < args.length] [inc j] : begin {
@@ -65,5 +78,11 @@ define ex : NodeTranslation : lambda [form env] : match form {
 	any : return any
 }
 
+define [checkEvaluated form] : if [form && form <@ Array] : begin {
+	if form.unevaluated : throw : new FormInvalidError form "Unevaluated subform"
+	form.forEach checkEvaluated
+}
+
 define [exports.pass form globalScope] [ex form globalScope]
 define exports.ex ex
+define exports.checkEvaluated checkEvaluated

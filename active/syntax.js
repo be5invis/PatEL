@@ -34,7 +34,9 @@ module.exports = (function() {
 
         peg$c0 = peg$FAILED,
         peg$c1 = function(it) {
-        	return ['.begin'].concat(it)
+        	var program = ['.begin'].concat(it)
+        	Unevaluated(program);
+        	return program
         },
         peg$c2 = "[",
         peg$c3 = { type: "literal", value: "[", description: "\"[\"" },
@@ -4060,6 +4062,13 @@ module.exports = (function() {
     			form.begins = begins;
     			form.ends = ends;
     		}
+    		return form
+    	}
+    	function Unevaluated(form){
+    		if(form instanceof Array){
+    			form.forEach(Unevaluated);
+    			form.unevaluated = true
+    		};
     		return form
     	}
 

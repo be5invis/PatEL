@@ -226,7 +226,7 @@ define [Create] : begin {
 				assign : lambda [x] (".set" [ex (".local" pattern) env] x)
 			}
 			(".quote" x) : object {
-				whether : lambda [x] ("===" pattern x)
+				whether : lambda [x] ("===" [ex pattern env] x)
 				assign  : lambda [x] (".unit")
 			}
 			("." :: whatever) : object {
@@ -349,7 +349,7 @@ define [Create] : begin {
 				macroBodyScope.castName "top"
 				* bodyCode
 			}
-			derived.macros.put macroName [ex macroFn Assign env.macros atom prim externs]
+			derived.macros.put macroName [macroFn ex Assign env.macros atom prim externs]
 		}
 		return : ex body derived
 	}

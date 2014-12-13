@@ -43,6 +43,7 @@ instream.on('end', function(){
 		try {
 			if(argv.astinfo) { outstream.write(util.inspect(ast, {depth: null}) + '\n'); return }
 			var xast = patel.ex(ast, gs);
+			patel.checkEvaluated(xast);
 			if(argv.xastinfo) { outstream.write(util.inspect(xast, {depth: null}) + '\n'); return }
 			var rast = patel.regularize(xast, gs);
 			if(argv.rastinfo) { outstream.write(util.inspect(rast, {depth: null}) + '\n'); return }

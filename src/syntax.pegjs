@@ -28,10 +28,19 @@
 		}
 		return form
 	}
+	function Unevaluated(form){
+		if(form instanceof Array){
+			form.forEach(Unevaluated);
+			form.unevaluated = true
+		};
+		return form
+	}
 }
 
 start = __ it:blockContent __ {
-	return ['.begin'].concat(it)
+	var program = ['.begin'].concat(it)
+	Unevaluated(program);
+	return program
 }
 // Expression
 primitiveStart

@@ -165,7 +165,7 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
             {
                 whether: function(s32_x) {
                     var s32_x;
-                    return [ "===", s29_pattern, s32_x ];
+                    return [ "===", s1_ex(s29_pattern, s28_env), s32_x ];
                 },
                 assign: function() {
                     return [ ".unit" ];
@@ -255,7 +255,7 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
             var s50_form;
             return [ ".return", s50_form ];
         })), s49_macroFn = new Function(s49_macroBodyScope.castName("evaluate"), s49_macroBodyScope.castName("Assign"), s49_macroBodyScope.castName("externalMacros"), s49_macroBodyScope.castName("atom"), s49_macroBodyScope.castName("prim"), s49_macroBodyScope.castName("top"), s49_bodyCode), 
-        s49_derived.macros.put(s49_macroName, s1_ex(s49_macroFn, s5_Assign, s49_env.macros, s1_atom, s1_prim, s5_externs)), 
+        s49_derived.macros.put(s49_macroName, s49_macroFn(s1_ex, s5_Assign, s49_env.macros, s1_atom, s1_prim, s5_externs)), 
         s49_j += 1;
         return s1_ex(s49_body, s49_derived);
     }), s5_externs;
