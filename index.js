@@ -1,10 +1,10 @@
-var parse = require('./src/syntax.js').parse;
+var parse = require('./active/syntax.js').parse;
 var fs = require('fs');
 var util = require('util');
 var patrisika = require('patrisika');
 var escodegen = require('escodegen');
-var ex = require('./src/ex').pass;
-var exm = require('./src/externs');
+var ex = require('./active/ex').pass;
+var exm = require('./active/externs');
 
 function trace(s){ process.stderr.write(s + '\n') };
 
