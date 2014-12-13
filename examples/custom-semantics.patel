@@ -1,7 +1,7 @@
 with-semantics {
-	export : lambda [evaluate form env] : match form {
-		("export" id) (atom id) : Assign evaluate ("." [top.use "exports"] (".quote" id)) [env.use id] env false
-		("export" id value) (atom id) : Assign evaluate ("." [top.use "exports"] (".quote" id)) value env false
+	export : lambda [form env] : match form {
+		("export" id) [atom id] : Assign ("." [top.use "exports"] (".quote" id)) [env.use id] env false
+		("export" id value) [atom id] : Assign ("." [top.use "exports"] (".quote" id)) value env false
 	}
 	begin {
 		define [greet] [console.log "greet"]

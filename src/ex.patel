@@ -66,3 +66,4 @@ define ex : NodeTranslation : lambda [form env] : match form {
 }
 
 define [exports.pass form globalScope] [ex form globalScope]
+define exports.ex ex

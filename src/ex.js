@@ -46,7 +46,7 @@ s1_Scope = require("patrisika").Scope, s1_atom = function(s2_x) {
     if (_s6_t0 instanceof Array && 2 === _s6_t0.length && ".local" === _s6_t0[0]) return s6_x = _s6_t0[1], 
     s6_env.declare(s6_x), s6_env.use(s6_x);
     if (_s6_t0 instanceof Array && _s6_t0.length >= 1) {
-        if (s6_callee = _s6_t0[0], s6_args = _s6_t0.slice(1), s1_atom(s6_callee) && s6_env.macros.has(s6_callee)) return s6_env.macros.get(s6_callee)(s1_ex, s6_form, s6_env);
+        if (s6_callee = _s6_t0[0], s6_args = _s6_t0.slice(1), s1_atom(s6_callee) && s6_env.macros.has(s6_callee)) return s6_env.macros.get(s6_callee)(s6_form, s6_env);
         for (_s6_t10 = void 0, _s6_t11 = s1_prim(s6_callee) ? void 0 : s6_callee = s1_ex(s6_callee, s6_env), 
         s6_a = [ s6_callee ], s6_j = 1; s6_j < s6_form.length; ) s6_a[s6_j] = s1_ex(s6_form[s6_j], s6_env), 
         s6_j += 1;
@@ -57,4 +57,4 @@ s1_Scope = require("patrisika").Scope, s1_atom = function(s2_x) {
 }), exports.pass = function(s7_form, s7_globalScope) {
     var s7_form, s7_globalScope;
     return s1_ex(s7_form, s7_globalScope);
-};
+}, exports.ex = s1_ex;
