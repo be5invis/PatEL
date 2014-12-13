@@ -8,6 +8,6 @@ with-semantics {
 		define [greet] [console.log "greet"]
 		export greet
 		export anotherGreet greet
-		export lalala lululu lololo
+		# export lalala lululu lololo ---- will cause an error
 	}
 }
