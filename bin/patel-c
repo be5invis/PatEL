@@ -31,6 +31,11 @@ function generateLineAndColumnMap(input){
 	}
 }
 
+function deepcopy(form){
+	if(form instanceof Array) return form.map(deepcopy)
+	else return form;
+}
+
 var input = '';
 instream.on('data', function(buf){ input += buf.toString() })
 instream.on('end', function(){
@@ -41,16 +46,16 @@ instream.on('end', function(){
 	try {
 		var ast = patel.parse(input);
 		try {
-			if(argv.astinfo) { outstream.write(util.inspect(ast, {depth: null}) + '\n'); return }
+			if(argv['dump-ast']) { outstream.write(util.inspect(deepcopy(ast), {depth: null}) + '\n'); return }
 			var xast = patel.ex(ast, gs);
 			patel.checkEvaluated(xast);
-			if(argv.xastinfo) { outstream.write(util.inspect(xast, {depth: null}) + '\n'); return }
+			if(argv['dump-expanded']) { outstream.write(util.inspect(deepcopy(xast), {depth: null}) + '\n'); return }
 			var rast = patel.regularize(xast, gs);
-			if(argv.rastinfo) { outstream.write(util.inspect(rast, {depth: null}) + '\n'); return }
-			var east = patel.pat2esc(rast, gs, lcmap);
-			if(argv.eastinfo) { outstream.write(util.inspect(east, {depth: null}) + '\n'); return }
+			if(argv['dump-regularized']) { outstream.write(util.inspect(deepcopy(rast), {depth: null}) + '\n'); return }
+			var tast = patel.pat2esc(rast, gs, lcmap);
+			if(argv['dump-transformed']) { outstream.write(util.inspect(tast, {depth: null}) + '\n'); return }
 
-			var result = patel.generateCode(east, {sourceMap: argv._[0] || '(stdin)', sourceMapWithCode: true})
+			var result = patel.generateCode(tast, {sourceMap: argv._[0] || '(stdin)', sourceMapWithCode: true})
 			if(argv.source_map) {
 				outstream.write(result.map.toString() + '\n');
 			} else {
