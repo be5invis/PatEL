@@ -2,7 +2,8 @@
 // browserify index.js -o hindex.js
 
 var patel = require('../index');
-var util = require('util');
+var inspect = require('./inspect').inspect;
+var ansiup = require('./ansi-up');
 
 var xs = patel.globals();
 var gs = new patel.Scope(xs);
@@ -182,7 +183,7 @@ function evaluate(input){
 			return x
 		};
 		sandbox.trace = function(x){
-			report.append($('<pre>').text(util.inspect(x)).addClass('output'));
+			report.append($('<pre>').html(ansiup.ansi_to_html(inspect(x, {colors: true}))).addClass('output'));
 			return x;
 		};
 
@@ -198,9 +199,9 @@ function evaluate(input){
 		
 		report.append($('<label>').text('Out [' + n + ']:').addClass('output'));
 		if(correct){
-			report.append($('<pre>').text(util.inspect(result)).addClass('output'));
+			report.append($('<pre>').html(ansiup.ansi_to_html(inspect(result, {colors: true}))).addClass('output'));
 		} else {
-			report.append($('<pre>').text(util.inspect(err)).addClass('wrong'));
+			report.append($('<pre>').text(inspect(err)).addClass('wrong'));
 		}
 		existingResults.append(report);
 
