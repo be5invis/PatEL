@@ -1,6 +1,4 @@
 var parse = require('./active/syntax.js').parse;
-var fs = require('fs');
-var util = require('util');
 var patrisika = require('patrisika');
 var escodegen = require('escodegen');
 var ex = require('./active/ex').pass;
@@ -16,6 +14,7 @@ var compile = function(ast, globals){
 	return escodegen.generate(rast) 
 };
 
+exports.Scope = patrisika.Scope;
 exports.globals = globals;
 exports.parse = parse;
 exports.ex = ex;
