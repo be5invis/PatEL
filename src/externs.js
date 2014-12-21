@@ -86,7 +86,7 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
         s19_paras = _s19_t0.slice(1), s1_prim(s19_callee) ? [ ".set", s1_ex(s19_left, s19_env), s1_ex([ s19_mod, s19_right ], s19_env) ] : s1_atom(s19_callee) && s19_locallyQ ? [ ".set", s1_ex([ ".local", s19_callee ], s19_env), s1_ex([ s19_mod, [ ".lambda", [].concat(s19_paras), s19_right ] ], s19_env) ] : [ ".set", s1_ex(s19_callee, s19_env), s1_ex([ s19_mod, [ ".lambda", [].concat(s19_paras), s19_right ] ], s19_env) ]) : (s19_any = _s19_t0, 
         s5_Assign(s1_ex, s19_left, [ s19_mod, s19_right ], s19_env, s19_locallyQ));
     }, s5_Assign = function(s20_left, s20_right, s20_env, s20_locallyQ) {
-        var s20_left, s20_right, s20_env, s20_locallyQ, s20_any, s20_callee, s20_paras, s20_items, s20_t, s20_assignments, s20_j, s20_a, s20_id, s20_SyntaxError, _s20_t0;
+        var s20_left, s20_right, s20_env, s20_locallyQ, s20_any, s20_callee, s20_paras, s20_items, s20_t, s20_assignments, s20_j, s20_a, s20_id, _s20_t0;
         if (_s20_t0 = s20_left, s20_id = _s20_t0, s1_atom(s20_id)) return s20_locallyQ ? [ ".set", s1_ex([ ".local", s20_id ], s20_env), s1_ex(s20_right, s20_env) ] : [ ".set", s1_ex(s20_left, s20_env), s1_ex(s20_right, s20_env) ];
         if (_s20_t0 instanceof Array && 2 === _s20_t0.length && "local" === _s20_t0[0]) return s20_a = _s20_t0[1], 
         s5_Assign(s20_a, s20_right, s20_env, !0);
@@ -106,9 +106,9 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
         }
         if (_s20_t0 instanceof Array && _s20_t0.length >= 1) return s20_callee = _s20_t0[0], 
         s20_paras = _s20_t0.slice(1), s1_prim(s20_callee) ? [ ".set", s1_ex(s20_left, s20_env), s1_ex(s20_right, s20_env) ] : s1_atom(s20_callee) && s20_locallyQ ? [ ".set", s1_ex([ ".local", s20_callee ], s20_env), s1_ex([ ".lambda", [].concat(s20_paras), s20_right ], s20_env) ] : [ ".set", s1_ex(s20_callee, s20_env), s1_ex([ ".lambda", [].concat(s20_paras), s20_right ], s20_env) ];
-        throw s20_any = _s20_t0, new s20_SyntaxError("Invalid Assignment");
+        throw s20_any = _s20_t0, new SyntaxError("Invalid Assignment");
     }, s5_externs.macros.put("define", function(s21_form, s21_env) {
-        var s21_form, s21_env, s21_any, s21_op, s21_left, s21_right, s21_modifer, s21_SyntaxError, _s21_t0, _s21_t1, _s21_t4, _s21_t5;
+        var s21_form, s21_env, s21_any, s21_op, s21_left, s21_right, s21_modifer, _s21_t0, _s21_t1, _s21_t4, _s21_t5;
         if (_s21_t0 = s21_form, _s21_t0 instanceof Array && 4 === _s21_t0.length) return s21_op = _s21_t0[0], 
         s21_modifer = _s21_t0[1], s21_left = _s21_t0[2], s21_right = _s21_t0[3], s5_AssignWithMod(s21_left, s21_right, s21_modifer, s21_env, !0);
         if (_s21_t0 instanceof Array && 3 === _s21_t0.length) return s21_op = _s21_t0[0], 
@@ -116,12 +116,12 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
         if (_s21_t1 = !1, _s21_t0 instanceof Array && 2 === _s21_t0.length ? (s21_op = _s21_t0[0], 
         s21_left = _s21_t0[1], _s21_t5 = _s21_t1 = s1_atom(s21_left) ? !0 : !1, _s21_t4 = _s21_t5) : _s21_t4 = void 0, 
         _s21_t1) return [ ".local", s21_left ];
-        throw s21_any = _s21_t0, new s21_SyntaxError("Invalid Assignment");
+        throw s21_any = _s21_t0, new SyntaxError("Invalid Assignment");
     }), s5_externs.macros.put("local", s5_externs.macros.get("define")), s5_externs.macros.put("set", function(s22_form, s22_env) {
-        var s22_form, s22_env, s22_any, s22_op, s22_left, s22_right, s22_SyntaxError, _s22_t0;
+        var s22_form, s22_env, s22_any, s22_op, s22_left, s22_right, _s22_t0;
         if (_s22_t0 = s22_form, _s22_t0 instanceof Array && 3 === _s22_t0.length) return s22_op = _s22_t0[0], 
         s22_left = _s22_t0[1], s22_right = _s22_t0[2], s5_Assign(s22_left, s22_right, s22_env, !1);
-        throw s22_any = _s22_t0, new s22_SyntaxError("Invalid Assignment");
+        throw s22_any = _s22_t0, new SyntaxError("Invalid Assignment");
     }), s5_externs.macros.put("inc", function(s23_form, s23_env) {
         var s23_form, s23_env, s23_op, s23_id, s23_shift, _s23_t0;
         return _s23_t0 = s23_form, _s23_t0 instanceof Array && 2 === _s23_t0.length ? (s23_op = _s23_t0[0], 
@@ -157,15 +157,15 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
                 whether: function() {
                     return null;
                 },
-                assign: function(s31_x) {
-                    var s31_x;
-                    return [ ".set", s1_ex([ ".local", s29_pattern ], s28_env), s31_x ];
+                assign: function(s47_x) {
+                    var s47_x;
+                    return [ ".set", s1_ex([ ".local", s29_pattern ], s28_env), s47_x ];
                 }
             } : _s29_t0 instanceof Array && 2 === _s29_t0.length && ".quote" === _s29_t0[0] ? (s29_x = _s29_t0[1], 
             {
-                whether: function(s32_x) {
-                    var s32_x;
-                    return [ "===", s1_ex(s29_pattern, s28_env), s32_x ];
+                whether: function(s44_x) {
+                    var s44_x;
+                    return [ "===", s1_ex(s29_pattern, s28_env), s44_x ];
                 },
                 assign: function() {
                     return [ ".unit" ];
@@ -175,57 +175,57 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
                 whether: function() {
                     return null;
                 },
-                assign: function(s35_x) {
-                    var s35_x;
-                    return [ ".set", s1_ex(s29_pattern, s28_env), s35_x ];
+                assign: function(s43_x) {
+                    var s43_x;
+                    return [ ".set", s1_ex(s29_pattern, s28_env), s43_x ];
                 }
             }) : _s29_t0 instanceof Array && _s29_t0.length >= 1 && ".list" === _s29_t0[0] ? (s29_subpatterns = _s29_t0.slice(1), 
             s29_ms = s29_subpatterns.map(s28_matchQ), {
-                whether: function(s36_x) {
-                    var s36_x;
-                    return [ "&&", [ ".is", s36_x, s5_externs.use("Array") ], [ "===", [ ".", s36_x, [ ".quote", "length" ] ], [ ".quote", s29_ms.length ] ] ].concat(s29_ms.map(function(s37_p, s37_j) {
-                        var s37_p, s37_j;
-                        return s37_p.whether([ ".", s36_x, [ ".quote", s37_j ] ]);
+                whether: function(s38_x) {
+                    var s38_x;
+                    return [ "&&", [ ".is", s38_x, s5_externs.use("Array") ], [ "===", [ ".", s38_x, [ ".quote", "length" ] ], [ ".quote", s29_ms.length ] ] ].concat(s29_ms.map(function(s39_p, s39_j) {
+                        var s39_p, s39_j;
+                        return s39_p.whether([ ".", s38_x, [ ".quote", s39_j ] ]);
                     })).filter(s5_boole);
                 },
-                assign: function(s38_x) {
-                    var s38_x;
-                    return [ ".begin" ].concat(s29_ms.map(function(s39_p, s39_j) {
-                        var s39_p, s39_j;
-                        return s39_p.assign([ ".", s38_x, [ ".quote", s39_j ] ]);
+                assign: function(s40_x) {
+                    var s40_x;
+                    return [ ".begin" ].concat(s29_ms.map(function(s41_p, s41_j) {
+                        var s41_p, s41_j;
+                        return s41_p.assign([ ".", s40_x, [ ".quote", s41_j ] ]);
                     }));
                 }
             }) : _s29_t0 instanceof Array && _s29_t0.length >= 1 && ".conslist" === _s29_t0[0] ? (s29_subpatterns = _s29_t0.slice(1), 
             s29_ms = s29_pattern.slice(1, -1).map(s28_matchQ), s29_final = s28_matchQ(s29_pattern[s29_pattern.length - 1]), 
             {
-                whether: function(s40_x) {
-                    var s40_x;
-                    return [ "&&", [ ".is", s40_x, s5_externs.use("Array") ], [ ">=", [ ".", s40_x, [ ".quote", "length" ] ], [ ".quote", s29_ms.length ] ] ].concat(s29_ms.map(function(s41_p, s41_j) {
-                        var s41_p, s41_j;
-                        return s41_p.whether([ ".", s40_x, [ ".quote", s41_j ] ]);
-                    }).concat([ s29_final.whether([ [ ".", s40_x, [ ".quote", "slice" ] ], [ ".quote", s28_j ] ]) ])).filter(s5_boole);
+                whether: function(s34_x) {
+                    var s34_x;
+                    return [ "&&", [ ".is", s34_x, s5_externs.use("Array") ], [ ">=", [ ".", s34_x, [ ".quote", "length" ] ], [ ".quote", s29_ms.length ] ] ].concat(s29_ms.map(function(s35_p, s35_j) {
+                        var s35_p, s35_j;
+                        return s35_p.whether([ ".", s34_x, [ ".quote", s35_j ] ]);
+                    }).concat([ s29_final.whether([ [ ".", s34_x, [ ".quote", "slice" ] ], [ ".quote", s28_j ] ]) ])).filter(s5_boole);
                 },
-                assign: function(s42_x) {
-                    var s42_x;
-                    return [ ".begin" ].concat(s29_ms.map(function(s43_p, s43_j) {
-                        var s43_p, s43_j;
-                        return s43_p.assign([ ".", s42_x, [ ".quote", s43_j ] ]);
-                    })).concat([ s29_final.assign([ [ ".", s42_x, [ ".quote", "slice" ] ], [ ".quote", s29_ms.length ] ]) ]);
+                assign: function(s36_x) {
+                    var s36_x;
+                    return [ ".begin" ].concat(s29_ms.map(function(s37_p, s37_j) {
+                        var s37_p, s37_j;
+                        return s37_p.assign([ ".", s36_x, [ ".quote", s37_j ] ]);
+                    })).concat([ s29_final.assign([ [ ".", s36_x, [ ".quote", "slice" ] ], [ ".quote", s29_ms.length ] ]) ]);
                 }
             }) : _s29_t0 instanceof Array && _s29_t0.length >= 1 ? (s29_callee = _s29_t0[0], 
             s29_subpatterns = _s29_t0.slice(1), s29_ms = s29_subpatterns.map(s28_matchQ), s29_t = s28_env.newt(), 
             {
-                whether: function(s44_x) {
-                    var s44_x;
-                    return [ "&&", [ ".set", s29_t, [ [ ".", s1_ex(s29_callee, s28_env), [ ".quote", "unapply" ] ], s44_x, [ ".quote", s29_ms.length ] ] ] ].concat(s29_ms.map(function(s45_p, s45_j) {
-                        var s45_p, s45_j;
-                        return s45_p.whether([ ".", s29_t, [ ".quote", s45_j ] ]);
+                whether: function(s30_x) {
+                    var s30_x;
+                    return [ "&&", [ ".set", s29_t, [ [ ".", s1_ex(s29_callee, s28_env), [ ".quote", "unapply" ] ], s30_x, [ ".quote", s29_ms.length ] ] ] ].concat(s29_ms.map(function(s31_p, s31_j) {
+                        var s31_p, s31_j;
+                        return s31_p.whether([ ".", s29_t, [ ".quote", s31_j ] ]);
                     })).filter(s5_boole);
                 },
                 assign: function() {
-                    return [ ".begin" ].concat(s29_ms.map(function(s47_p, s47_j) {
-                        var s47_p, s47_j;
-                        return s47_p.assign([ ".", s29_t, [ ".quote", s47_j ] ]);
+                    return [ ".begin" ].concat(s29_ms.map(function(s33_p, s33_j) {
+                        var s33_p, s33_j;
+                        return s33_p.assign([ ".", s29_t, [ ".quote", s33_j ] ]);
                     }));
                 }
             }) : void 0;
