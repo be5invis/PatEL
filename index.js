@@ -168,6 +168,13 @@ function evaluate(input){
 	var n = 0;
 	var runningReport = null;
 
+	function traceInto(report, content, cls){
+		report.append($('<pre>').html(ansiup.ansi_to_html(ansiup.escape_for_html(inspect(content, {colors: true})))).addClass(cls));
+	}
+	function printInto(report, content, cls){
+		report.append($('<pre>').text(content).addClass(cls));
+	}
+
 	function run(){
 		justExec = false;
 		var input = inputArea.value;
@@ -177,23 +184,23 @@ function evaluate(input){
 		var report = $('<div>').addClass('report');
 		runningReport = report;
 		report.append($('<label>').text('In [' + n + ']:').addClass('input'));
-		report.append($('<pre>').text(input).addClass('input'));
+		printInto(report, input, 'input');
 
 		// reset print and trace for sandbox
 		sandbox.print = function(x){
-			if(runningReport) runningReport.append($('<pre>').text(x).addClass('output'));
+			if(runningReport) printInto(runningReport, x, 'output')
 			return x
 		};
 		sandbox.trace = function(x){
-			if(runningReport) runningReport.append($('<pre>').html(ansiup.ansi_to_html(inspect(x, {colors: true}))).addClass('output'));
+			if(runningReport) traceInto(runningReport, x, 'output')
 			return x;
 		};
 		sandbox.print_here = function(x){
-			if(runningReport) runningReport.append($('<pre>').text(x).addClass('output'));
+			printInto(report, x, 'output')
 			return x
 		};
 		sandbox.trace_here = function(x){
-			if(runningReport) runningReport.append($('<pre>').html(ansiup.ansi_to_html(inspect(x, {colors: true}))).addClass('output'));
+			traceInto(report, x, 'output')
 			return x;
 		};
 
@@ -209,9 +216,9 @@ function evaluate(input){
 		
 		report.append($('<label>').text('Out [' + n + ']:').addClass('output'));
 		if(correct){
-			report.append($('<pre>').html(ansiup.ansi_to_html(inspect(result, {colors: true}))).addClass('output'));
+			traceInto(report, result, 'output');
 		} else {
-			report.append($('<pre>').text(inspect(err)).addClass('wrong'));
+			traceInto(report, err, 'wrong');
 		}
 		existingResults.append(report);
 

@@ -6,6 +6,10 @@
 	main {
 		max-width: 40em;
 		margin: 0 auto;
+		font-family: "Helvetica", "Arial", sans-serif;
+	}
+	main p img {
+		vertical-align: middle;
 	}
 	#incoming {
 		font-size: 1rem;
@@ -55,11 +59,13 @@
 </style>
 <body>
 <main>
-<p>Patrisika Example Language Online REPL, ver 0.0.1</p>
+<p>Online Interactive Patrisika Example Language environment, ver 0.1.0.</p>
+<p>Powered by <img src="https://rawgit.com/be5invis/patrisika/7f2783ca91ccaa7481c8ea8c1ed4f0d881ceaff8/resources/patrisika-logo.svg" height="24" width="24"/> Patrisika.</p>
+<p>Copyright (c) 2014 Belleve Invis.</p>
 <div id="existing-results"></div>
 <div class="report input">
 <label id="label-for-input">In [1]:</label>
-<textarea name="incoming" id="incoming" cols="30" rows="1"></textarea>
+<textarea name="incoming" id="incoming" cols="30" rows="1" placeholder="Execute by Ctrl-Enter"></textarea>
 </div>
 </main>
 </body>
