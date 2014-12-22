@@ -166,6 +166,7 @@ function evaluate(input){
 	}, false);
 
 	var n = 0;
+	var runningReport = null;
 
 	function run(){
 		justExec = false;
@@ -174,16 +175,25 @@ function evaluate(input){
 		var correct = true;
 		var result, err;
 		var report = $('<div>').addClass('report');
+		runningReport = report;
 		report.append($('<label>').text('In [' + n + ']:').addClass('input'));
 		report.append($('<pre>').text(input).addClass('input'));
 
 		// reset print and trace for sandbox
 		sandbox.print = function(x){
-			report.append($('<pre>').text(x).addClass('output'));
+			if(runningReport) runningReport.append($('<pre>').text(x).addClass('output'));
 			return x
 		};
 		sandbox.trace = function(x){
-			report.append($('<pre>').html(ansiup.ansi_to_html(inspect(x, {colors: true}))).addClass('output'));
+			if(runningReport) runningReport.append($('<pre>').html(ansiup.ansi_to_html(inspect(x, {colors: true}))).addClass('output'));
+			return x;
+		};
+		sandbox.print_here = function(x){
+			if(runningReport) runningReport.append($('<pre>').text(x).addClass('output'));
+			return x
+		};
+		sandbox.trace_here = function(x){
+			if(runningReport) runningReport.append($('<pre>').html(ansiup.ansi_to_html(inspect(x, {colors: true}))).addClass('output'));
 			return x;
 		};
 
