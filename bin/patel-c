@@ -8,8 +8,6 @@ var yargs = require('yargs')
 	.describe('help', 'Displays this help.')
 	.describe('o', 'Output sfd path. When absent, the result sfd is written to STDOUT.');
 
-var getLineFromPos = require('get-line-from-pos');
-
 var argv = yargs.argv;
 var instream = argv._[0] ? fs.createReadStream(argv._[0]): process.stdin;
 var outstream = argv.o ? fs.createWriteStream(argv.o, { encoding: 'utf-8' }): process.stdout;
