@@ -142,7 +142,7 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
         var s26_form, s26_env, s26_varid, s26_range, s26_body, s26_tR, s26_t, _s26_t0;
         return _s26_t0 = s26_form, _s26_t0 instanceof Array && 4 === _s26_t0.length && "foreach" === _s26_t0[0] ? (s26_varid = _s26_t0[1], 
         s26_range = _s26_t0[2], s26_body = _s26_t0[3], s26_tR = s26_env.newt(), s26_t = s26_env.newt(), 
-        [ ".begin", [ ".set", s26_tR, s1_ex(s26_range, s26_env) ], [ ".while", [ "!", [ ".", [ ".set", s26_t, [ [ ".", s26_tR, [ ".quote", "next" ] ] ] ], [ ".quote", "done" ] ] ], [ ".begin", s5_Assign(s1_ex, s26_varid, [ ".", s26_t, [ ".quote", "value" ] ], s26_env, !1), s1_ex(s26_body, s26_env) ] ] ]) : void 0;
+        [ ".begin", [ ".set", s26_tR, s1_ex(s26_range, s26_env) ], [ ".while", [ "!", [ ".", [ ".set", s26_t, [ [ ".", s26_tR, [ ".quote", "next" ] ] ] ], [ ".quote", "done" ] ] ], [ ".begin", s5_Assign(s26_varid, [ ".", s26_t, [ ".quote", "value" ] ], s26_env, !1), s1_ex(s26_body, s26_env) ] ] ]) : void 0;
     }), s5_externs.macros.put("this", [ ".thisp" ]), s5_externs.macros.put("arguments", [ ".argsp" ]), 
     s5_externs.macros.put("nothing", [ ".unit" ]), s5_externs.macros.put("undefined", [ ".unit" ]), 
     s5_externs.macros.put("null", [ ".quote", null ]), s5_externs.macros.put("true", [ ".quote", !0 ]), 

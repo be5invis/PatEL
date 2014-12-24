@@ -202,7 +202,7 @@ define [Create] : begin {
 				(".while" 
 					("!" ("." (".set" t (("." tR (".quote" "next")))) (".quote" "done"))) 
 					(".begin"
-						[Assign ex varid ("." t (".quote" "value")) env false]
+						[Assign varid ("." t (".quote" "value")) env false]
 						[ex body env])))
 		}
 	}
