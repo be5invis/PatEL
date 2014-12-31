@@ -77,14 +77,21 @@ define [Create] : begin {
 
 	externs.macros.put "let" : lambda [form env] : begin {
 		local pairs [form.slice 1 [0 - 1]]
-		local args : pairs.map : lambda [pair] pair`0
-		local paras : pairs.map : lambda [pair] pair`1
+		local args ()
+		local paras ()
+		for [local j 0] [j < pairs.length] [inc j] : match pairs`j {
+			(arg param :: useless)	: begin { args.push arg; paras.push param }
+			(arg param)           	: begin { args.push arg; paras.push param }
+			(arg) [atom arg]      	: begin { args.push arg; paras.push [env.use arg] }
+		}
 		ex (".beta" args form.[form.length - 1] :: paras) env
 	}
 
 	externs.macros.put "object" : lambda [form env] : begin {
-		local pairs : [form.slice 1].map : lambda [pair] {
-			return (pair`0 [ex pair`1 env])
+		local pairs : [form.slice 1].map : lambda [pair] : match pair {
+			(property value :: useless)	: return (property [ex value env])
+			(property value)           	: return (property [ex value env])
+			(property) [atom property] 	: return (property [env.use property])
 		}
 		return (".hash" :: pairs)
 	}
