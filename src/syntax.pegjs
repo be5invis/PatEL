@@ -51,14 +51,18 @@ primitive
 	/ it:stringliteral { return ['.quote', it] }
 	/ identifier
 
-group
+group = operate / struct
+
+operate
 	= begins: POS "[" __ "]" ends: POS                              	{ return BeginsEndsWith([], begins, ends) }
 	/ begins: POS "[" __ it:invokeWithOptionalBlock __ "]" ends: POS	{ return BeginsEndsWith(it, begins, ends) }
 	/ begins: POS "[" __ it:either __ "]" ends: POS                 	{ return BeginsEndsWith(it, begins, ends) }
-	/ begins: POS "(" __ ")" ends: POS                              	{ return BeginsEndsWith(['.list'], begins, ends) }
-	/ begins: POS "(" __ "." __ ")" ends: POS                       	{ return BeginsEndsWith(['.hash'], begins, ends) }
-	/ begins: POS "(" __ it:cons __ ")" ends: POS                   	{ return BeginsEndsWith(it, begins, ends) }
-	/ begins: POS "(" __ it:propertyPairs __ ")" ends: POS          	{ return BeginsEndsWith(['.hash'].concat(it), begins, ends) }
+
+struct
+	= begins: POS "(" __ ")" ends: POS                    	{ return BeginsEndsWith(['.list'], begins, ends) }
+	/ begins: POS "(" __ "." __ ")" ends: POS             	{ return BeginsEndsWith(['.hash'], begins, ends) }
+	/ begins: POS "(" __ it:cons __ ")" ends: POS         	{ return BeginsEndsWith(it, begins, ends) }
+	/ begins: POS "(" __ it:propertyPairs __ ")" ends: POS	{ return BeginsEndsWith(['.hash'].concat(it), begins, ends) }
 	
 parting
 	= head:primitive rear:(qualifier*) {
@@ -70,8 +74,10 @@ parting
 	}
 qualifier
 	= "." property:identifier { return ['.quote', property] }
+	/ "." property:numberliteral { return ['.quote', property] }
 	/ "." property:stringliteral { return ['.quote', property] }
-	/ "." property:group { return property }
+	/ "." "(" __ property:parting __ ")" { return property }
+	/ "." property:operate { return property }
 	/ "`" property:primitive { return property }
 
 factor
