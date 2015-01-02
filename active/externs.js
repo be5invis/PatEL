@@ -111,7 +111,7 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
         }
         if (_s18_t0 instanceof Array && _s18_t0.length >= 1) return s18_callee = _s18_t0[0], 
         s18_paras = _s18_t0.slice(1), s1_prim(s18_callee) ? [ ".set", s1_ex(s18_left, s18_env), s1_ex(s18_right, s18_env) ] : s1_atom(s18_callee) && s18_locallyQ ? [ ".set", s1_ex([ ".local", s18_callee ], s18_env), s1_ex([ ".lambda", [].concat(s18_paras), s18_right ], s18_env) ] : [ ".set", s1_ex(s18_callee, s18_env), s1_ex([ ".lambda", [].concat(s18_paras), s18_right ], s18_env) ];
-        throw s18_any = _s18_t0, new SyntaxError("Invalid Assignment");
+        throw s18_any = _s18_t0, new s1_FormInvalidError(s18_left, "Invalid Assignment Left-hand Side");
     }, s5_externs.macros.put("define", function(s19_form, s19_env) {
         var s19_form, s19_env, s19_any, s19_op, s19_left, s19_right, s19_modifer, _s19_t0, _s19_t1, _s19_t4, _s19_t5;
         if (_s19_t0 = s19_form, _s19_t0 instanceof Array && 4 === _s19_t0.length) return s19_op = _s19_t0[0], 
@@ -121,12 +121,12 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
         if (_s19_t1 = !1, _s19_t0 instanceof Array && 2 === _s19_t0.length ? (s19_op = _s19_t0[0], 
         s19_left = _s19_t0[1], _s19_t5 = _s19_t1 = s1_atom(s19_left) ? !0 : !1, _s19_t4 = _s19_t5) : _s19_t4 = void 0, 
         _s19_t1) return [ ".local", s19_left ];
-        throw s19_any = _s19_t0, new SyntaxError("Invalid Assignment");
+        throw s19_any = _s19_t0, new s1_FormInvalidError(s19_any, "Invalid Assignment");
     }), s5_externs.macros.put("local", s5_externs.macros.get("define")), s5_externs.macros.put("set", function(s20_form, s20_env) {
         var s20_form, s20_env, s20_any, s20_op, s20_left, s20_right, _s20_t0;
         if (_s20_t0 = s20_form, _s20_t0 instanceof Array && 3 === _s20_t0.length) return s20_op = _s20_t0[0], 
         s20_left = _s20_t0[1], s20_right = _s20_t0[2], s5_Assign(s20_left, s20_right, s20_env, !1);
-        throw s20_any = _s20_t0, new SyntaxError("Invalid Assignment");
+        throw s20_any = _s20_t0, new s1_FormInvalidError(s20_any, "Invalid Assignment");
     }), s5_externs.macros.put("inc", function(s21_form, s21_env) {
         var s21_form, s21_env, s21_op, s21_id, s21_shift, _s21_t0;
         return _s21_t0 = s21_form, _s21_t0 instanceof Array && 2 === _s21_t0.length ? (s21_op = _s21_t0[0], 

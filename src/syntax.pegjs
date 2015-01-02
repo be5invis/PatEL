@@ -13,13 +13,13 @@
 			return head
 		}
 	}
-	function buildleft(car, cdr){
+	function buildleft(car, cdr, begins, ends){
 		if(!cdr.length) return car;
 		var form = car;
 		for(var j = 0; j < cdr.length; j++){
-			form = [cdr[j][1], form, cdr[j][3]]
+			form = BeginsEndsWith([cdr[j][1], form, cdr[j][3]], begins, cdr[j][4]);
 		};
-		return form;
+		return BeginsEndsWith(form, begins, ends);
 	}
 	function BeginsEndsWith(form, begins, ends) {
 		if(form instanceof Array) {
@@ -65,12 +65,12 @@ struct
 	/ begins: POS "(" __ it:propertyPairs __ ")" ends: POS	{ return BeginsEndsWith(['.hash'].concat(it), begins, ends) }
 	
 parting
-	= head:primitive rear:(qualifier*) {
+	= begins:POS head:primitive rear:((qualifier POS)*) ends:POS {
 		var res = head;
 		for(var j = 0; j < rear.length; j++){
-			res = ['.', res, rear[j]];
+			res = BeginsEndsWith(['.', res, rear[j][0]], begins, rear[j][1]);
 		};
-		return res;
+		return BeginsEndsWith(res, begins, ends);
 	}
 qualifier
 	= "." property:identifier { return ['.quote', property] }
@@ -81,32 +81,32 @@ qualifier
 	/ "`" property:primitive { return property }
 
 factor
-	= left:prefixOp __ right:parting { return [left, right] }
+	= begins:POS left:prefixOp __ right:parting ends:POS { return BeginsEndsWith([left, right], begins, ends) }
 	/ parting
 prefixOp = "+" / "-" / "!"
 
 term
-	= car:factor cdr:((__ termOp __ factor)*) { return buildleft(car, cdr) }
+	= begins:POS car:factor cdr:((__ termOp __ factor POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
 termOp = $([*/%] [\-_/+*<=>!?$%_&~^@|]*)
 
 sum
-	= car:term cdr:((__ sumOp __ term)*) { return buildleft(car, cdr) }
+	= begins:POS car:term cdr:((__ sumOp __ term POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
 sumOp = $([+\-] [\-_/+*<=>!?$%_&~^@|]*)
 
 equality
-	= car:sum cdr:((__ equalityOp __ sum)*) { return buildleft(car, cdr) }
+	= begins:POS car:sum cdr:((__ equalityOp __ sum POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
 equalityOp = $([=!] [\-_/+*<=>!?$%_&~^@|]+)
 
 compare
-	= car:equality cdr:((__ compareOp __ equality)*) { return buildleft(car, cdr) }
+	= begins:POS car:equality cdr:((__ compareOp __ equality POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
 compareOp = $([<>] [\-_/+*<=>!?$%_&~^@|]*)
 
 both
-	= car:compare cdr:((__ bothOp __ compare)*) { return buildleft(car, cdr) }
+	= begins:POS car:compare cdr:((__ bothOp __ compare POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
 bothOp = $([&] [\-_/+*<=>!?$%_&~^@|]*)
 
 either
-	= car:both cdr:((__ eitherOp __ both)*) { return buildleft(car, cdr) }
+	= begins:POS car:both cdr:((__ eitherOp __ both POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
 eitherOp = $([|] [\-_/+*<=>!?$%_&~^@|]*)
 
 list
@@ -118,6 +118,28 @@ cons
 	= car:list __ "::" __ cdr:parting { return ['.conslist'].concat(car.slice(1), [cdr]) }
 	/ "::" __ cdr:parting { return ['.conslist', cdr] }
 	/ list
+invokeWithOptionalBlock
+	= begins:POS head:invoke __ rear:block ends:POS { return BeginsEndsWith(head.concat(rear), begins, ends) }
+	/ invoke
+invoke
+	= head:parting rear:(__ parting)* { 
+		var res = [head]
+		for(var j = 0; j < rear.length; j++){
+			res.push(rear[j][1])
+		};
+		return res;
+	}
+propertyPairs
+	= head:propertyPair rear:((__ ([,;] __)? propertyPair)*) { 
+		var res = [head]
+		for(var j = 0; j < rear.length; j++){
+			res.push(rear[j][2])
+		};
+		return res;
+	}
+propertyPair
+	= "." head:stringliteral _ rear:either { return [head[1], rear]}
+	/ "." head:identifier _ rear:either { return [head, rear]}
 
 block
 	= "{" __ it:blockContent __ "}" { return it }
@@ -133,24 +155,14 @@ line
 	= begins:POS head:linePart _ ":" _ rear:line ends:POS { return BeginsEndsWith(head.concat([rear]), begins, ends) }
 	/ begins:POS head:linePart _ rear:block ends:POS { return BeginsEndsWith(head.concat(rear), begins, ends) }
 	/ linePart
-invokeWithOptionalBlock
-	= head:invoke __ rear:block { return head.concat(rear) }
-	/ invoke
-invoke
-	= head:parting rear:(__ parting)* { 
-		var res = [head]
-		for(var j = 0; j < rear.length; j++){
-			res.push(rear[j][1])
-		};
-		return res;
-	}
-
 linePart
-	= begins:POS head:lineInvoke rear:(_ pipeRear)* ends:POS  { 
+	= begins:POS head:lineInvoke rear:(_ pipeRear POS)* ends:POS  { 
 		var res = head
 		for(var j = 0; j < rear.length; j++) {
-			if(rear[j][1].qualifier) res = [[".", res, rear[j][1].qualifier]].concat(rear[j][1].rear || [])
-			else res = [rear[j][1].rear[0]].concat([res], rear[j][1].rear.slice(1))
+			if(rear[j][1].qualifier) 
+				res = BeginsEndsWith([[".", res, rear[j][1].qualifier]].concat(rear[j][1].rear || []), begins, rear[j][2])
+			else 
+				res = BeginsEndsWith([rear[j][1].rear[0]].concat([res], rear[j][1].rear.slice(1)), begins, rear[j][2])
 		};
 		return BeginsEndsWith(res, begins, ends);
 	}
@@ -168,19 +180,6 @@ lineInvoke
 		};
 		return BeginsEndsWith(res, begins, ends);
 	}
-
-
-propertyPairs
-	= head:propertyPair rear:((__ ([,;] __)? propertyPair)*) { 
-		var res = [head]
-		for(var j = 0; j < rear.length; j++){
-			res.push(rear[j][2])
-		};
-		return res;
-	}
-propertyPair
-	= "." head:stringliteral _ rear:either { return [head[1], rear]}
-	/ "." head:identifier _ rear:either { return [head, rear]}
 
 
 // Tokens

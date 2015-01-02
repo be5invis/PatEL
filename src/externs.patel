@@ -168,19 +168,19 @@ define [Create] : begin {
 			}
 			true (".set" [ex callee env] [ex (".lambda" (::paras) right) env])
 		}
-		any : throw [new SyntaxError "Invalid Assignment"]
+		any : throw [new FormInvalidError left "Invalid Assignment Left-hand Side"]
 	}
 
 	externs.macros.put "define" : lambda [form env] : match form {
 		(op modifer left right) : AssignWithMod left right modifer env true
 		(op left right) : Assign left right env true
 		(op left) [atom left] : return (".local" left)
-		any : throw [new SyntaxError "Invalid Assignment"]
+		any : throw [new FormInvalidError any "Invalid Assignment"]
 	}
 	externs.macros.put "local" : externs.macros.get "define"
 	externs.macros.put "set" : lambda [form env] : match form {
 		(op left right) : Assign left right env false
-		any : throw [new SyntaxError "Invalid Assignment"]
+		any : throw [new FormInvalidError any "Invalid Assignment"]
 	}
 
 	externs.macros.put "inc" : lambda [form env] : match form {
