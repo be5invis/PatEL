@@ -3259,12 +3259,12 @@ module.exports = (function() {
       s0 = s1;
       if (s0 === peg$FAILED) {
         s0 = peg$currPos;
-        if (input.charCodeAt(peg$currPos) === 40) {
-          s1 = peg$c4;
+        if (input.charCodeAt(peg$currPos) === 91) {
+          s1 = peg$c2;
           peg$currPos++;
         } else {
           s1 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c5); }
+          if (peg$silentFails === 0) { peg$fail(peg$c3); }
         }
         if (s1 !== peg$FAILED) {
           s2 = peg$currPos;
@@ -3295,12 +3295,12 @@ module.exports = (function() {
           }
           s2 = s3;
           if (s2 !== peg$FAILED) {
-            if (input.charCodeAt(peg$currPos) === 41) {
-              s3 = peg$c13;
+            if (input.charCodeAt(peg$currPos) === 93) {
+              s3 = peg$c9;
               peg$currPos++;
             } else {
               s3 = peg$FAILED;
-              if (peg$silentFails === 0) { peg$fail(peg$c14); }
+              if (peg$silentFails === 0) { peg$fail(peg$c10); }
             }
             if (s3 !== peg$FAILED) {
               peg$reportedPos = s0;
