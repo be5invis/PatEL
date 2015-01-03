@@ -55,13 +55,12 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
         return [ [ ".", s1_ex([ ".list" ].concat(s12_form.slice(1, -1)), s12_env), [ ".quote", "concat" ] ], s1_ex(s12_form[s12_form.length - 1], s12_env) ];
     }), s5_externs.macros.put("let", function(s13_form, s13_env) {
         var s13_form, s13_env, s13_pairs, s13_args, s13_paras, s13_j, s13_arg, s13_param, s13_useless, _s13_t0, _s13_t1, _s13_t2, _s13_t3;
-        for (s13_pairs = s13_form.slice(1, -1), s13_args = [], s13_paras = [], s13_j = 0; s13_j < s13_pairs.length; ) _s13_t0 = s13_pairs[s13_j], 
+        for (s13_pairs = s13_form.slice(1, -1), s13_args = [], s13_paras = [], s13_j = 0; s13_j < s13_pairs.length; s13_j += 1) _s13_t0 = s13_pairs[s13_j], 
         _s13_t0 instanceof Array && _s13_t0.length >= 2 ? (s13_arg = _s13_t0[0], s13_param = _s13_t0[1], 
         s13_useless = _s13_t0.slice(2), s13_args.push(s13_arg), s13_paras.push(s13_param)) : _s13_t0 instanceof Array && 2 === _s13_t0.length ? (s13_arg = _s13_t0[0], 
         s13_param = _s13_t0[1], s13_args.push(s13_arg), s13_paras.push(s13_param)) : (_s13_t1 = !1, 
         _s13_t0 instanceof Array && 1 === _s13_t0.length ? (s13_arg = _s13_t0[0], _s13_t3 = _s13_t1 = s1_atom(s13_arg) ? !0 : !1, 
-        _s13_t2 = _s13_t3) : _s13_t2 = void 0, _s13_t1 && (s13_args.push(s13_arg), s13_paras.push(s13_env.use(s13_arg)))), 
-        s13_j += 1;
+        _s13_t2 = _s13_t3) : _s13_t2 = void 0, _s13_t1 && (s13_args.push(s13_arg), s13_paras.push(s13_env.use(s13_arg))));
         return s1_ex([ ".beta", s13_args, s13_form[s13_form.length - 1] ].concat(s13_paras), s13_env);
     }), s5_externs.macros.put("object", function(s14_form, s14_env) {
         var s14_form, s14_env, s14_pairs;
@@ -76,8 +75,7 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
     }), s5_externs.macros.put("piecewise", function(s16_form, s16_env) {
         var s16_form, s16_env, s16_pairs, s16_f, s16_j, _s16_t0;
         if (_s16_t0 = s16_form, _s16_t0 instanceof Array && _s16_t0.length >= 1 && "piecewise" === _s16_t0[0]) {
-            for (s16_pairs = _s16_t0.slice(1), s16_f = [ ".unit" ], s16_j = s16_pairs.length - 1; s16_j >= 0; ) s16_f = [ ".if", s1_ex(s16_pairs[s16_j][0], s16_env), s1_ex(s16_pairs[s16_j][1], s16_env), s16_f ], 
-            s16_j -= 1;
+            for (s16_pairs = _s16_t0.slice(1), s16_f = [ ".unit" ], s16_j = s16_pairs.length - 1; s16_j >= 0; s16_j -= 1) s16_f = [ ".if", s1_ex(s16_pairs[s16_j][0], s16_env), s1_ex(s16_pairs[s16_j][1], s16_env), s16_f ];
             return s16_f;
         }
         return void 0;
@@ -99,14 +97,12 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
         s5_Assign(s18_a, s18_right, s18_env, !0);
         if (_s18_t0 instanceof Array && _s18_t0.length >= 1 && ".list" === _s18_t0[0]) {
             for (s18_items = _s18_t0.slice(1), s18_t = s18_env.newt(), s18_assignments = [ ".begin", [ ".set", s18_t, s1_ex(s18_right, s18_env) ] ], 
-            s18_j = 0; s18_j < s18_items.length; ) s18_assignments.push(s5_Assign(s18_items[s18_j], [ ".", s18_t, [ ".quote", s18_j ] ], s18_env, s18_locallyQ)), 
-            s18_j += 1;
+            s18_j = 0; s18_j < s18_items.length; s18_j += 1) s18_assignments.push(s5_Assign(s18_items[s18_j], [ ".", s18_t, [ ".quote", s18_j ] ], s18_env, s18_locallyQ));
             return s18_assignments.push(s18_t), s18_assignments;
         }
         if (_s18_t0 instanceof Array && _s18_t0.length >= 1 && ".hash" === _s18_t0[0]) {
             for (s18_items = _s18_t0.slice(1), s18_t = s18_env.newt(), s18_assignments = [ ".begin", [ ".set", s18_t, s1_ex(s18_right, s18_env) ] ], 
-            s18_j = 0; s18_j < s18_items.length; ) s18_assignments.push(s5_Assign(s18_items[s18_j][1], [ ".", s18_t, [ ".quote", s18_items[s18_j][0] ] ], s18_env, s18_locallyQ)), 
-            s18_j += 1;
+            s18_j = 0; s18_j < s18_items.length; s18_j += 1) s18_assignments.push(s5_Assign(s18_items[s18_j][1], [ ".", s18_t, [ ".quote", s18_items[s18_j][0] ] ], s18_env, s18_locallyQ));
             return s18_assignments.push(s18_t), s18_assignments;
         }
         if (_s18_t0 instanceof Array && _s18_t0.length >= 1) return s18_callee = _s18_t0[0], 
@@ -234,14 +230,14 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
                     }));
                 }
             }) : void 0;
-        }, s26_f = [ ".unit" ], s26_j = s26_pairs.length - 1; s26_j >= 0; ) _s26_t0 = s26_pairs[s26_j], 
+        }, s26_f = [ ".unit" ], s26_j = s26_pairs.length - 1; s26_j >= 0; s26_j -= 1) _s26_t0 = s26_pairs[s26_j], 
         _s26_t0 instanceof Array && 2 === _s26_t0.length ? (s26_pattern = _s26_t0[0], s26_body = _s26_t0[1], 
         s26_pat = s26_matchQ(s26_pattern), s26_cond = s26_pat.whether(s26_t), s26_cond ? _s26_t3 = [ ".if", s26_cond, [ ".begin", s26_pat.assign(s26_t), s1_ex(s26_body, s26_env) ], s26_f ] : (_s26_t4 = [ ".begin", s26_pat.assign(s26_t), s1_ex(s26_body, s26_env) ], 
         _s26_t3 = _s26_t4), _s26_t2 = _s26_t3) : (_s26_t0 instanceof Array && 3 === _s26_t0.length ? (s26_pattern = _s26_t0[0], 
         s26_guard = _s26_t0[1], s26_body = _s26_t0[2], s26_pat = s26_matchQ(s26_pattern), 
         s26_cond = s26_pat.whether(s26_t), s26_cond ? (s26_tc = s26_env.newt(), _s26_t6 = [ ".begin", [ ".set", s26_tc, [ ".quote", !1 ] ], [ ".if", s26_cond, [ ".begin", s26_pat.assign(s26_t), [ ".if", s1_ex(s26_guard, s26_env), [ ".set", s26_tc, [ ".quote", !0 ] ], [ ".set", s26_tc, [ ".quote", !1 ] ] ] ] ], [ ".if", s26_tc, s1_ex(s26_body, s26_env), s26_f ] ]) : (_s26_t7 = [ ".begin", s26_pat.assign(s26_t), [ ".if", s1_ex(s26_guard, s26_env), s1_ex(s26_body, s26_env), s26_f ] ], 
         _s26_t6 = _s26_t7), _s26_t5 = _s26_t6) : (s26_any = _s26_t0, _s26_t5 = s26_f), _s26_t2 = _s26_t5), 
-        s26_f = _s26_t2, s26_j -= 1;
+        s26_f = _s26_t2;
         return [ ".begin", [ ".set", s26_t, s1_ex(s26_form[1], s26_env) ], s26_f ];
     }), s5_externs.macros.put("regex", function(s46_form) {
         var s46_form, s46_args, s46_s, s46_flag, _s46_t0;
@@ -252,7 +248,7 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
     }), s5_externs.macros.put("with-semantics", function(s47_form, s47_env) {
         var s47_form, s47_env, s47_body, s47_derived, s47_j, s47_macroBodyScope, s47_macroName, s47_macroBody, s47_bodyCode, s47_macroFn;
         for (s47_body = s47_form[s47_form.length - 1], s47_derived = new s1_Scope(s47_env), 
-        s47_j = 1; s47_j < s47_form.length - 1; ) s47_macroBodyScope = new s1_Scope(s1_Create()), 
+        s47_j = 1; s47_j < s47_form.length - 1; s47_j += 1) s47_macroBodyScope = new s1_Scope(s1_Create()), 
         s47_macroBodyScope.declare("evaluate", !0), s47_macroBodyScope.declare("Assign", !0), 
         s47_macroBodyScope.declare("externalMacros", !0), s47_macroBodyScope.declare("atom", !0), 
         s47_macroBodyScope.declare("prim", !0), s47_macroBodyScope.declare("top", !0), s47_macroName = s47_form[s47_j][0], 
@@ -260,8 +256,7 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
             var s48_form;
             return [ ".return", s48_form ];
         })), s47_macroFn = new Function(s47_macroBodyScope.castName("evaluate"), s47_macroBodyScope.castName("Assign"), s47_macroBodyScope.castName("externalMacros"), s47_macroBodyScope.castName("atom"), s47_macroBodyScope.castName("prim"), s47_macroBodyScope.castName("top"), s47_bodyCode), 
-        s47_derived.macros.put(s47_macroName, s47_macroFn(s1_ex, s5_Assign, s47_env.macros, s1_atom, s1_prim, s5_externs)), 
-        s47_j += 1;
+        s47_derived.macros.put(s47_macroName, s47_macroFn(s1_ex, s5_Assign, s47_env.macros, s1_atom, s1_prim, s5_externs));
         return s1_ex(s47_body, s47_derived);
     }), s5_externs;
 }, exports.Create = s1_Create;

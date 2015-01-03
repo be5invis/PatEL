@@ -30,23 +30,21 @@ s1_Scope = require("patrisika").Scope, s1_atom = function(s2_x) {
     [ ".t" ].concat(s7_x);
     if (_s7_t0 instanceof Array && 3 === _s7_t0.length && ".lambda" === _s7_t0[0] && _s7_t0[1] instanceof Array && _s7_t0[1].length >= 0) {
         for (s7_args = _s7_t0[1].slice(0), s7_body = _s7_t0[2], s7_derived = new s1_Scope(s7_env), 
-        s7_j = 0; s7_j < s7_args.length; ) s7_derived.declare(s7_args[s7_j], !0), s7_args[s7_j] = s7_derived.use(s7_args[s7_j]), 
-        s7_j += 1;
+        s7_j = 0; s7_j < s7_args.length; s7_j += 1) s7_derived.declare(s7_args[s7_j], !0), 
+        s7_args[s7_j] = s7_derived.use(s7_args[s7_j]);
         return [ ".lambda.scoped", s7_args, s1_ex(s7_body, s7_derived), s7_derived ];
     }
     if (_s7_t0 instanceof Array && _s7_t0.length >= 3 && ".beta" === _s7_t0[0] && _s7_t0[1] instanceof Array && _s7_t0[1].length >= 0) {
         for (s7_args = _s7_t0[1].slice(0), s7_body = _s7_t0[2], s7_params = _s7_t0.slice(3), 
-        s7_derived = new s1_Scope(s7_env), s7_j = 0; s7_j < s7_args.length; ) s7_derived.declare(s7_args[s7_j], !0), 
-        s7_args[s7_j] = s7_derived.use(s7_args[s7_j]), s7_j += 1;
-        for (s7_j = 0; s7_j < s7_args.length; ) s7_params[s7_j] = s1_ex(s7_params[s7_j], s7_env), 
-        s7_j += 1;
+        s7_derived = new s1_Scope(s7_env), s7_j = 0; s7_j < s7_args.length; s7_j += 1) s7_derived.declare(s7_args[s7_j], !0), 
+        s7_args[s7_j] = s7_derived.use(s7_args[s7_j]);
+        for (s7_j = 0; s7_j < s7_args.length; s7_j += 1) s7_params[s7_j] = s1_ex(s7_params[s7_j], s7_env);
         return [ ".beta.scoped", s7_args, s1_ex(s7_body, s7_derived), s7_derived ].concat(s7_params);
     }
     if (_s7_t0 instanceof Array && 4 === _s7_t0.length && ".try" === _s7_t0[0] && _s7_t0[2] instanceof Array && 1 === _s7_t0[2].length) return s7_block = _s7_t0[1], 
     s7_param = _s7_t0[2][0], s7_handler = _s7_t0[3], s7_env.declare(s7_param), [ ".try", s1_ex(s7_block, s7_env), [ s7_env.use(s7_param) ], s1_ex(s7_handler, s7_env) ];
     if (_s7_t0 instanceof Array && _s7_t0.length >= 1 && ".hash" === _s7_t0[0]) {
-        for (s7_args = _s7_t0.slice(1), s7_a = [ ".hash" ], s7_j = 1; s7_j < s7_form.length; ) s7_a[s7_j] = [ s7_form[s7_j][0], s1_ex(s7_form[s7_j][1], s7_env) ], 
-        s7_j += 1;
+        for (s7_args = _s7_t0.slice(1), s7_a = [ ".hash" ], s7_j = 1; s7_j < s7_form.length; s7_j += 1) s7_a[s7_j] = [ s7_form[s7_j][0], s1_ex(s7_form[s7_j][1], s7_env) ];
         return s7_a;
     }
     if (_s7_t0 instanceof Array && 2 === _s7_t0.length && ".local" === _s7_t0[0]) return s7_x = _s7_t0[1], 
@@ -54,8 +52,7 @@ s1_Scope = require("patrisika").Scope, s1_atom = function(s2_x) {
     if (_s7_t0 instanceof Array && _s7_t0.length >= 1) {
         if (s7_callee = _s7_t0[0], s7_args = _s7_t0.slice(1), s1_atom(s7_callee) && s7_env.macros.has(s7_callee)) return s7_env.macros.get(s7_callee)(s7_form, s7_env);
         for (_s7_t10 = void 0, _s7_t11 = s1_prim(s7_callee) ? void 0 : s7_callee = s1_ex(s7_callee, s7_env), 
-        s7_a = [ s7_callee ], s7_j = 1; s7_j < s7_form.length; ) s7_a[s7_j] = s1_ex(s7_form[s7_j], s7_env), 
-        s7_j += 1;
+        s7_a = [ s7_callee ], s7_j = 1; s7_j < s7_form.length; s7_j += 1) s7_a[s7_j] = s1_ex(s7_form[s7_j], s7_env);
         return s7_a;
     }
     return s7_x = _s7_t0, !s1_atom(s7_x) || !s7_env.macros.has(s7_x) || s7_env.macros.get(s7_x) instanceof Function ? (s7_x = _s7_t0, 
