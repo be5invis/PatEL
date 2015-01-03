@@ -138,7 +138,7 @@ propertyPairs
 		return res;
 	}
 propertyPair
-	= "." head:stringliteral _ rear:either { return [head[1], rear]}
+	= "." head:stringliteral _ rear:either { return [head, rear]}
 	/ "." head:identifier _ rear:either { return [head, rear]}
 
 block
