@@ -57,10 +57,54 @@
 	.report.input label {
 		padding-top: 0.5rem;
 	}
+	.report .trace {
+		white-space: pre-wrap;
+		display: inline-block;
+	}
+	.report .trace .list.large{
+		display: flex;
+	}
+	.report .trace .list.large > span {
+		display: inline-block;
+	}
+	.report .trace .large > .braceleft { display: block; flex: none; }
+	.report .trace .large > .braceright { display: block; flex: none; align-self: flex-end }
+	.report .trace .large > .items { display: block; flex: 1; margin: 0 0.5em }
+	.report .trace .list.large > .items {
+		white-space: normal;
+	}
+	.report .trace .list.large > .items > span {
+		white-space: pre-wrap;
+		display: block;
+	}
+	.report .trace .hash.large{
+	 	display: flex;
+	}	
+	.report .trace .hash.large > .items {
+		white-space: normal;
+	}
+	.report .trace .hash.large > .items > .pair {
+		display: flex;
+	}
+	.report .trace .hash.large > .items > .pair > .prop {
+		white-space: pre-wrap;
+		flex: none;
+		margin-right: 0.5em;
+	}
+	.report .trace .hash.large > .items > .pair > .val {
+		white-space: pre-wrap;
+		flex: 1;
+	}
+	.report .trace .string { color: rgb(0, 187, 0) }
+	.report .trace .prop { color: rgb(187, 0, 187) }
+	.report .trace .number { color: rgb(187, 0, 0) }
+	.report .trace .boolean { color: rgb(187, 187, 0) }
+	.report .trace .undefined { color: rgb(0, 187, 187) }
+	.report .trace .null { color: rgb(0, 187, 187) }
 </style>
 <body>
 <main>
-<p>Online Interactive Patrisika Example Language environment, ver 0.13.0.</p>
+<p>Online Interactive Patrisika Example Language environment, ver 0.13.1.</p>
 <p>Powered by <img src="https://rawgit.com/be5invis/patrisika/7f2783ca91ccaa7481c8ea8c1ed4f0d881ceaff8/resources/patrisika-logo.svg" height="24" width="24"/> Patrisika r0.13.0.</p>
 <p>Copyright (c) 2014 Belleve Invis.</p>
 <div id="existing-results"></div>

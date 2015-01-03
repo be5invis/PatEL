@@ -2,8 +2,9 @@
 // browserify index.js -o hindex.js
 
 var patel = require('../index');
-var inspect = require('./inspect').inspect;
-var ansiup = require('./ansi-up');
+// var inspect = require('./inspect').inspect;
+// var ansiup = require('./ansi-up');
+var showup = require('./show-up').showup;
 
 var xs = patel.globals();
 var gs = new patel.Scope(xs);
@@ -169,7 +170,7 @@ function evaluate(input){
 	var runningReport = null;
 
 	function traceInto(report, content, cls){
-		report.append($('<pre>').html(ansiup.ansi_to_html(ansiup.escape_for_html(inspect(content, {colors: true})))).addClass(cls));
+		report.append($('<pre>').append($('<div>').append(showup(content, 3)).addClass('trace')).addClass(cls));
 	}
 	function printInto(report, content, cls){
 		report.append($('<pre>').text(content).addClass(cls));
