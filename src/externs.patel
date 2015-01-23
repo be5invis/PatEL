@@ -66,6 +66,7 @@ define [Create] : begin {
 		("if" test consequent alternate)                          	: ex ('.if' test consequent alternate) env
 		("if" test ('then' :: consequents))                       	: ex ('.if' test ('.begin' :: consequents)) env
 		("if" test ('then' :: consequents) ('else' :: alternates))	: ex ('.if' test ('.begin' :: consequents) ('.begin' :: alternates)) env
+		otherwise                                                 	: reportInvalid otherwise "Invalid Conditional Form"
 	}
 
 	externs.macros.put ".conslist" : lambda [form env] {

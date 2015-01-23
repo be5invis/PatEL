@@ -8,6 +8,8 @@ var yargs = require('yargs')
 	.describe('help', 'Displays this help.')
 	.describe('o', 'Output sfd path. When absent, the result sfd is written to STDOUT.');
 
+var os = require('os');
+
 var argv = yargs.argv;
 var instream = argv._[0] ? fs.createReadStream(argv._[0]): process.stdin;
 var outstream = argv.o ? fs.createWriteStream(argv.o, { encoding: 'utf-8' }): process.stdout;
@@ -42,6 +44,7 @@ var input = '';
 instream.on('data', function(buf){ input += buf.toString() })
 instream.on('end', function(){
 	input += '\n\n\n';
+	if(argv['dump-input']) { outstream.write(input); return }
 	var lcmap = generateLineAndColumnMap(input);
 	var lines = input.split('\n');
 	var gs = patel.globals();
@@ -61,6 +64,7 @@ instream.on('end', function(){
 			if(argv.source_map) {
 				outstream.write(result.map.toString() + '\n');
 			} else {
+				if(os.platform() === 'win32') outstream.write('\uFEFF');
 				outstream.write(result.code + '\n');
 			}
 		} catch(ex) {
