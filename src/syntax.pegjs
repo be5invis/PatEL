@@ -165,7 +165,7 @@ line
 	/ begins:POS head:linePart _ rear:block ends:POS { return BeginsEndsWith(head.concat(rear), begins, ends) }
 	/ linePart
 linePart
-	= begins:POS head:lineInvoke rear:(_ pipeRear POS)* ends:POS  { 
+	= begins:POS head:lineInvoke rear:(__ pipeRear POS)* ends:POS  { 
 		var res = head
 		for(var j = 0; j < rear.length; j++) {
 			if(rear[j][1].qualifier) 

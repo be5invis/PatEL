@@ -44,8 +44,7 @@ s1_Scope = require("patrisika").Scope, s1_atom = function(s2_x) {
     if (_s7_t0 instanceof Array && 4 === _s7_t0.length && ".try" === _s7_t0[0] && _s7_t0[2] instanceof Array && 1 === _s7_t0[2].length) return s7_block = _s7_t0[1], 
     s7_param = _s7_t0[2][0], s7_handler = _s7_t0[3], s7_env.declare(s7_param), [ ".try", s1_ex(s7_block, s7_env), [ s7_env.use(s7_param) ], s1_ex(s7_handler, s7_env) ];
     if (_s7_t0 instanceof Array && _s7_t0.length >= 1 && ".hash" === _s7_t0[0]) {
-        s7_a = [];
-        for (s7_args = _s7_t0.slice(1), s7_allKeysAreQuotes = !0, s7_j = 1; s7_j < s7_form.length; s7_j += 1) s7_key = s1_ex(s7_form[s7_j][0], s7_env), 
+        for (s7_args = _s7_t0.slice(1), s7_a = [], s7_allKeysAreQuotes = !0, s7_j = 1; s7_j < s7_form.length; s7_j += 1) s7_key = s1_ex(s7_form[s7_j][0], s7_env), 
         s7_value = s1_ex(s7_form[s7_j][1], s7_env), _s7_t1 = s7_key, _s7_t1 instanceof Array && 2 === _s7_t1.length && ".quote" === _s7_t1[0] ? s7_x = _s7_t1[1] : (s7_otherwise = _s7_t1, 
         s7_allKeysAreQuotes = !1), s7_a.push([ s7_key, s7_value ]);
         return s7_allKeysAreQuotes ? [ ".hash" ].concat(s7_a.map(function(s8_pair) {
