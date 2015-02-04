@@ -151,7 +151,7 @@ define [Create] : begin {
 			local t [env.newt]
 			local assignments (".begin" (".set" t [ex right env]))
 			for [local j 0] [j < items.length] [inc j] {
-				assignments.push : Assign items`j`1 ("." t (".quote" items`j`0))  env locallyQ
+				assignments.push : Assign items`j`1 ("." t items`j`0)  env locallyQ
 			}
 			assignments.push t
 			return assignments

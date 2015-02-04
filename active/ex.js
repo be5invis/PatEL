@@ -21,8 +21,8 @@ s1_Scope = require("patrisika").Scope, s1_atom = function(s2_x) {
         _s6_t3 = s6_form && s6_form.ends >= 0 ? s6_res.ends = s6_form.ends : void 0, s6_res;
     };
 }, s1_ex = s1_NodeTranslation(function(s7_form, s7_env) {
-    var s7_form, s7_env, s7_any, s7_x, s7_callee, s7_args, s7_a, s7_j, s7_block, s7_param, s7_handler, s7_body, s7_params, s7_derived, _s7_t0, _s7_t10, _s7_t11;
-    if (_s7_t0 = s7_form, _s7_t0 instanceof Array && _s7_t0.length >= 1 && ".quote" === _s7_t0[0]) return s7_x = _s7_t0.slice(1), 
+    var s7_form, s7_env, s7_any, s7_x, s7_callee, s7_args, s7_a, s7_j, s7_allKeysAreQuotes, s7_key, s7_value, s7_otherwise, s7_block, s7_param, s7_handler, s7_body, s7_params, s7_derived, _s7_t0, _s7_t1, _s7_t11, _s7_t12, _s7_t13, _s7_t18, _s7_t19;
+    if (_s7_t13 = arguments, _s7_t12 = this, _s7_t0 = s7_form, _s7_t0 instanceof Array && _s7_t0.length >= 1 && ".quote" === _s7_t0[0]) return s7_x = _s7_t0.slice(1), 
     [ ".quote" ].concat(s7_x);
     if (_s7_t0 instanceof Array && _s7_t0.length >= 1 && ".id" === _s7_t0[0]) return s7_x = _s7_t0.slice(1), 
     [ ".id" ].concat(s7_x);
@@ -44,27 +44,39 @@ s1_Scope = require("patrisika").Scope, s1_atom = function(s2_x) {
     if (_s7_t0 instanceof Array && 4 === _s7_t0.length && ".try" === _s7_t0[0] && _s7_t0[2] instanceof Array && 1 === _s7_t0[2].length) return s7_block = _s7_t0[1], 
     s7_param = _s7_t0[2][0], s7_handler = _s7_t0[3], s7_env.declare(s7_param), [ ".try", s1_ex(s7_block, s7_env), [ s7_env.use(s7_param) ], s1_ex(s7_handler, s7_env) ];
     if (_s7_t0 instanceof Array && _s7_t0.length >= 1 && ".hash" === _s7_t0[0]) {
-        for (s7_args = _s7_t0.slice(1), s7_a = [ ".hash" ], s7_j = 1; s7_j < s7_form.length; s7_j += 1) s7_a[s7_j] = [ s7_form[s7_j][0], s1_ex(s7_form[s7_j][1], s7_env) ];
-        return s7_a;
+        s7_a = [];
+        for (s7_args = _s7_t0.slice(1), s7_allKeysAreQuotes = !0, s7_j = 1; s7_j < s7_form.length; s7_j += 1) s7_key = s1_ex(s7_form[s7_j][0], s7_env), 
+        s7_value = s1_ex(s7_form[s7_j][1], s7_env), _s7_t1 = s7_key, _s7_t1 instanceof Array && 2 === _s7_t1.length && ".quote" === _s7_t1[0] ? s7_x = _s7_t1[1] : (s7_otherwise = _s7_t1, 
+        s7_allKeysAreQuotes = !1), s7_a.push([ s7_key, s7_value ]);
+        return s7_allKeysAreQuotes ? [ ".hash" ].concat(s7_a.map(function(s8_pair) {
+            var s8_pair;
+            return [ s8_pair[0][1], s8_pair[1] ];
+        })) : (_s7_t11 = s7_env.newt(), function(s9_t) {
+            var s9_t;
+            return [ ".begin", [ ".set", s9_t, [ ".hash" ] ] ].concat(s7_a.map(function(s10_pair) {
+                var s10_pair;
+                return [ ".set", [ ".", s9_t, s10_pair[0] ], s10_pair[1] ];
+            }).concat([ s9_t ]));
+        }(_s7_t11));
     }
     if (_s7_t0 instanceof Array && 2 === _s7_t0.length && ".local" === _s7_t0[0]) return s7_x = _s7_t0[1], 
     s7_env.declare(s7_x), s7_env.use(s7_x);
     if (_s7_t0 instanceof Array && _s7_t0.length >= 1) {
         if (s7_callee = _s7_t0[0], s7_args = _s7_t0.slice(1), s1_atom(s7_callee) && s7_env.macros.has(s7_callee)) return s7_env.macros.get(s7_callee)(s7_form, s7_env);
-        for (_s7_t10 = void 0, _s7_t11 = s1_prim(s7_callee) ? void 0 : s7_callee = s1_ex(s7_callee, s7_env), 
+        for (_s7_t18 = void 0, _s7_t19 = s1_prim(s7_callee) ? void 0 : s7_callee = s1_ex(s7_callee, s7_env), 
         s7_a = [ s7_callee ], s7_j = 1; s7_j < s7_form.length; s7_j += 1) s7_a[s7_j] = s1_ex(s7_form[s7_j], s7_env);
         return s7_a;
     }
     return s7_x = _s7_t0, !s1_atom(s7_x) || !s7_env.macros.has(s7_x) || s7_env.macros.get(s7_x) instanceof Function ? (s7_x = _s7_t0, 
     s1_prim(s7_x) ? s7_x : (s7_x = _s7_t0, s1_atom(s7_x) ? s7_env.use(s7_x) : s7_any = _s7_t0)) : s7_env.macros.get(s7_x);
-}), s1_checkEvaluated = function(s8_form) {
-    var s8_form, _s8_t1;
-    if (s8_form && s8_form instanceof Array) {
-        if (s8_form.unevaluated) throw new s1_FormInvalidError(s8_form, "Unevaluated subform");
-        return _s8_t1 = void 0, s8_form.forEach(s1_checkEvaluated);
+}), s1_checkEvaluated = function(s11_form) {
+    var s11_form, _s11_t1;
+    if (s11_form && s11_form instanceof Array) {
+        if (s11_form.unevaluated) throw new s1_FormInvalidError(s11_form, "Unevaluated subform");
+        return _s11_t1 = void 0, s11_form.forEach(s1_checkEvaluated);
     }
     return void 0;
-}, exports.pass = function(s9_form, s9_globalScope) {
-    var s9_form, s9_globalScope;
-    return s1_ex(s9_form, s9_globalScope);
+}, exports.pass = function(s12_form, s12_globalScope) {
+    var s12_form, s12_globalScope;
+    return s1_ex(s12_form, s12_globalScope);
 }, exports.ex = s1_ex, exports.checkEvaluated = s1_checkEvaluated;

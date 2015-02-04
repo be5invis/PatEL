@@ -148,8 +148,8 @@ propertyPairs
 		return res;
 	}
 propertyPair
-	= "." head:stringliteral & { head instanceof Array && head[0] === '.quote' } _ rear:either { return [head, rear]}
-	/ "." head:identifier _ rear:either { return [head, rear]}
+	= "." head:stringliteral _ rear:either { return [head, rear]}
+	/ "." head:identifier _ rear:either { return [['.quote', head], rear]}
 
 block
 	= "{" __ it:blockContent __ "}" { return it }

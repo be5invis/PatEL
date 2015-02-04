@@ -51,11 +51,22 @@ define ex : NodeTranslation : lambda [form env] : match form {
 		return (".try" [ex block env] ([env.use param]) [ex handler env])
 	}
 	(".hash" :: args) : begin {
-		local a [list ".hash"]
+		local a ()
+		local allKeysAreQuotes true
 		for [local j 1] [j < form.length] [inc j] : begin {
-			set a`j (form`j`0 [ex form`j`1 env])
+			local key [ex form`j`0 env]
+			local value [ex form`j`1 env]
+			match key {
+				(".quote" x) nothing
+				otherwise : set allKeysAreQuotes false
+			}
+			a.push (key value)
 		}
-		return a
+		if allKeysAreQuotes {
+			then : return (".hash" :: [a.map [lambda [pair] (pair`0`1 pair`1)]])
+			else : return : let [t [env.newt]] (".begin" (".set" t (".hash")) :: [[a.map [lambda [pair] (".set" ("." t pair`0) pair`1)]].concat (t)])
+		}
+
 	}
 	(".local" x) : begin {
 		env.declare x

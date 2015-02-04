@@ -44,12 +44,13 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
         s10_body = _s10_t0[1], s1_ex([ ".lambda", [], s10_body ], s10_env)) : _s10_t0 instanceof Array && 1 === _s10_t0.length ? (s10_car = _s10_t0[0], 
         s1_ex([ ".lambda", [], [ ".unit" ] ], s10_body)) : (s10_otherwise = _s10_t0, s5_reportInvalid(s10_otherwise, "Invalid Lambda Formation"));
     }), s5_externs.macros.put("function", s5_externs.macros.get("lambda")), s5_externs.macros.put("if", function(s11_form, s11_env) {
-        var s11_form, s11_env, s11_test, s11_consequents, s11_alternates, s11_consequent, s11_alternate, _s11_t0;
+        var s11_form, s11_env, s11_otherwise, s11_test, s11_consequents, s11_alternates, s11_consequent, s11_alternate, _s11_t0;
         return _s11_t0 = s11_form, _s11_t0 instanceof Array && 3 === _s11_t0.length && "if" === _s11_t0[0] ? (s11_test = _s11_t0[1], 
         s11_consequent = _s11_t0[2], s1_ex([ ".if", s11_test, s11_consequent ], s11_env)) : _s11_t0 instanceof Array && 4 === _s11_t0.length && "if" === _s11_t0[0] ? (s11_test = _s11_t0[1], 
         s11_consequent = _s11_t0[2], s11_alternate = _s11_t0[3], s1_ex([ ".if", s11_test, s11_consequent, s11_alternate ], s11_env)) : _s11_t0 instanceof Array && 3 === _s11_t0.length && "if" === _s11_t0[0] && _s11_t0[2] instanceof Array && _s11_t0[2].length >= 1 && "then" === _s11_t0[2][0] ? (s11_test = _s11_t0[1], 
         s11_consequents = _s11_t0[2].slice(1), s1_ex([ ".if", s11_test, [ ".begin" ].concat(s11_consequents) ], s11_env)) : _s11_t0 instanceof Array && 4 === _s11_t0.length && "if" === _s11_t0[0] && _s11_t0[2] instanceof Array && _s11_t0[2].length >= 1 && "then" === _s11_t0[2][0] && _s11_t0[3] instanceof Array && _s11_t0[3].length >= 1 && "else" === _s11_t0[3][0] ? (s11_test = _s11_t0[1], 
-        s11_consequents = _s11_t0[2].slice(1), s11_alternates = _s11_t0[3].slice(1), s1_ex([ ".if", s11_test, [ ".begin" ].concat(s11_consequents), [ ".begin" ].concat(s11_alternates) ], s11_env)) : void 0;
+        s11_consequents = _s11_t0[2].slice(1), s11_alternates = _s11_t0[3].slice(1), s1_ex([ ".if", s11_test, [ ".begin" ].concat(s11_consequents), [ ".begin" ].concat(s11_alternates) ], s11_env)) : (s11_otherwise = _s11_t0, 
+        s5_reportInvalid(s11_otherwise, "Invalid Conditional Form"));
     }), s5_externs.macros.put(".conslist", function(s12_form, s12_env) {
         var s12_form, s12_env;
         return [ [ ".", s1_ex([ ".list" ].concat(s12_form.slice(1, -1)), s12_env), [ ".quote", "concat" ] ], s1_ex(s12_form[s12_form.length - 1], s12_env) ];
@@ -102,7 +103,7 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
         }
         if (_s18_t0 instanceof Array && _s18_t0.length >= 1 && ".hash" === _s18_t0[0]) {
             for (s18_items = _s18_t0.slice(1), s18_t = s18_env.newt(), s18_assignments = [ ".begin", [ ".set", s18_t, s1_ex(s18_right, s18_env) ] ], 
-            s18_j = 0; s18_j < s18_items.length; s18_j += 1) s18_assignments.push(s5_Assign(s18_items[s18_j][1], [ ".", s18_t, [ ".quote", s18_items[s18_j][0] ] ], s18_env, s18_locallyQ));
+            s18_j = 0; s18_j < s18_items.length; s18_j += 1) s18_assignments.push(s5_Assign(s18_items[s18_j][1], [ ".", s18_t, s18_items[s18_j][0] ], s18_env, s18_locallyQ));
             return s18_assignments.push(s18_t), s18_assignments;
         }
         if (_s18_t0 instanceof Array && _s18_t0.length >= 1) return s18_callee = _s18_t0[0], 
