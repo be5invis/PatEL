@@ -148,8 +148,7 @@ propertyPairs
 		return res;
 	}
 propertyPair
-	= "." head:stringliteral _ rear:either { return [head, rear]}
-	/ "." head:identifier _ rear:either { return [['.quote', head], rear]}
+	= head:qualifier _ rear:either { return [head, rear]}
 
 block
 	= "{" __ it:blockContent __ "}" { return it }
