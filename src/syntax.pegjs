@@ -35,6 +35,16 @@
 		};
 		return form
 	}
+	function joinInterpolation(parts){
+		var result = [], pivot = ['.quote', ''];
+		for(var j = 0; j < parts.length; j++){
+			if(parts[j] instanceof Array && parts[j][0] === '.quote') pivot[1] += parts[j][1];
+			else result.push(pivot, parts[j]), pivot = ['.quote', '']
+		};
+		if(pivot[1]) result.push(pivot);
+		if(result.length === 1 && result[0] instanceof Array && result[0][0] === '.quote') return result[0]
+		return ['+'].concat(result)
+	}
 }
 
 start = __ it:blockContent __ {
@@ -47,8 +57,8 @@ primitiveStart
 	= identifier / numberliteral / stringliteral / "[" / "(" / "{"
 primitive
 	= group
-	/ it:numberliteral { return ['.quote', it] }
-	/ it:stringliteral { return ['.quote', it] }
+	/ numberliteral
+	/ stringliteral
 	/ identifier
 
 group = operate / struct
@@ -74,8 +84,8 @@ parting
 	}
 qualifier
 	= "." property:identifier { return ['.quote', property] }
-	/ "." property:numberliteral { return ['.quote', property] }
-	/ "." property:stringliteral { return ['.quote', property] }
+	/ "." property:numberliteral { return property }
+	/ "." property:stringliteral { return property }
 	/ "." "(" __ property:parting __ ")" { return property }
 	/ "." property:operate { return property }
 	/ "`" property:primitive { return property }
@@ -138,7 +148,7 @@ propertyPairs
 		return res;
 	}
 propertyPair
-	= "." head:stringliteral _ rear:either { return [head, rear]}
+	= "." head:stringliteral & { head instanceof Array && head[0] === '.quote' } _ rear:either { return [head, rear]}
 	/ "." head:identifier _ rear:either { return [head, rear]}
 
 block
@@ -187,28 +197,30 @@ identifier "Identifier"
 	= $((UnicodeLetter / [_$@]) (UnicodeLetter / UnicodeCombiningMark / UnicodeDigit / UnicodeConnectorPunctuation / [\-_$@])*)
 	/ "[" it:$([\-_/+*<=>!?$%_&~^@|]+) "]" { return it }
 numberliteral "Numeric Literal"
-	= ("0x" / "0X") hexdigits:$([0-9a-fA-F]+) { return parseInt(hexdigits, 16) }
-	/ decimal:$([0-9]+ ("." [0-9]+)? ([eE] [+\-]? [0-9]+)?) { return decimal - 0 }
+	= ("0x" / "0X") hexdigits:$([0-9a-fA-F]+) { return ['.quote', parseInt(hexdigits, 16)] }
+	/ decimal:$([0-9]+ ("." [0-9]+)? ([eE] [+\-]? [0-9]+)?) { return ['.quote', decimal - 0] }
 stringliteral "String Literal"
-	= "\"" inner:stringcharacter* "\"" { return inner.join('') }
-	/ "'" inner:singlestringchar* "'" { return inner.join('') }
+	= "\"" inner:stringcharacter* "\"" { return joinInterpolation(inner) }
+	/ "'" inner:singlestringchar* "'" { return ['.quote', inner.join('')] }
 stringcharacter
-	= [^"\\\r\n]
+	= common:$([^"\\\r\n]+) { return ['.quote', common] }
 	/ "\\u" digits:([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9]) { 
-		return String.fromCharCode(parseInt(digits.join(''), 16))
+		return ['.quote', String.fromCharCode(parseInt(digits.join(''), 16))]
 	}
+	/ "\\" g:operate { return g }
+	/ "\\" "(" __ g:parting __ ")"  { return g }
+	/ "\\" LINE_TERMINATOR SPACE_CHARACTER_OR_NEWLINE* "\\" { return ['.quote', ''] }
 	/ "\\" which:[^u\r\n] {
 		switch(which) {
-			case('n'): return "\n"
-			case('r'): return "\r"
-			case('"'): return "\""
-			case('t'): return "\t"
-			case('v'): return "\v"
-			case('\\'): return "\\"
-			default: return "\\" + which
+			case('n'): return ['.quote', "\n"];
+			case('r'): return ['.quote', "\r"];
+			case('"'): return ['.quote', "\""];
+			case('t'): return ['.quote', "\t"];
+			case('v'): return ['.quote', "\v"];
+			case('\\'): return ['.quote', "\\"];
+			default: return ['.quote', "\\" + which];
 		}
 	}
-	/ "\\" LINE_TERMINATOR SPACE_CHARACTER_OR_NEWLINE* "\\" { return '' }
 singlestringchar
 	= [^']
 	/ "''" { return "'" }
