@@ -1,18 +1,4 @@
 {
-	function composeLine(head, rear){
-		var j;
-		if(head instanceof Array && (j = head.indexOf(":")) >= 0){
-			return head.slice(0, j).concat(rear, head.slice(j + 1))
-		} else if(head instanceof Array){
-			var r = [];
-			for(var j = 0; j < head.length; j++){
-				r[j] = composeLine(head[j], rear)
-			};
-			return r;
-		} else {
-			return head
-		}
-	}
 	function buildleft(car, cdr, begins, ends){
 		if(!cdr.length) return car;
 		var form = car;
