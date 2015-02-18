@@ -22,9 +22,11 @@ s1_Scope = require("patrisika").Scope, s1_atom = function(s2_x) {
         s6_res;
     };
 }, s1_deQuasiquote = function(s7_form) {
-    var s7_form, s7_otherwise, s7_xs, s7_c, _s7_t0;
+    var s7_form, s7_otherwise, s7_xs, s7_x, s7_c, _s7_t0, _s7_t1;
     return _s7_t0 = s7_form, _s7_t0 instanceof Array && 2 === _s7_t0.length && ".unquote" === _s7_t0[0] ? s7_c = _s7_t0[1] : _s7_t0 instanceof Array && _s7_t0.length >= 0 ? (s7_xs = _s7_t0.slice(0), 
-    [ ".list" ].concat(s7_xs.map(s1_deQuasiquote))) : (s7_otherwise = _s7_t0, [ ".quote", s7_otherwise ]);
+    _s7_t1 = s7_xs[s7_xs.length - 1], _s7_t1 instanceof Array && 2 === _s7_t1.length && ".sliceunquote" === _s7_t1[0] ? (s7_x = _s7_t1[1], 
+    [ ".conslist" ].concat(s7_xs.slice(0, -1).map(s1_deQuasiquote), [ s7_x ])) : (s7_otherwise = _s7_t1, 
+    [ ".list" ].concat(s7_xs.map(s1_deQuasiquote)))) : (s7_otherwise = _s7_t0, [ ".quote", s7_otherwise ]);
 }, s1_ex = s1_NodeTranslation(function(s8_form, s8_env) {
     var s8_form, s8_env, s8_any, s8_x, s8_callee, s8_args, s8_a, s8_j, s8_allKeysAreQuotes, s8_key, s8_value, s8_otherwise, s8_block, s8_param, s8_handler, s8_body, s8_params, s8_derived, s8_c, s8_e, _s8_t0, _s8_t1, _s8_t14, _s8_t15, _s8_t16, _s8_t21, _s8_t22;
     if (_s8_t16 = arguments, _s8_t15 = this, _s8_t0 = s8_form, _s8_t0 instanceof Array && _s8_t0.length >= 1 && ".quote" === _s8_t0[0]) return s8_x = _s8_t0.slice(1), 

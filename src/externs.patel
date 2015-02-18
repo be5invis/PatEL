@@ -242,7 +242,7 @@ define [Create] : begin {
 				assign : lambda [x flag] (".set" [ex (".local" pattern) env] [if [wrapper && !flag] (wrapper x) x])
 			}
 			(".quote" x) : object {
-				whether : lambda [x] ("===" [ex pattern env] [if [wrapper && !flag] (wrapper x) x])
+				whether : lambda [x] ("===" [ex pattern env] x)
 				assign  : lambda [x flag] (".unit")
 			}
 			("." :: whatever) : object {
@@ -285,7 +285,9 @@ define [Create] : begin {
 								(("." x (".quote" "slice")) (".quote" ms.length))] true]]]
 				}
 			}
-			(".quasiquote" :: subpatterns) : matchQ [deQuasiquote pattern`1]
+			(".quasiquote" :: subpatterns) : begin {
+				matchQ [deQuasiquote pattern`1]
+			}
 			(callee :: subpatterns) : begin {
 				local ms : subpatterns.map matchQ
 				local t : env.newt
@@ -347,15 +349,19 @@ define [Create] : begin {
 
 	externs.macros.put "define-macro" : lambda [form env] : match form {
 		(op name body) [atom name] : begin {
-			local ds [new Scope [Create]]
+			local ds [new Scope env]
 			ds.declare "atom" true
 			ds.declare "prim" true
+			ds.declare "formOf" true
+			ds.declare "scopeOf" true
 			local macroG : new Function {
 				ds.castName 'atom'
 				ds.castName 'prim'
+				ds.castName 'formOf'
+				ds.castName 'scopeOf'
 				escodegen.generate : patrisika.generate (".return" [ex body ds]) ds [lambda [form] (".return" form)]
 			}
-			local macroFn [macroG [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim]]
+			local macroFn [macroG [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim] [lambda [x] x`1] [lambda [x] x`2]]
 			env.macros.put name : lambda [c e] : begin {
 				local result [macroFn c e]
 				return [ex result [new Scope env]]

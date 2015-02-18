@@ -1,13 +1,14 @@
-define [falsy x] [not x]
 
-define-macro myor : lambda [form env] : macro-match form env {
-	@`[@op @x] @x
-	@`[@op @x @y] : let [t [env.newt]] : syntax : begin {
-		console.log 1
-		set @t @x
-		if [falsy @t] @y @x
-	}
-	(op x :: rest) : return @`[myor @x @('myor' :: rest)]
+define-macro syntax-rules : lambda [form env] : macro-match form env {
+	@`[syntax-rules @::patterns] : syntax : lambda [form env] [macro-match form env @::[patterns.map formOf]]
 }
 
-let [falsy [lambda [x] true]] : console.log [myor 0]
+define-macro pointer : syntax-rules {
+	@`[pointer @x] : return @`(.get [lambda [] @x] .set [lambda [y] [set @x y]])
+}
+
+local a 1
+local at-a [pointer a]
+console.log [at-a.get]
+console.log [at-a.set 2]
+console.log [at-a.get]

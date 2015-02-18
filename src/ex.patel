@@ -24,8 +24,11 @@ define [NodeTranslation fn] : lambda [form] : begin {
 
 define [deQuasiquote form] : match form {
 	(".unquote" c)	c
-	(::xs)        	(".list" :: [xs.map deQuasiquote])
-	otherwise     	(".quote" otherwise)	
+	(::xs) : match xs`[xs.length - 1] {
+		(".sliceunquote" x)	: (".conslist").concat [[xs.slice 0 [0-1]].map deQuasiquote] (x)
+		otherwise          	: (".list").concat [xs.map deQuasiquote]
+	}
+	otherwise	(".quote" otherwise)	
 }
 
 # Function [ex form env]: Expand macros and do scoping

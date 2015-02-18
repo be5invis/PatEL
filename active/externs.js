@@ -175,9 +175,8 @@ s1_ex = require("./ex").ex, s1_deQuasiquote = require("./ex").deQuasiquote, s1_F
             } : _s29_t0 instanceof Array && 2 === _s29_t0.length && ".quote" === _s29_t0[0] ? (s29_x = _s29_t0[1], 
             {
                 whether: function(s44_x) {
-                    var s44_x, s44_flag, _s44_t0, _s44_t1, _s44_t2;
-                    return _s44_t0 = "===", _s44_t1 = s1_ex(s29_pattern, s28_env), _s44_t2 = s28_wrapper && !s44_flag ? [ s28_wrapper, s44_x ] : s44_x, 
-                    [ _s44_t0, _s44_t1, _s44_t2 ];
+                    var s44_x;
+                    return [ "===", s1_ex(s29_pattern, s28_env), s44_x ];
                 },
                 assign: function() {
                     return [ ".unit" ];
@@ -265,20 +264,26 @@ s1_ex = require("./ex").ex, s1_deQuasiquote = require("./ex").deQuasiquote, s1_F
         var s49_form, s49_env, s49_otherwise, s49_op, s49_name, s49_body, s49_ds, s49_macroG, s49_macroFn, _s49_t0, _s49_t1, _s49_t2, _s49_t3;
         return _s49_t0 = s49_form, _s49_t1 = !1, _s49_t0 instanceof Array && 3 === _s49_t0.length ? (s49_op = _s49_t0[0], 
         s49_name = _s49_t0[1], s49_body = _s49_t0[2], _s49_t3 = _s49_t1 = s1_atom(s49_name) ? !0 : !1, 
-        _s49_t2 = _s49_t3) : _s49_t2 = void 0, _s49_t1 ? (s49_ds = new s1_Scope(s1_Create()), 
-        s49_ds.declare("atom", !0), s49_ds.declare("prim", !0), s49_macroG = new Function(s49_ds.castName("atom"), s49_ds.castName("prim"), s1_escodegen.generate(s1_patrisika.generate([ ".return", s1_ex(s49_body, s49_ds) ], s49_ds, function(s50_form) {
+        _s49_t2 = _s49_t3) : _s49_t2 = void 0, _s49_t1 ? (s49_ds = new s1_Scope(s49_env), 
+        s49_ds.declare("atom", !0), s49_ds.declare("prim", !0), s49_ds.declare("formOf", !0), 
+        s49_ds.declare("scopeOf", !0), s49_macroG = new Function(s49_ds.castName("atom"), s49_ds.castName("prim"), s49_ds.castName("formOf"), s49_ds.castName("scopeOf"), s1_escodegen.generate(s1_patrisika.generate([ ".return", s1_ex(s49_body, s49_ds) ], s49_ds, function(s50_form) {
             var s50_form;
             return [ ".return", s50_form ];
-        }))), s49_macroFn = s49_macroG(s1_wrapForSyntacticClosure(s1_atom), s1_wrapForSyntacticClosure(s1_prim)), 
-        s49_env.macros.put(s49_name, function(s51_c, s51_e) {
-            var s51_c, s51_e, s51_result;
-            return s51_result = s49_macroFn(s51_c, s51_e), s1_ex(s51_result, new s1_Scope(s49_env));
+        }))), s49_macroFn = s49_macroG(s1_wrapForSyntacticClosure(s1_atom), s1_wrapForSyntacticClosure(s1_prim), function(s51_x) {
+            var s51_x;
+            return s51_x[1];
+        }, function(s52_x) {
+            var s52_x;
+            return s52_x[2];
+        }), s49_env.macros.put(s49_name, function(s53_c, s53_e) {
+            var s53_c, s53_e, s53_result;
+            return s53_result = s49_macroFn(s53_c, s53_e), s1_ex(s53_result, new s1_Scope(s49_env));
         }), [ ".unit" ]) : (s49_otherwise = _s49_t0, [ ".unit" ]);
-    }), s7_externs.macros.put("macro-match", function(s52_form, s52_env) {
-        var s52_form, s52_env, s52_otherwise, s52_c, s52_e, s52_patterns, s52_t, s52_tx, s52_tw, _s52_t0;
-        return _s52_t0 = s52_form, _s52_t0 instanceof Array && _s52_t0.length >= 3 && "macro-match" === _s52_t0[0] ? (s52_c = _s52_t0[1], 
-        s52_e = _s52_t0[2], s52_patterns = _s52_t0.slice(3), s52_t = s52_env.newt(), s52_tx = s52_env.newt(), 
-        s52_tw = s52_env.newt(), [ ".begin", [ ".set", s52_t, s52_e ], [ ".set", s52_tw, [ ".lambda", [ s52_tx ], [ ".return", [ ".list", [ ".quote", ".syntactic-closure" ], s52_tx, s52_t ] ] ] ], s7_externs.macros.get("match")([ "match", s52_c ].concat(s52_patterns), s52_env, s52_tw) ]) : (s52_otherwise = _s52_t0, 
+    }), s7_externs.macros.put("macro-match", function(s54_form, s54_env) {
+        var s54_form, s54_env, s54_otherwise, s54_c, s54_e, s54_patterns, s54_t, s54_tx, s54_tw, _s54_t0;
+        return _s54_t0 = s54_form, _s54_t0 instanceof Array && _s54_t0.length >= 3 && "macro-match" === _s54_t0[0] ? (s54_c = _s54_t0[1], 
+        s54_e = _s54_t0[2], s54_patterns = _s54_t0.slice(3), s54_t = s54_env.newt(), s54_tx = s54_env.newt(), 
+        s54_tw = s54_env.newt(), [ ".begin", [ ".set", s54_t, s54_e ], [ ".set", s54_tw, [ ".lambda", [ s54_tx ], [ ".return", [ ".list", [ ".quote", ".syntactic-closure" ], s54_tx, s54_t ] ] ] ], s7_externs.macros.get("match")([ "match", s54_c ].concat(s54_patterns), s54_env, s54_tw) ]) : (s54_otherwise = _s54_t0, 
         [ ".unit" ]);
     }), s7_externs;
 }, exports.Create = s1_Create;
