@@ -22,18 +22,16 @@ define [NodeTranslation fn] : lambda [form] : begin {
 	return res
 }
 
+define [deQuasiquote form] : match form {
+	(".unquote" c)	c
+	(::xs)        	(".list" :: [xs.map deQuasiquote])
+	otherwise     	(".quote" otherwise)	
+}
+
 # Function [ex form env]: Expand macros and do scoping
 define ex : NodeTranslation : lambda [form env] : match form {
 	(".quote" :: x) : return (".quote" :: x)
-	(".quasiquote" x) : begin {
-		define [r form] : match form {
-			("unquote" c) 	: ex c env
-			(".unquote" c)	: ex c env
-			(::xs)        	(".list" :: [xs.map r])
-			otherwise     	(".quote" otherwise)
-		}
-		r x
-	}
+	(".quasiquote" x) : ex [deQuasiquote x] env
 	(".unquote" x) : return [ex x env]
 	(".id" :: x) : return (".id" :: x)
 	(".t" :: x) : return (".t" :: x)
@@ -108,3 +106,4 @@ define [checkEvaluated form] : if [form && form <@ Array] : begin {
 define [exports.pass form globalScope] [ex form globalScope]
 define exports.ex ex
 define exports.checkEvaluated checkEvaluated
+define exports.deQuasiquote deQuasiquote

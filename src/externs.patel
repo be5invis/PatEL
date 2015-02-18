@@ -5,6 +5,7 @@ define Scope [require "patrisika"].Scope
 define escodegen [require "escodegen"]
 define util [require "util"]
 define ex [require "./ex"].ex
+define deQuasiquote [require "./ex"].deQuasiquote
 
 define [FormInvalidError form reason] : begin {
 	set this.reason reason
@@ -284,6 +285,7 @@ define [Create] : begin {
 								(("." x (".quote" "slice")) (".quote" ms.length))] true]]]
 				}
 			}
+			(".quasiquote" :: subpatterns) : matchQ [deQuasiquote pattern`1]
 			(callee :: subpatterns) : begin {
 				local ms : subpatterns.map matchQ
 				local t : env.newt

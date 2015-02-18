@@ -1,4 +1,4 @@
-var s1_patrisika, s1_atom, s1_prim, s1_Scope, s1_escodegen, s1_util, s1_ex, s1_FormInvalidError, s1_wrapForSyntacticClosure, s1_Create, _s1_t0, _s1_t1, _s1_t2, _s1_t3, _s1_t4;
+var s1_patrisika, s1_atom, s1_prim, s1_Scope, s1_escodegen, s1_util, s1_ex, s1_deQuasiquote, s1_FormInvalidError, s1_wrapForSyntacticClosure, s1_Create, _s1_t0, _s1_t1, _s1_t2, _s1_t3, _s1_t4;
 
 s1_patrisika = require("patrisika"), s1_atom = function(s2_x) {
     var s2_x;
@@ -7,7 +7,7 @@ s1_patrisika = require("patrisika"), s1_atom = function(s2_x) {
     var s3_x;
     return s1_atom(s3_x) && "&" !== s3_x && "&!" !== s3_x && ("." === s3_x[0] || /^\W+/.test(s3_x));
 }, s1_Scope = require("patrisika").Scope, s1_escodegen = require("escodegen"), s1_util = require("util"), 
-s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
+s1_ex = require("./ex").ex, s1_deQuasiquote = require("./ex").deQuasiquote, s1_FormInvalidError = function(s4_form, s4_reason) {
     var s4_form, s4_reason, _s4_t0, _s4_t1;
     return _s4_t0 = this, _s4_t0.reason = s4_reason, _s4_t0.message = s4_reason, _s4_t0.relatedForm = s4_form, 
     s4_form && s4_form.begins >= 0 && s4_form.ends >= 0 ? (_s4_t0.begins = s4_form.begins, 
@@ -227,7 +227,8 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
                     _s36_t6 = !0, _s36_t7 = _s36_t4.call(_s36_t3, _s36_t5, _s36_t6), _s36_t8 = [ _s36_t7 ], 
                     _s36_t2.call(_s36_t1, _s36_t8);
                 }
-            }) : _s29_t0 instanceof Array && _s29_t0.length >= 1 ? (s29_callee = _s29_t0[0], 
+            }) : _s29_t0 instanceof Array && _s29_t0.length >= 1 && ".quasiquote" === _s29_t0[0] ? (s29_subpatterns = _s29_t0.slice(1), 
+            s28_matchQ(s1_deQuasiquote(s29_pattern[1]))) : _s29_t0 instanceof Array && _s29_t0.length >= 1 ? (s29_callee = _s29_t0[0], 
             s29_subpatterns = _s29_t0.slice(1), s29_ms = s29_subpatterns.map(s28_matchQ), s29_t = s28_env.newt(), 
             {
                 whether: function(s30_x) {

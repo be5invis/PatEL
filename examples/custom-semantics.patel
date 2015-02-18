@@ -1,7 +1,8 @@
 define [falsy x] [not x]
 
 define-macro myor : lambda [form env] : macro-match form env {
-	(op x y) : let [t [env.newt]] : syntax : begin {
+	@`[@op @x] @x
+	@`[@op @x @y] : let [t [env.newt]] : syntax : begin {
 		console.log 1
 		set @t @x
 		if [falsy @t] @y @x
@@ -9,4 +10,4 @@ define-macro myor : lambda [form env] : macro-match form env {
 	(op x :: rest) : return @`[myor @x @('myor' :: rest)]
 }
 
-let [falsy [lambda [x] true]] : console.log [myor 0 5 5 1]
+let [falsy [lambda [x] true]] : console.log [myor 0]
