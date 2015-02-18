@@ -25,6 +25,16 @@ define [NodeTranslation fn] : lambda [form] : begin {
 # Function [ex form env]: Expand macros and do scoping
 define ex : NodeTranslation : lambda [form env] : match form {
 	(".quote" :: x) : return (".quote" :: x)
+	(".quasiquote" x) : begin {
+		define [r form] : match form {
+			("unquote" c) 	: ex c env
+			(".unquote" c)	: ex c env
+			(::xs)        	(".list" :: [xs.map r])
+			otherwise     	(".quote" otherwise)
+		}
+		r x
+	}
+	(".unquote" x) : return [ex x env]
 	(".id" :: x) : return (".id" :: x)
 	(".t" :: x) : return (".t" :: x)
 	(".lambda" (::args) body) : begin {

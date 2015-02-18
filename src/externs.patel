@@ -57,6 +57,8 @@ define [Create] : begin {
 	externs.macros.put "throw" : operatorRename ".throw"
 	externs.macros.put "list" : operatorRename ".list"
 	externs.macros.put "typeof" : operatorRename ".typeof"
+	externs.macros.put "quasiquote" : operatorRename ".quasiquote"
+	externs.macros.put "syntax" : operatorRename ".quasiquote"
 
 	externs.macros.put "lambda" : lambda [form env] : match form {
 		(car parameters body)	: ex ('.lambda' parameters body) env

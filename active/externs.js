@@ -44,6 +44,7 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
     s7_externs.macros.put("not", s7_operatorRename("!")), s7_externs.macros.put("return", s7_operatorRename(".return")), 
     s7_externs.macros.put("yield", s7_operatorRename(".yield")), s7_externs.macros.put("throw", s7_operatorRename(".throw")), 
     s7_externs.macros.put("list", s7_operatorRename(".list")), s7_externs.macros.put("typeof", s7_operatorRename(".typeof")), 
+    s7_externs.macros.put("quasiquote", s7_operatorRename(".quasiquote")), s7_externs.macros.put("syntax", s7_operatorRename(".quasiquote")), 
     s7_externs.macros.put("lambda", function(s12_form, s12_env) {
         var s12_form, s12_env, s12_otherwise, s12_car, s12_body, s12_parameters, _s12_t0;
         return _s12_t0 = s12_form, _s12_t0 instanceof Array && 3 === _s12_t0.length ? (s12_car = _s12_t0[0], 
@@ -267,7 +268,7 @@ s1_ex = require("./ex").ex, s1_FormInvalidError = function(s4_form, s4_reason) {
         s49_ds.declare("atom", !0), s49_ds.declare("prim", !0), s49_macroG = new Function(s49_ds.castName("atom"), s49_ds.castName("prim"), s1_escodegen.generate(s1_patrisika.generate([ ".return", s1_ex(s49_body, s49_ds) ], s49_ds, function(s50_form) {
             var s50_form;
             return [ ".return", s50_form ];
-        }))), console.log("" + s49_macroG), s49_macroFn = s49_macroG(s1_wrapForSyntacticClosure(s1_atom), s1_wrapForSyntacticClosure(s1_prim)), 
+        }))), s49_macroFn = s49_macroG(s1_wrapForSyntacticClosure(s1_atom), s1_wrapForSyntacticClosure(s1_prim)), 
         s49_env.macros.put(s49_name, function(s51_c, s51_e) {
             var s51_c, s51_e, s51_result;
             return s51_result = s49_macroFn(s51_c, s51_e), s1_ex(s51_result, new s1_Scope(s49_env));

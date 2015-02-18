@@ -43,11 +43,16 @@ primitiveStart
 	= identifier / numberliteral / stringliteral / "[" / "(" / "{"
 primitive
 	= group
+	/ quasiquote
+	/ unquote
 	/ numberliteral
 	/ stringliteral
 	/ identifier
 
 group = operate / struct
+
+quasiquote = begins:POS '@`' it:primitive ends:POS	{return BeginsEndsWith(['.quasiquote', it], begins, ends)}
+unquote = begins:POS '@' it:primitive ends:POS    	{return BeginsEndsWith(['.unquote', it], begins, ends)}
 
 operate
 	= begins: POS "[" __ "]" ends: POS                              	{ return BeginsEndsWith([], begins, ends) }
