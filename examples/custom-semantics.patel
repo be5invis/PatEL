@@ -2,6 +2,7 @@ define [falsy x] [not x]
 
 define-macro myor : lambda [form env] : macro-match form env {
 	(op x y) : let [t [env.newt]] (".begin" (".set" t x) (".if" ("falsy" t) y t))
+	(op x :: rest) : return ("myor" x ("myor" :: rest))
 }
 
-let [falsy [lambda [x] true]] : trace [myor 1 2]
+let [falsy [lambda [x] true]] : trace [myor 1 2 3 4]

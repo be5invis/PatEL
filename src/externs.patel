@@ -232,20 +232,19 @@ define [Create] : begin {
 	externs.macros.put "match" : lambda [form env wrapper] : begin {
 		local pairs [form.slice 2]
 		local t [env.newt]
-		set wrapper [wrapper || [lambda [x] x]]
 
 		define [matchQ pattern] : match pattern {
 			id [atom id] : object {
 				whether : lambda [x] null
-				assign : lambda [x] (".set" [ex (".local" pattern) env] [wrapper x])
+				assign : lambda [x flag] (".set" [ex (".local" pattern) env] [if [wrapper && !flag] (wrapper x) x])
 			}
 			(".quote" x) : object {
-				whether : lambda [x] ("===" [ex pattern env] [wrapper x])
-				assign  : lambda [x] (".unit")
+				whether : lambda [x] ("===" [ex pattern env] [if [wrapper && !flag] (wrapper x) x])
+				assign  : lambda [x flag] (".unit")
 			}
 			("." :: whatever) : object {
 				whether : lambda [x] null
-				assign : lambda [x] (".set" [ex pattern env] [wrapper x])
+				assign : lambda [x flag] (".set" [ex pattern env] [if [wrapper && !flag] (wrapper x) x])
 			}
 			(".list" :: subpatterns) : begin {
 				local ms : subpatterns.map matchQ
@@ -257,8 +256,8 @@ define [Create] : begin {
 							:: [ms.map [lambda [p j] 
 								[p.whether ("." x (".quote" j))]]]
 						).filter boole]
-					assign : lambda [x] (".begin" :: [ms.map [lambda [p j] 
-						[p.assign ("." x (".quote" j))]]] )
+					assign : lambda [x flag] (".begin" :: [ms.map [lambda [p j] 
+						[p.assign ("." x (".quote" j)) flag]]] )
 				}
 			}
 			(".conslist" :: subpatterns) : begin {
@@ -274,11 +273,13 @@ define [Create] : begin {
 									[p.whether ("." x (".quote" j))]]].concat
 								[list [final.whether (("." x (".quote" "slice")) (".quote" j))]]]
 						).filter boole]
-					assign : lambda [x] [(".begin"
+					assign : lambda [x flag] [(".begin"
 						:: [ms.map [lambda [p j] 
 							[p.assign ("." x (".quote" j))]]] 
 						).concat [list [final.assign 
-							(("." x (".quote" "slice")) (".quote" ms.length))]]]
+							[if [wrapper && !flag]
+								(("." (("." x (".quote" "slice")) (".quote" ms.length)) (".quote" "map")) wrapper)
+								(("." x (".quote" "slice")) (".quote" ms.length))] true]]]
 				}
 			}
 			(callee :: subpatterns) : begin {
@@ -293,8 +294,8 @@ define [Create] : begin {
 							:: [ms.map [lambda [p j] 
 								[p.whether ("." t (".quote" j))]]]
 						).filter boole]
-					assign : lambda [x] (".begin" :: [ms.map [lambda [p j]
-						[p.assign ("." t (".quote" j))]]] )
+					assign : lambda [x flag] (".begin" :: [ms.map [lambda [p j]
+						[p.assign ("." t (".quote" j)) flag]]] )
 				}
 			}
 		}
@@ -363,9 +364,12 @@ define [Create] : begin {
 	externs.macros.put "macro-match" : lambda [form env] : match form {
 		("macro-match" c e :: patterns) : begin {
 			local t [env.newt]
+			local tx [env.newt]
+			local tw [env.newt]
 			return (".begin"
 				(".set" t e)
-				[[externs.macros.get "match"] ("match" c :: patterns) env [lambda [x] (".list" (".quote" ".syntactic-closure") x t)]])
+				(".set" tw (".lambda" (tx) (".return" (".list" (".quote" ".syntactic-closure") tx t))))
+				[[externs.macros.get "match"] ("match" c :: patterns) env tw])
 		}
 		otherwise (".unit")
 	}
