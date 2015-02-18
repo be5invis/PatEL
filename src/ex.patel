@@ -17,8 +17,8 @@ set FormInvalidError.prototype : Object.create Error.prototype
 
 define [NodeTranslation fn] : lambda [form] : begin {
 	local res : fn.apply this arguments
-	if [form && form.begins >= 0] : set res.begins form.begins
-	if [form && form.ends >= 0] : set res.ends form.ends
+	if [form && res && form.begins >= 0] : set res.begins form.begins
+	if [form && res && form.ends >= 0] : set res.ends form.ends
 	return res
 }
 

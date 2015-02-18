@@ -1,13 +1,7 @@
-with-semantics {
-	export : lambda [form env] : match form {
-		("export" id) [atom id] : Assign ("." [top.use "exports"] (".quote" id)) [env.use id] env false
-		("export" id value) [atom id] : Assign ("." [top.use "exports"] (".quote" id)) value env false
-		otherwise otherwise
-	}
-	begin {
-		define [greet] [console.log "greet"]
-		export greet
-		export anotherGreet greet
-		# export lalala lululu lololo ---- will cause an error
-	}
+define [falsy x] [not x]
+
+define-macro myor : lambda [form env] : macro-match form env {
+	(op x y) : let [t [env.newt]] (".begin" (".set" t x) (".if" ("falsy" t) y t))
 }
+
+let [falsy [lambda [x] true]] : trace [myor 1 2]

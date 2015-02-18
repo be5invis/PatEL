@@ -19,6 +19,11 @@ define [FormInvalidError form reason] : begin {
 }
 set FormInvalidError.prototype : Object.create Error.prototype
 
+define [wrapForSyntacticClosure fn] : lambda [x] : match x {
+	(".syntactic-closure" c e)	: fn c
+	otherwise                 	: fn x
+}
+
 # This file defines built-in macros of PatEL
 define [Create] : begin {
 	local externs [patrisika.DefaultExterns]
@@ -224,22 +229,23 @@ define [Create] : begin {
 	externs.macros.put "false" (".quote" false)
 
 	define [boole x] [not [not x]]
-	externs.macros.put "match" : lambda [form env] : begin {
+	externs.macros.put "match" : lambda [form env wrapper] : begin {
 		local pairs [form.slice 2]
 		local t [env.newt]
+		set wrapper [wrapper || [lambda [x] x]]
 
 		define [matchQ pattern] : match pattern {
 			id [atom id] : object {
 				whether : lambda [x] null
-				assign : lambda [x] (".set" [ex (".local" pattern) env] x)
+				assign : lambda [x] (".set" [ex (".local" pattern) env] [wrapper x])
 			}
 			(".quote" x) : object {
-				whether : lambda [x] ("===" [ex pattern env] x)
+				whether : lambda [x] ("===" [ex pattern env] [wrapper x])
 				assign  : lambda [x] (".unit")
 			}
 			("." :: whatever) : object {
 				whether : lambda [x] null
-				assign : lambda [x] (".set" [ex pattern env] x)
+				assign : lambda [x] (".set" [ex pattern env] [wrapper x])
 			}
 			(".list" :: subpatterns) : begin {
 				local ms : subpatterns.map matchQ
@@ -332,6 +338,36 @@ define [Create] : begin {
 		("regex" (".quote" s)) (".quote" [new RegExp s])
 		("regex" (".quote" s) (".quote" flag)) (".quote" [new RegExp s flag])
 		("regex" :: args) (".new" [externs.use "RegExp"] :: args)
+	}
+
+	externs.macros.put "define-macro" : lambda [form env] : match form {
+		(op name body) [atom name] : begin {
+			local ds [new Scope [Create]]
+			ds.declare "atom" true
+			ds.declare "prim" true
+			local macroG : new Function {
+				ds.castName 'atom'
+				ds.castName 'prim'
+				escodegen.generate : patrisika.generate (".return" [ex body ds]) ds [lambda [form] (".return" form)]
+			}
+			local macroFn [macroG [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim]]
+			env.macros.put name : lambda [c e] : begin {
+				local result [macroFn c e]
+				return [ex result [new Scope env]]
+			}
+			return (".unit")
+		}
+		otherwise (".unit")
+	}
+
+	externs.macros.put "macro-match" : lambda [form env] : match form {
+		("macro-match" c e :: patterns) : begin {
+			local t [env.newt]
+			return (".begin"
+				(".set" t e)
+				[[externs.macros.get "match"] ("match" c :: patterns) env [lambda [x] (".list" (".quote" ".syntactic-closure") x t)]])
+		}
+		otherwise (".unit")
 	}
 
 	return externs

@@ -17,12 +17,13 @@ s1_Scope = require("patrisika").Scope, s1_atom = function(s2_x) {
     return function(s6_form) {
         var s6_form, s6_res, _s6_t0, _s6_t1, _s6_t2, _s6_t3;
         return _s6_t1 = arguments, _s6_t0 = this, s6_res = s5_fn.apply(_s6_t0, _s6_t1), 
-        _s6_t2 = s6_form && s6_form.begins >= 0 ? s6_res.begins = s6_form.begins : void 0, 
-        _s6_t3 = s6_form && s6_form.ends >= 0 ? s6_res.ends = s6_form.ends : void 0, s6_res;
+        _s6_t2 = s6_form && s6_res && s6_form.begins >= 0 ? s6_res.begins = s6_form.begins : void 0, 
+        _s6_t3 = s6_form && s6_res && s6_form.ends >= 0 ? s6_res.ends = s6_form.ends : void 0, 
+        s6_res;
     };
 }, s1_ex = s1_NodeTranslation(function(s7_form, s7_env) {
-    var s7_form, s7_env, s7_any, s7_x, s7_callee, s7_args, s7_a, s7_j, s7_allKeysAreQuotes, s7_key, s7_value, s7_otherwise, s7_block, s7_param, s7_handler, s7_body, s7_params, s7_derived, _s7_t0, _s7_t1, _s7_t11, _s7_t12, _s7_t13, _s7_t18, _s7_t19;
-    if (_s7_t13 = arguments, _s7_t12 = this, _s7_t0 = s7_form, _s7_t0 instanceof Array && _s7_t0.length >= 1 && ".quote" === _s7_t0[0]) return s7_x = _s7_t0.slice(1), 
+    var s7_form, s7_env, s7_any, s7_x, s7_callee, s7_args, s7_a, s7_j, s7_allKeysAreQuotes, s7_key, s7_value, s7_otherwise, s7_block, s7_param, s7_handler, s7_body, s7_params, s7_derived, s7_c, s7_e, _s7_t0, _s7_t1, _s7_t12, _s7_t13, _s7_t14, _s7_t19, _s7_t20;
+    if (_s7_t14 = arguments, _s7_t13 = this, _s7_t0 = s7_form, _s7_t0 instanceof Array && _s7_t0.length >= 1 && ".quote" === _s7_t0[0]) return s7_x = _s7_t0.slice(1), 
     [ ".quote" ].concat(s7_x);
     if (_s7_t0 instanceof Array && _s7_t0.length >= 1 && ".id" === _s7_t0[0]) return s7_x = _s7_t0.slice(1), 
     [ ".id" ].concat(s7_x);
@@ -34,6 +35,8 @@ s1_Scope = require("patrisika").Scope, s1_atom = function(s2_x) {
         s7_args[s7_j] = s7_derived.use(s7_args[s7_j]);
         return [ ".lambda.scoped", s7_args, s1_ex(s7_body, s7_derived), s7_derived ];
     }
+    if (_s7_t0 instanceof Array && 3 === _s7_t0.length && ".syntactic-closure" === _s7_t0[0]) return s7_c = _s7_t0[1], 
+    s7_e = _s7_t0[2], s1_ex(s7_c, s7_e);
     if (_s7_t0 instanceof Array && _s7_t0.length >= 3 && ".beta" === _s7_t0[0] && _s7_t0[1] instanceof Array && _s7_t0[1].length >= 0) {
         for (s7_args = _s7_t0[1].slice(0), s7_body = _s7_t0[2], s7_params = _s7_t0.slice(3), 
         s7_derived = new s1_Scope(s7_env), s7_j = 0; s7_j < s7_args.length; s7_j += 1) s7_derived.declare(s7_args[s7_j], !0), 
@@ -50,19 +53,19 @@ s1_Scope = require("patrisika").Scope, s1_atom = function(s2_x) {
         return s7_allKeysAreQuotes ? [ ".hash" ].concat(s7_a.map(function(s8_pair) {
             var s8_pair;
             return [ s8_pair[0][1], s8_pair[1] ];
-        })) : (_s7_t11 = s7_env.newt(), function(s9_t) {
+        })) : (_s7_t12 = s7_env.newt(), function(s9_t) {
             var s9_t;
             return [ ".begin", [ ".set", s9_t, [ ".hash" ] ] ].concat(s7_a.map(function(s10_pair) {
                 var s10_pair;
                 return [ ".set", [ ".", s9_t, s10_pair[0] ], s10_pair[1] ];
             }).concat([ s9_t ]));
-        }(_s7_t11));
+        }(_s7_t12));
     }
     if (_s7_t0 instanceof Array && 2 === _s7_t0.length && ".local" === _s7_t0[0]) return s7_x = _s7_t0[1], 
     s7_env.declare(s7_x), s7_env.use(s7_x);
     if (_s7_t0 instanceof Array && _s7_t0.length >= 1) {
         if (s7_callee = _s7_t0[0], s7_args = _s7_t0.slice(1), s1_atom(s7_callee) && s7_env.macros.has(s7_callee)) return s7_env.macros.get(s7_callee)(s7_form, s7_env);
-        for (_s7_t18 = void 0, _s7_t19 = s1_prim(s7_callee) ? void 0 : s7_callee = s1_ex(s7_callee, s7_env), 
+        for (_s7_t19 = void 0, _s7_t20 = s1_prim(s7_callee) ? void 0 : s7_callee = s1_ex(s7_callee, s7_env), 
         s7_a = [ s7_callee ], s7_j = 1; s7_j < s7_form.length; s7_j += 1) s7_a[s7_j] = s1_ex(s7_form[s7_j], s7_env);
         return s7_a;
     }
