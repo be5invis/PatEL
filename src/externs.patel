@@ -334,34 +334,6 @@ define [Create] : begin {
 		("regex" :: args) (".new" [externs.use "RegExp"] :: args)
 	}
 
-	externs.macros.put "with-semantics" : lambda [form env] : begin {
-		local body form`[form.length - 1]
-		local derived [new Scope env]
-		for [local j 1] [j < form.length - 1] [inc j by 1] : begin {
-			local macroBodyScope [new Scope [Create]]
-			macroBodyScope.declare "evaluate" true
-			macroBodyScope.declare "Assign" true
-			macroBodyScope.declare "externalMacros" true
-			macroBodyScope.declare "atom" true
-			macroBodyScope.declare "prim" true
-			macroBodyScope.declare "top" true
-			local macroName form`j`0
-			local macroBody form`j`1
-			local bodyCode : escodegen.generate : patrisika.generate (".return" [ex macroBody macroBodyScope]) macroBodyScope [lambda [form] (".return" form)]
-			local macroFn : new Function {
-				macroBodyScope.castName "evaluate"
-				macroBodyScope.castName "Assign"
-				macroBodyScope.castName "externalMacros"
-				macroBodyScope.castName "atom"
-				macroBodyScope.castName "prim"
-				macroBodyScope.castName "top"
-				* bodyCode
-			}
-			derived.macros.put macroName [macroFn ex Assign env.macros atom prim externs]
-		}
-		return : ex body derived
-	}
-
 	return externs
 }
 

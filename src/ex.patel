@@ -35,6 +35,7 @@ define ex : NodeTranslation : lambda [form env] : match form {
 		}
 		return (".lambda.scoped" args [ex body derived] derived)
 	}
+	(".syntactic-closure" c e) : ex c e
 	(".beta" (::args) body :: params) : begin {
 		define derived [new Scope env]
 		for [local j 0] [j < args.length] [inc j] : begin {
