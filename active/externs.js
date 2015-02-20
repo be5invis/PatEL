@@ -266,7 +266,7 @@ r0_ex = require("./ex").ex, r0_deQuasiquote = require("./ex").deQuasiquote, r0_F
         r48_name = _r48_t0[1], r48_body = _r48_t0[2], _r48_t3 = _r48_t1 = r0_atom(r48_name) ? !0 : !1, 
         _r48_t2 = _r48_t3) : _r48_t2 = void 0, _r48_t1 ? (r48_ds = new r0_Scope(r48_env), 
         r48_ds.declare("atom", !0), r48_ds.declare("prim", !0), r48_ds.declare("formOf", !0), 
-        r48_ds.declare("scopeOf", !0), r48_ds.declare("defineScope", !0), r48_macroG = new Function(r48_ds.castName("atom"), r48_ds.castName("prim"), r48_ds.castName("formOf"), r48_ds.castName("defineScope"), r0_escodegen.generate(r0_patrisika.generate([ ".return", r0_ex(r48_body, r48_ds) ], r48_ds, function(r49_form) {
+        r48_ds.declare("scopeOf", !0), r48_macroG = new Function(r48_ds.castName("atom"), r48_ds.castName("prim"), r48_ds.castName("formOf"), r48_ds.castName("scopeOf"), r0_escodegen.generate(r0_patrisika.generate([ ".return", r0_ex(r48_body, r48_ds) ], r48_ds, function(r49_form) {
             var r49_form;
             return [ ".return", r49_form ];
         }))), r48_macroFn = r48_macroG(r0_wrapForSyntacticClosure(r0_atom), r0_wrapForSyntacticClosure(r0_prim), function(r50_x) {
@@ -275,7 +275,7 @@ r0_ex = require("./ex").ex, r0_deQuasiquote = require("./ex").deQuasiquote, r0_F
         }, function(r51_x) {
             var r51_x;
             return r51_x[2];
-        }, r48_ds), r48_env.macros.put(r48_name, function(r52_c, r52_e) {
+        }), r48_env.macros.put(r48_name, function(r52_c, r52_e) {
             var r52_c, r52_e, r52_result;
             return r52_result = r48_macroFn(r52_c, r52_e), r0_ex(r52_result, new r0_Scope(r48_env));
         }), [ ".unit" ]) : (r48_otherwise = _r48_t0, [ ".unit" ]);

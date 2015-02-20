@@ -354,15 +354,14 @@ define [Create] : begin {
 			ds.declare "prim" true
 			ds.declare "formOf" true
 			ds.declare "scopeOf" true
-			ds.declare "defineScope" true
 			local macroG : new Function {
 				ds.castName 'atom'
 				ds.castName 'prim'
 				ds.castName 'formOf'
-				ds.castName 'defineScope'
+				ds.castName 'scopeOf'
 				escodegen.generate : patrisika.generate (".return" [ex body ds]) ds [lambda [form] (".return" form)]
 			}
-			local macroFn [macroG [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim] [lambda [x] x`1] [lambda [x] x`2] ds]
+			local macroFn [macroG [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim] [lambda [x] x`1] [lambda [x] x`2]]
 			env.macros.put name : lambda [c e] : begin {
 				local result [macroFn c e]
 				return [ex result [new Scope env]]
