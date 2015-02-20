@@ -14,6 +14,8 @@ var argv = yargs.argv;
 var instream = argv._[0] ? fs.createReadStream(argv._[0]): process.stdin;
 var outstream = argv.o ? fs.createWriteStream(argv.o, { encoding: 'utf-8' }): process.stdout;
 
+if(argv['use-dev']) patel.setDev();
+
 function generateLineAndColumnMap(input){
 	var lines = [];
 	var columns = [];

@@ -286,7 +286,7 @@ define [Create] : begin {
 				}
 			}
 			(".quasiquote" :: subpatterns) : begin {
-				matchQ [deQuasiquote pattern`1]
+				matchQ [deQuasiquote pattern`1 0]
 			}
 			(callee :: subpatterns) : begin {
 				local ms : subpatterns.map matchQ
@@ -354,14 +354,15 @@ define [Create] : begin {
 			ds.declare "prim" true
 			ds.declare "formOf" true
 			ds.declare "scopeOf" true
+			ds.declare "defineScope" true
 			local macroG : new Function {
 				ds.castName 'atom'
 				ds.castName 'prim'
 				ds.castName 'formOf'
-				ds.castName 'scopeOf'
+				ds.castName 'defineScope'
 				escodegen.generate : patrisika.generate (".return" [ex body ds]) ds [lambda [form] (".return" form)]
 			}
-			local macroFn [macroG [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim] [lambda [x] x`1] [lambda [x] x`2]]
+			local macroFn [macroG [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim] [lambda [x] x`1] [lambda [x] x`2] ds]
 			env.macros.put name : lambda [c e] : begin {
 				local result [macroFn c e]
 				return [ex result [new Scope env]]

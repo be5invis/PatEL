@@ -1,13 +1,21 @@
-var parse = require('./active/syntax.js').parse;
 var patrisika = require('patrisika');
 var escodegen = require('escodegen');
-var ex = require('./active/ex').pass;
-var checkEvaluated = require('./active/ex').checkEvaluated;
-var exm = require('./active/externs');
 
-function trace(s){ process.stderr.write(s + '\n') };
+var parserLib = require('./active/syntax.js');
+var exLib = require('./active/ex');
+var externsLib = require('./active/externs');
 
-var globals = function(){ return new patrisika.Scope(exm.Create()) };
+exports.setDev = function(){
+	parserLib = require('./src/syntax.js');
+	exLib = require('./src/ex');
+	externsLib = require('./src/externs');	
+}
+
+var parse = function(){ return parserLib.parse.apply(this, arguments) };
+var ex = function(){ return exLib.ex.apply(this, arguments) };
+var checkEvaluated = function(){ return exLib.checkEvaluated.apply(this, arguments) };
+
+var globals = function(){ return new patrisika.Scope(externsLib.Create()) };
 var compile = function(ast, globals){ 
 	var xast = ex(ast, globals);
 	var rast = patrisika.generate(xast, globals)

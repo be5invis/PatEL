@@ -22,19 +22,26 @@ define [NodeTranslation fn] : lambda [form] : begin {
 	return res
 }
 
-define [deQuasiquote form] : match form {
-	(".unquote" c)	c
+define [deQuasiquote form level] : match form {
+	(".unquote" c) : if [not level] c (".list" (".quote" ".unquote") [deQuasiquote c [level - 1]])
+	(".quasiquote" c) (".list" (".quote" ".quasiquote") [deQuasiquote c [level + 1]])
 	(::xs) : match xs`[xs.length - 1] {
-		(".sliceunquote" x)	: (".conslist").concat [[xs.slice 0 [0-1]].map deQuasiquote] (x)
-		otherwise          	: (".list").concat [xs.map deQuasiquote]
+		(".sliceunquote" x) : begin {
+			local commonParts [[xs.slice 0 [0-1]].map [lambda [c] [deQuasiquote c level]]]
+			if [not level] {
+				(".conslist").concat commonParts (x)
+				(".list").concat commonParts ((".list" (".quote" ".sliceunquote") [deQuasiquote x [level - 1]]))
+			}
+		}
+		otherwise	: (".list").concat [xs.map [lambda [c] [deQuasiquote c level]]]
 	}
-	otherwise	(".quote" otherwise)	
+	otherwise (".quote" otherwise)
 }
 
 # Function [ex form env]: Expand macros and do scoping
 define ex : NodeTranslation : lambda [form env] : match form {
 	(".quote" :: x) : return (".quote" :: x)
-	(".quasiquote" x) : ex [deQuasiquote x] env
+	(".quasiquote" x) : ex [deQuasiquote x 0] env
 	(".unquote" x) : return [ex x env]
 	(".id" :: x) : return (".id" :: x)
 	(".t" :: x) : return (".t" :: x)

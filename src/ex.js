@@ -1,94 +1,102 @@
-var s1_Scope, s1_atom, s1_prim, s1_FormInvalidError, s1_NodeTranslation, s1_deQuasiquote, s1_ex, s1_checkEvaluated, _s1_t0, _s1_t1, _s1_t2, _s1_t3, _s1_t4, _s1_t5, _s1_t6, _s1_t7;
+var r0_Scope, r0_atom, r0_prim, r0_FormInvalidError, r0_NodeTranslation, r0_deQuasiquote, r0_ex, r0_checkEvaluated, _r0_t0, _r0_t1, _r0_t2, _r0_t3, _r0_t4, _r0_t5, _r0_t6, _r0_t7;
 
-s1_Scope = require("patrisika").Scope, s1_atom = function(s2_x) {
-    var s2_x;
-    return "string" == typeof s2_x;
-}, s1_prim = function(s3_x) {
-    var s3_x;
-    return s1_atom(s3_x) && "&" !== s3_x && "&!" !== s3_x && ("." === s3_x[0] || /^\W+/.test(s3_x));
-}, s1_FormInvalidError = function(s4_form, s4_reason) {
-    var s4_form, s4_reason, _s4_t0, _s4_t1;
-    return _s4_t0 = this, _s4_t0.reason = s4_reason, _s4_t0.message = s4_reason, _s4_t0.relatedForm = s4_form, 
-    s4_form && s4_form.begins >= 0 && s4_form.ends >= 0 ? (_s4_t0.begins = s4_form.begins, 
-    _s4_t0.ends = s4_form.ends, _s4_t1 = _s4_t0.message = _s4_t0.message + ("\nAround (" + _s4_t0.begins + " -- " + _s4_t0.ends + ")")) : _s4_t1 = void 0, 
+r0_Scope = require("patrisika").Scope, r0_atom = function(r1_x) {
+    var r1_x;
+    return "string" == typeof r1_x;
+}, r0_prim = function(r2_x) {
+    var r2_x;
+    return r0_atom(r2_x) && "&" !== r2_x && "&!" !== r2_x && ("." === r2_x[0] || /^\W+/.test(r2_x));
+}, r0_FormInvalidError = function(r3_form, r3_reason) {
+    var r3_form, r3_reason, _r3_t0, _r3_t1;
+    return _r3_t0 = this, _r3_t0.reason = r3_reason, _r3_t0.message = r3_reason, _r3_t0.relatedForm = r3_form, 
+    r3_form && r3_form.begins >= 0 && r3_form.ends >= 0 ? (_r3_t0.begins = r3_form.begins, 
+    _r3_t0.ends = r3_form.ends, _r3_t1 = _r3_t0.message = _r3_t0.message + ("\nAround (" + _r3_t0.begins + " -- " + _r3_t0.ends + ")")) : _r3_t1 = void 0, 
     null;
-}, s1_FormInvalidError.prototype = Object.create(Error.prototype), s1_NodeTranslation = function(s5_fn) {
-    var s5_fn;
-    return function(s6_form) {
-        var s6_form, s6_res, _s6_t0, _s6_t1, _s6_t2, _s6_t3;
-        return _s6_t1 = arguments, _s6_t0 = this, s6_res = s5_fn.apply(_s6_t0, _s6_t1), 
-        _s6_t2 = s6_form && s6_res && s6_form.begins >= 0 ? s6_res.begins = s6_form.begins : void 0, 
-        _s6_t3 = s6_form && s6_res && s6_form.ends >= 0 ? s6_res.ends = s6_form.ends : void 0, 
-        s6_res;
+}, r0_FormInvalidError.prototype = Object.create(Error.prototype), r0_NodeTranslation = function(r4_fn) {
+    var r4_fn;
+    return function(r5_form) {
+        var r5_form, r5_res, _r5_t0, _r5_t1, _r5_t2, _r5_t3;
+        return _r5_t1 = arguments, _r5_t0 = this, r5_res = r4_fn.apply(_r5_t0, _r5_t1), 
+        _r5_t2 = r5_form && r5_res && r5_form.begins >= 0 ? r5_res.begins = r5_form.begins : void 0, 
+        _r5_t3 = r5_form && r5_res && r5_form.ends >= 0 ? r5_res.ends = r5_form.ends : void 0, 
+        r5_res;
     };
-}, s1_deQuasiquote = function(s7_form) {
-    var s7_form, s7_otherwise, s7_xs, s7_x, s7_c, _s7_t0, _s7_t1;
-    return _s7_t0 = s7_form, _s7_t0 instanceof Array && 2 === _s7_t0.length && ".unquote" === _s7_t0[0] ? s7_c = _s7_t0[1] : _s7_t0 instanceof Array && _s7_t0.length >= 0 ? (s7_xs = _s7_t0.slice(0), 
-    _s7_t1 = s7_xs[s7_xs.length - 1], _s7_t1 instanceof Array && 2 === _s7_t1.length && ".sliceunquote" === _s7_t1[0] ? (s7_x = _s7_t1[1], 
-    [ ".conslist" ].concat(s7_xs.slice(0, -1).map(s1_deQuasiquote), [ s7_x ])) : (s7_otherwise = _s7_t1, 
-    [ ".list" ].concat(s7_xs.map(s1_deQuasiquote)))) : (s7_otherwise = _s7_t0, [ ".quote", s7_otherwise ]);
-}, s1_ex = s1_NodeTranslation(function(s8_form, s8_env) {
-    var s8_form, s8_env, s8_any, s8_x, s8_callee, s8_args, s8_a, s8_j, s8_allKeysAreQuotes, s8_key, s8_value, s8_otherwise, s8_block, s8_param, s8_handler, s8_body, s8_params, s8_derived, s8_c, s8_e, _s8_t0, _s8_t1, _s8_t14, _s8_t15, _s8_t16, _s8_t21, _s8_t22;
-    if (_s8_t16 = arguments, _s8_t15 = this, _s8_t0 = s8_form, _s8_t0 instanceof Array && _s8_t0.length >= 1 && ".quote" === _s8_t0[0]) return s8_x = _s8_t0.slice(1), 
-    [ ".quote" ].concat(s8_x);
-    if (_s8_t0 instanceof Array && 2 === _s8_t0.length && ".quasiquote" === _s8_t0[0]) return s8_x = _s8_t0[1], 
-    s1_ex(s1_deQuasiquote(s8_x), s8_env);
-    if (_s8_t0 instanceof Array && 2 === _s8_t0.length && ".unquote" === _s8_t0[0]) return s8_x = _s8_t0[1], 
-    s1_ex(s8_x, s8_env);
-    if (_s8_t0 instanceof Array && _s8_t0.length >= 1 && ".id" === _s8_t0[0]) return s8_x = _s8_t0.slice(1), 
-    [ ".id" ].concat(s8_x);
-    if (_s8_t0 instanceof Array && _s8_t0.length >= 1 && ".t" === _s8_t0[0]) return s8_x = _s8_t0.slice(1), 
-    [ ".t" ].concat(s8_x);
-    if (_s8_t0 instanceof Array && 3 === _s8_t0.length && ".lambda" === _s8_t0[0] && _s8_t0[1] instanceof Array && _s8_t0[1].length >= 0) {
-        for (s8_args = _s8_t0[1].slice(0), s8_body = _s8_t0[2], s8_derived = new s1_Scope(s8_env), 
-        s8_j = 0; s8_j < s8_args.length; s8_j += 1) s8_derived.declare(s8_args[s8_j], !0), 
-        s8_args[s8_j] = s8_derived.use(s8_args[s8_j]);
-        return [ ".lambda.scoped", s8_args, s1_ex(s8_body, s8_derived), s8_derived ];
+}, r0_deQuasiquote = function(r6_form, r6_level) {
+    var r6_form, r6_level, r6_otherwise, r6_xs, r6_x, r6_commonParts, r6_c, _r6_t0, _r6_t1;
+    return _r6_t0 = r6_form, _r6_t0 instanceof Array && 2 === _r6_t0.length && ".unquote" === _r6_t0[0] ? (r6_c = _r6_t0[1], 
+    r6_level ? [ ".list", [ ".quote", ".unquote" ], r0_deQuasiquote(r6_c, r6_level - 1) ] : r6_c) : _r6_t0 instanceof Array && 2 === _r6_t0.length && ".quasiquote" === _r6_t0[0] ? (r6_c = _r6_t0[1], 
+    [ ".list", [ ".quote", ".quasiquote" ], r0_deQuasiquote(r6_c, r6_level + 1) ]) : _r6_t0 instanceof Array && _r6_t0.length >= 0 ? (r6_xs = _r6_t0.slice(0), 
+    _r6_t1 = r6_xs[r6_xs.length - 1], _r6_t1 instanceof Array && 2 === _r6_t1.length && ".sliceunquote" === _r6_t1[0] ? (r6_x = _r6_t1[1], 
+    r6_commonParts = r6_xs.slice(0, -1).map(function(r8_c) {
+        var r8_c;
+        return r0_deQuasiquote(r8_c, r6_level);
+    }), r6_level ? [ ".list" ].concat(r6_commonParts, [ [ ".list", [ ".quote", ".sliceunquote" ], r0_deQuasiquote(r6_x, r6_level - 1) ] ]) : [ ".conslist" ].concat(r6_commonParts, [ r6_x ])) : (r6_otherwise = _r6_t1, 
+    [ ".list" ].concat(r6_xs.map(function(r7_c) {
+        var r7_c;
+        return r0_deQuasiquote(r7_c, r6_level);
+    })))) : (r6_otherwise = _r6_t0, [ ".quote", r6_otherwise ]);
+}, r0_ex = r0_NodeTranslation(function(r9_form, r9_env) {
+    var r9_form, r9_env, r9_any, r9_x, r9_callee, r9_args, r9_a, r9_j, r9_allKeysAreQuotes, r9_key, r9_value, r9_otherwise, r9_block, r9_param, r9_handler, r9_body, r9_params, r9_derived, r9_c, r9_e, _r9_t0, _r9_t1, _r9_t14, _r9_t15, _r9_t16, _r9_t21, _r9_t22;
+    if (_r9_t16 = arguments, _r9_t15 = this, _r9_t0 = r9_form, _r9_t0 instanceof Array && _r9_t0.length >= 1 && ".quote" === _r9_t0[0]) return r9_x = _r9_t0.slice(1), 
+    [ ".quote" ].concat(r9_x);
+    if (_r9_t0 instanceof Array && 2 === _r9_t0.length && ".quasiquote" === _r9_t0[0]) return r9_x = _r9_t0[1], 
+    r0_ex(r0_deQuasiquote(r9_x, 0), r9_env);
+    if (_r9_t0 instanceof Array && 2 === _r9_t0.length && ".unquote" === _r9_t0[0]) return r9_x = _r9_t0[1], 
+    r0_ex(r9_x, r9_env);
+    if (_r9_t0 instanceof Array && _r9_t0.length >= 1 && ".id" === _r9_t0[0]) return r9_x = _r9_t0.slice(1), 
+    [ ".id" ].concat(r9_x);
+    if (_r9_t0 instanceof Array && _r9_t0.length >= 1 && ".t" === _r9_t0[0]) return r9_x = _r9_t0.slice(1), 
+    [ ".t" ].concat(r9_x);
+    if (_r9_t0 instanceof Array && 3 === _r9_t0.length && ".lambda" === _r9_t0[0] && _r9_t0[1] instanceof Array && _r9_t0[1].length >= 0) {
+        for (r9_args = _r9_t0[1].slice(0), r9_body = _r9_t0[2], r9_derived = new r0_Scope(r9_env), 
+        r9_j = 0; r9_j < r9_args.length; r9_j += 1) r9_derived.declare(r9_args[r9_j], !0), 
+        r9_args[r9_j] = r9_derived.use(r9_args[r9_j]);
+        return [ ".lambda.scoped", r9_args, r0_ex(r9_body, r9_derived), r9_derived ];
     }
-    if (_s8_t0 instanceof Array && 3 === _s8_t0.length && ".syntactic-closure" === _s8_t0[0]) return s8_c = _s8_t0[1], 
-    s8_e = _s8_t0[2], s1_ex(s8_c, s8_e);
-    if (_s8_t0 instanceof Array && _s8_t0.length >= 3 && ".beta" === _s8_t0[0] && _s8_t0[1] instanceof Array && _s8_t0[1].length >= 0) {
-        for (s8_args = _s8_t0[1].slice(0), s8_body = _s8_t0[2], s8_params = _s8_t0.slice(3), 
-        s8_derived = new s1_Scope(s8_env), s8_j = 0; s8_j < s8_args.length; s8_j += 1) s8_derived.declare(s8_args[s8_j], !0), 
-        s8_args[s8_j] = s8_derived.use(s8_args[s8_j]);
-        for (s8_j = 0; s8_j < s8_args.length; s8_j += 1) s8_params[s8_j] = s1_ex(s8_params[s8_j], s8_env);
-        return [ ".beta.scoped", s8_args, s1_ex(s8_body, s8_derived), s8_derived ].concat(s8_params);
+    if (_r9_t0 instanceof Array && 3 === _r9_t0.length && ".syntactic-closure" === _r9_t0[0]) return r9_c = _r9_t0[1], 
+    r9_e = _r9_t0[2], r0_ex(r9_c, r9_e);
+    if (_r9_t0 instanceof Array && _r9_t0.length >= 3 && ".beta" === _r9_t0[0] && _r9_t0[1] instanceof Array && _r9_t0[1].length >= 0) {
+        for (r9_args = _r9_t0[1].slice(0), r9_body = _r9_t0[2], r9_params = _r9_t0.slice(3), 
+        r9_derived = new r0_Scope(r9_env), r9_j = 0; r9_j < r9_args.length; r9_j += 1) r9_derived.declare(r9_args[r9_j], !0), 
+        r9_args[r9_j] = r9_derived.use(r9_args[r9_j]);
+        for (r9_j = 0; r9_j < r9_args.length; r9_j += 1) r9_params[r9_j] = r0_ex(r9_params[r9_j], r9_env);
+        return [ ".beta.scoped", r9_args, r0_ex(r9_body, r9_derived), r9_derived ].concat(r9_params);
     }
-    if (_s8_t0 instanceof Array && 4 === _s8_t0.length && ".try" === _s8_t0[0] && _s8_t0[2] instanceof Array && 1 === _s8_t0[2].length) return s8_block = _s8_t0[1], 
-    s8_param = _s8_t0[2][0], s8_handler = _s8_t0[3], s8_env.declare(s8_param), [ ".try", s1_ex(s8_block, s8_env), [ s8_env.use(s8_param) ], s1_ex(s8_handler, s8_env) ];
-    if (_s8_t0 instanceof Array && _s8_t0.length >= 1 && ".hash" === _s8_t0[0]) {
-        for (s8_args = _s8_t0.slice(1), s8_a = [], s8_allKeysAreQuotes = !0, s8_j = 1; s8_j < s8_form.length; s8_j += 1) s8_key = s1_ex(s8_form[s8_j][0], s8_env), 
-        s8_value = s1_ex(s8_form[s8_j][1], s8_env), _s8_t1 = s8_key, _s8_t1 instanceof Array && 2 === _s8_t1.length && ".quote" === _s8_t1[0] ? s8_x = _s8_t1[1] : (s8_otherwise = _s8_t1, 
-        s8_allKeysAreQuotes = !1), s8_a.push([ s8_key, s8_value ]);
-        return s8_allKeysAreQuotes ? [ ".hash" ].concat(s8_a.map(function(s9_pair) {
-            var s9_pair;
-            return [ s9_pair[0][1], s9_pair[1] ];
-        })) : (_s8_t14 = s8_env.newt(), function(s10_t) {
-            var s10_t;
-            return [ ".begin", [ ".set", s10_t, [ ".hash" ] ] ].concat(s8_a.map(function(s11_pair) {
-                var s11_pair;
-                return [ ".set", [ ".", s10_t, s11_pair[0] ], s11_pair[1] ];
-            }).concat([ s10_t ]));
-        }(_s8_t14));
+    if (_r9_t0 instanceof Array && 4 === _r9_t0.length && ".try" === _r9_t0[0] && _r9_t0[2] instanceof Array && 1 === _r9_t0[2].length) return r9_block = _r9_t0[1], 
+    r9_param = _r9_t0[2][0], r9_handler = _r9_t0[3], r9_env.declare(r9_param), [ ".try", r0_ex(r9_block, r9_env), [ r9_env.use(r9_param) ], r0_ex(r9_handler, r9_env) ];
+    if (_r9_t0 instanceof Array && _r9_t0.length >= 1 && ".hash" === _r9_t0[0]) {
+        for (r9_args = _r9_t0.slice(1), r9_a = [], r9_allKeysAreQuotes = !0, r9_j = 1; r9_j < r9_form.length; r9_j += 1) r9_key = r0_ex(r9_form[r9_j][0], r9_env), 
+        r9_value = r0_ex(r9_form[r9_j][1], r9_env), _r9_t1 = r9_key, _r9_t1 instanceof Array && 2 === _r9_t1.length && ".quote" === _r9_t1[0] ? r9_x = _r9_t1[1] : (r9_otherwise = _r9_t1, 
+        r9_allKeysAreQuotes = !1), r9_a.push([ r9_key, r9_value ]);
+        return r9_allKeysAreQuotes ? [ ".hash" ].concat(r9_a.map(function(r10_pair) {
+            var r10_pair;
+            return [ r10_pair[0][1], r10_pair[1] ];
+        })) : (_r9_t14 = r9_env.newt(), function(r11_t) {
+            var r11_t;
+            return [ ".begin", [ ".set", r11_t, [ ".hash" ] ] ].concat(r9_a.map(function(r12_pair) {
+                var r12_pair;
+                return [ ".set", [ ".", r11_t, r12_pair[0] ], r12_pair[1] ];
+            }).concat([ r11_t ]));
+        }(_r9_t14));
     }
-    if (_s8_t0 instanceof Array && 2 === _s8_t0.length && ".local" === _s8_t0[0]) return s8_x = _s8_t0[1], 
-    s8_env.declare(s8_x), s8_env.use(s8_x);
-    if (_s8_t0 instanceof Array && _s8_t0.length >= 1) {
-        if (s8_callee = _s8_t0[0], s8_args = _s8_t0.slice(1), s1_atom(s8_callee) && s8_env.macros.has(s8_callee)) return s8_env.macros.get(s8_callee)(s8_form, s8_env);
-        for (_s8_t21 = void 0, _s8_t22 = s1_prim(s8_callee) ? void 0 : s8_callee = s1_ex(s8_callee, s8_env), 
-        s8_a = [ s8_callee ], s8_j = 1; s8_j < s8_form.length; s8_j += 1) s8_a[s8_j] = s1_ex(s8_form[s8_j], s8_env);
-        return s8_a;
+    if (_r9_t0 instanceof Array && 2 === _r9_t0.length && ".local" === _r9_t0[0]) return r9_x = _r9_t0[1], 
+    r9_env.declare(r9_x), r9_env.use(r9_x);
+    if (_r9_t0 instanceof Array && _r9_t0.length >= 1) {
+        if (r9_callee = _r9_t0[0], r9_args = _r9_t0.slice(1), r0_atom(r9_callee) && r9_env.macros.has(r9_callee)) return r9_env.macros.get(r9_callee)(r9_form, r9_env);
+        for (_r9_t21 = void 0, _r9_t22 = r0_prim(r9_callee) ? void 0 : r9_callee = r0_ex(r9_callee, r9_env), 
+        r9_a = [ r9_callee ], r9_j = 1; r9_j < r9_form.length; r9_j += 1) r9_a[r9_j] = r0_ex(r9_form[r9_j], r9_env);
+        return r9_a;
     }
-    return s8_x = _s8_t0, !s1_atom(s8_x) || !s8_env.macros.has(s8_x) || s8_env.macros.get(s8_x) instanceof Function ? (s8_x = _s8_t0, 
-    s1_prim(s8_x) ? s8_x : (s8_x = _s8_t0, s1_atom(s8_x) ? s8_env.use(s8_x) : s8_any = _s8_t0)) : s8_env.macros.get(s8_x);
-}), s1_checkEvaluated = function(s12_form) {
-    var s12_form, _s12_t1;
-    if (s12_form && s12_form instanceof Array) {
-        if (s12_form.unevaluated) throw new s1_FormInvalidError(s12_form, "Unevaluated subform");
-        return _s12_t1 = void 0, s12_form.forEach(s1_checkEvaluated);
+    return r9_x = _r9_t0, !r0_atom(r9_x) || !r9_env.macros.has(r9_x) || r9_env.macros.get(r9_x) instanceof Function ? (r9_x = _r9_t0, 
+    r0_prim(r9_x) ? r9_x : (r9_x = _r9_t0, r0_atom(r9_x) ? r9_env.use(r9_x) : r9_any = _r9_t0)) : r9_env.macros.get(r9_x);
+}), r0_checkEvaluated = function(r13_form) {
+    var r13_form, _r13_t1;
+    if (r13_form && r13_form instanceof Array) {
+        if (r13_form.unevaluated) throw new r0_FormInvalidError(r13_form, "Unevaluated subform");
+        return _r13_t1 = void 0, r13_form.forEach(r0_checkEvaluated);
     }
     return void 0;
-}, exports.pass = function(s13_form, s13_globalScope) {
-    var s13_form, s13_globalScope;
-    return s1_ex(s13_form, s13_globalScope);
-}, exports.ex = s1_ex, exports.checkEvaluated = s1_checkEvaluated, exports.deQuasiquote = s1_deQuasiquote;
+}, exports.pass = function(r14_form, r14_globalScope) {
+    var r14_form, r14_globalScope;
+    return r0_ex(r14_form, r14_globalScope);
+}, exports.ex = r0_ex, exports.checkEvaluated = r0_checkEvaluated, exports.deQuasiquote = r0_deQuasiquote;
