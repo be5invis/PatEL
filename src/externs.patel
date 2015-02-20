@@ -384,23 +384,9 @@ define [Create] : begin {
 		otherwise (".unit")
 	}
 
-	[externs.macros.get "define-macro"] ('define-macro'
-	    'syntax-rules'
-	    ( 'lambda'
-	      ( 'form' 'env' )
-	      ( 'macro-match'
-	        'form'
-	        'env'
-	        ( ( '.quasiquote'
-	            ( 'syntax-rules' ( '.sliceunquote' 'patterns' ) ) )
-	          ( 'syntax'
-	            ( 'lambda'
-	              ( 'form' 'env' )
-	              ( 'macro-match'
-	                'form'
-	                'env'
-	                ( '.sliceunquote'
-	                  ( ( '.' 'patterns' ( '.quote' 'map' ) ) 'formOf' ) ) ) ) ) ) ) ) )externs
+	[externs.macros.get "define-macro"] ('define-macro' 'syntax-rules' ( 'lambda' ( 'form' 'env' ) ( 'macro-match' 'form' 'env'
+		( ( '.quasiquote' ( 'syntax-rules' ( '.sliceunquote' 'patterns' ) ) )
+		  ( '.quasiquote' ( 'lambda' ( 'form' 'env' ) ( 'macro-match' 'form' 'env' ( '.sliceunquote' ( ( '.' 'patterns' ( '.quote' 'map' ) ) 'formOf' ) ) ) ) ) ) ) ) ) externs
 
 	return externs
 }
