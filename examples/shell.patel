@@ -1,10 +1,11 @@
 define shell : require 'shelljs'
+define [escapeArgument x] x
 
 define-macro declare-command : syntax-rules {
 	@`[declare-command @_name] [atom _name] : begin {
 		local name [formOf _name]
 		local defineStatement @`[define-macro @name [syntax-rules {
-			@`[@@[literal name] @::args]  @`[shell.exec [@[literal @[literal name]] + ' ' + [(@::args).join ' ']]]
+			@`[@@('.quote' name) @::args]  @`[shell.exec @[args.reduce [lambda [x y] @`[@x + [escapeArgument @y]]] ('.quote' @('.quote' name))]]
 		}]]
 		[env.macros.get 'define-macro'] defineStatement arguments`1
 		return @`nothing
@@ -12,4 +13,4 @@ define-macro declare-command : syntax-rules {
 }
 
 declare-command ping
-ping '127.0.0.1' '-t'
+ping '127.0.0.1'
