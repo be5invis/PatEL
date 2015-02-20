@@ -387,7 +387,10 @@ define [Create] : begin {
 
 	[externs.macros.get "define-macro"] ('define-macro' 'syntax-rules' ( 'lambda' ( 'form' 'env' ) ( 'macro-match' 'form' 'env'
 		( ( '.quasiquote' ( 'syntax-rules' ( '.sliceunquote' 'patterns' ) ) )
-		  ( '.quasiquote' ( 'lambda' ( 'form' 'env' ) ( 'macro-match' 'form' 'env' ( '.sliceunquote' ( ( '.' 'patterns' ( '.quote' 'map' ) ) 'formOf' ) ) ) ) ) ) ) ) ) externs
+		  ('.list' 
+			('.quote' '.syntactic-closure')
+			( '.quasiquote' ( 'lambda' ( 'form' 'env' ) ( 'macro-match' 'form' 'env' ( '.sliceunquote' ( ( '.' 'patterns' ( '.quote' 'map' ) ) 'formOf' ) ) ) ) )
+			'env'))))) externs
 
 	set externs.pFamily 'r'
 

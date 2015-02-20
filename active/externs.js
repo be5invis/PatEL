@@ -285,6 +285,6 @@ r0_ex = require("./ex").ex, r0_deQuasiquote = require("./ex").deQuasiquote, r0_F
         r53_e = _r53_t0[2], r53_patterns = _r53_t0.slice(3), r53_t = r53_env.newt(), r53_tx = r53_env.newt(), 
         r53_tw = r53_env.newt(), [ ".begin", [ ".set", r53_t, r53_e ], [ ".set", r53_tw, [ ".lambda", [ r53_tx ], [ ".return", [ ".list", [ ".quote", ".syntactic-closure" ], r53_tx, r53_t ] ] ] ], r6_externs.macros.get("match")([ "match", r53_c ].concat(r53_patterns), r53_env, r53_tw) ]) : (r53_otherwise = _r53_t0, 
         [ ".unit" ]);
-    }), r6_externs.macros.get("define-macro")([ "define-macro", "syntax-rules", [ "lambda", [ "form", "env" ], [ "macro-match", "form", "env", [ [ ".quasiquote", [ "syntax-rules", [ ".sliceunquote", "patterns" ] ] ], [ ".quasiquote", [ "lambda", [ "form", "env" ], [ "macro-match", "form", "env", [ ".sliceunquote", [ [ ".", "patterns", [ ".quote", "map" ] ], "formOf" ] ] ] ] ] ] ] ] ], r6_externs), 
+    }), r6_externs.macros.get("define-macro")([ "define-macro", "syntax-rules", [ "lambda", [ "form", "env" ], [ "macro-match", "form", "env", [ [ ".quasiquote", [ "syntax-rules", [ ".sliceunquote", "patterns" ] ] ], [ ".list", [ ".quote", ".syntactic-closure" ], [ ".quasiquote", [ "lambda", [ "form", "env" ], [ "macro-match", "form", "env", [ ".sliceunquote", [ [ ".", "patterns", [ ".quote", "map" ] ], "formOf" ] ] ] ] ], "env" ] ] ] ] ], r6_externs), 
     r6_externs.pFamily = "r", r6_externs;
 }, exports.Create = r0_Create;
