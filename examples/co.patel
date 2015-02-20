@@ -3,6 +3,10 @@ define thunkify [require "thunkify"]
 define request [require "request"]
 define get [thunkify request.get]
 
+define-macro start-task : lambda [form env] : macro-match form env {
+	@`[start-task @task] @`[@task.then [lambda [] nothing]]
+}
+
 define [GeneratorFunction fn] : begin {
 	set fn.constructor (.name "GeneratorFunction")
 	fn
@@ -31,16 +35,12 @@ define GeneratorFunction [parallel] : begin {
 }
 
 define GeneratorFunction [somethingWrong] : begin {
-	try {
-		begin {
-			local res : yield [get "http://badhost.invalid"]
-			trace res
-		}
-		ex
-		begin : trace ex.code
-	}
+	try : begin {
+		local res : yield [get "http://badhost.invalid"]
+		trace res
+	}, ex, begin { trace ex.code }
 }
 
-[co sequent]
-[co parallel]
-[co somethingWrong]
+start-task [co sequent]
+start-task [co parallel]
+start-task [co somethingWrong]
