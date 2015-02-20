@@ -1,14 +1,13 @@
-
 define-macro syntax-rules : lambda [form env] : macro-match form env {
 	@`[syntax-rules @::patterns] : syntax : lambda [form env] [macro-match form env @::[patterns.map formOf]]
 }
 
 define-macro pointer : syntax-rules {
-	@`[pointer @x] : return @`(.get [lambda [] @x] .set [lambda [y] [set @x y]])
+	@`[pointer @x] : return @`(.get [lambda [] @x] .set [lambda [t] [set @x t]])
 }
 
 local a 1
 local at-a [pointer a]
-console.log [at-a.get]
-console.log [at-a.set 2]
-console.log [at-a.get]
+
+local b 2
+local at-b [pointer b]

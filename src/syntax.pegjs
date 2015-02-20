@@ -147,15 +147,29 @@ block
 	= "{" __ it:blockContent __ "}" { return it }
 blockContent
 	= head:line rear:(STATEMENT_SEPARATOR line)* {
+		var res = head
+		for(var j = 0; j < rear.length; j++){
+			res = res.concat(rear[j][1])
+		};
+		return res;
+	}
+line
+	= heads:(POS linePart _ ":" _)* rear:lineLayer ends:POS {
+		if(!heads || !heads.length) return rear;
+		return heads.reduceRight(function(sofar, curr){ return [BeginsEndsWith(curr[1].concat(sofar), curr[0], ends)] }, rear)
+	}
+
+lineLayer
+	= head:simpleLine rear:(LAYER_SEPARATOR simpleLine)* {
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
 			res.push(rear[j][1])
 		};
 		return res;
 	}
-line
-	= begins:POS head:linePart _ ":" _ rear:line ends:POS { return BeginsEndsWith(head.concat([rear]), begins, ends) }
-	/ begins:POS head:linePart _ rear:block ends:POS { return BeginsEndsWith(head.concat(rear), begins, ends) }
+
+simpleLine
+	= begins:POS head:linePart _ rear:block ends:POS { return BeginsEndsWith(head.concat(rear), begins, ends) }
 	/ linePart
 linePart
 	= begins:POS head:lineInvoke rear:(__ pipeRear POS)* ends:POS  { 
@@ -243,7 +257,10 @@ NEWLINE
 
 STATEMENT_SEPARATOR
 	= _ NEWLINE
-	/ _ [,;] _
+	/ _ ";" _
+
+LAYER_SEPARATOR
+	= _ "," _
 
 POS = { return offset() }
 
