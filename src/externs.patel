@@ -388,6 +388,8 @@ define [Create] : begin {
 		( ( '.quasiquote' ( 'syntax-rules' ( '.sliceunquote' 'patterns' ) ) )
 		  ( '.quasiquote' ( 'lambda' ( 'form' 'env' ) ( 'macro-match' 'form' 'env' ( '.sliceunquote' ( ( '.' 'patterns' ( '.quote' 'map' ) ) 'formOf' ) ) ) ) ) ) ) ) ) externs
 
+	set externs.pFamily 'r'
+
 	return externs
 }
 
