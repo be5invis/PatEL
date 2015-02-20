@@ -1,7 +1,3 @@
-define-macro syntax-rules : lambda [form env] : macro-match form env {
-	@`[syntax-rules @::patterns] : syntax : lambda [form env] [macro-match form env @::[patterns.map formOf]]
-}
-
 define-macro pointer : syntax-rules {
 	@`[pointer @x] : return @`(.get [lambda [] @x] .set [lambda [t] [set @x t]])
 }

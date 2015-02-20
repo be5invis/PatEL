@@ -1,7 +1,5 @@
 define shell : require 'shelljs'
-define-macro syntax-rules : lambda [form env] : macro-match form env {
-	@`[syntax-rules @::patterns] : syntax : lambda [form env] [macro-match form env @::[patterns.map formOf]]
-}
+
 define-macro ping : syntax-rules {
 	@`[ping @::args] : syntax : shell.exec ["ping " + [(@::args).join ' ']]
 }

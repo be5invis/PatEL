@@ -285,5 +285,6 @@ s1_ex = require("./ex").ex, s1_deQuasiquote = require("./ex").deQuasiquote, s1_F
         s54_e = _s54_t0[2], s54_patterns = _s54_t0.slice(3), s54_t = s54_env.newt(), s54_tx = s54_env.newt(), 
         s54_tw = s54_env.newt(), [ ".begin", [ ".set", s54_t, s54_e ], [ ".set", s54_tw, [ ".lambda", [ s54_tx ], [ ".return", [ ".list", [ ".quote", ".syntactic-closure" ], s54_tx, s54_t ] ] ] ], s7_externs.macros.get("match")([ "match", s54_c ].concat(s54_patterns), s54_env, s54_tw) ]) : (s54_otherwise = _s54_t0, 
         [ ".unit" ]);
-    }), s7_externs;
+    }), s7_externs.macros.get("define-macro")([ "define-macro", "syntax-rules", [ "lambda", [ "form", "env" ], [ "macro-match", "form", "env", [ [ ".quasiquote", [ "syntax-rules", [ ".sliceunquote", "patterns" ] ] ], [ "syntax", [ "lambda", [ "form", "env" ], [ "macro-match", "form", "env", [ ".sliceunquote", [ [ ".", "patterns", [ ".quote", "map" ] ], "formOf" ] ] ] ] ] ] ] ] ], s7_externs), 
+    s7_externs;
 }, exports.Create = s1_Create;
