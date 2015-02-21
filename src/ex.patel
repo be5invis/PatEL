@@ -108,7 +108,7 @@ define ex : NodeTranslation : lambda [form env] : match form {
 	any : return any
 }
 
-define [checkEvaluated form] : if [form && form <@ Array] : begin {
+define [checkEvaluated form] : if [form && form <@ Array && form.length > 0] : begin {
 	if form.unevaluated : throw : new FormInvalidError form "Unevaluated subform"
 	form.forEach checkEvaluated
 }

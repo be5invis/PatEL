@@ -364,7 +364,10 @@ define [Create] : begin {
 			local macroFn [macroG [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim] [lambda [x] x`1] [lambda [x] x`2]]
 			env.macros.put name : lambda [c e] : begin {
 				local result [macroFn c e]
-				return [ex result [new Scope env]]
+				local s [new Scope env]
+				set s.hanging e
+				set s.semiparent e
+				return [ex result s]
 			}
 			return (".unit")
 		}

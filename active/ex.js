@@ -91,7 +91,7 @@ r0_Scope = require("patrisika").Scope, r0_atom = function(r1_x) {
     r0_prim(r9_x) ? r9_x : (r9_x = _r9_t0, r0_atom(r9_x) ? r9_env.use(r9_x) : r9_any = _r9_t0)) : r9_env.macros.get(r9_x);
 }), r0_checkEvaluated = function(r13_form) {
     var r13_form, _r13_t1;
-    if (r13_form && r13_form instanceof Array) {
+    if (r13_form && r13_form instanceof Array && r13_form.length > 0) {
         if (r13_form.unevaluated) throw new r0_FormInvalidError(r13_form, "Unevaluated subform");
         return _r13_t1 = void 0, r13_form.forEach(r0_checkEvaluated);
     }

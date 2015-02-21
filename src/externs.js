@@ -276,8 +276,9 @@ r0_ex = require("./ex").ex, r0_deQuasiquote = require("./ex").deQuasiquote, r0_F
             var r51_x;
             return r51_x[2];
         }), r48_env.macros.put(r48_name, function(r52_c, r52_e) {
-            var r52_c, r52_e, r52_result;
-            return r52_result = r48_macroFn(r52_c, r52_e), r0_ex(r52_result, new r0_Scope(r48_env));
+            var r52_c, r52_e, r52_result, r52_s;
+            return r52_result = r48_macroFn(r52_c, r52_e), r52_s = new r0_Scope(r48_env), r52_s.hanging = r52_e, 
+            r52_s.semiparent = r52_e, r0_ex(r52_result, r52_s);
         }), [ ".unit" ]) : (r48_otherwise = _r48_t0, [ ".unit" ]);
     }), r6_externs.macros.put("macro-match", function(r53_form, r53_env) {
         var r53_form, r53_env, r53_otherwise, r53_c, r53_e, r53_patterns, r53_t, r53_tx, r53_tw, _r53_t0;
