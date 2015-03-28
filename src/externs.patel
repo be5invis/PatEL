@@ -116,25 +116,24 @@ define [Create] : begin {
 	}
 
 	define [AssignWithMod left right mod env locallyQ] : match left {
-			("local" a)       	: AssignWithMod a left right mod env true
-			(".local" a)      	: AssignWithMod a left right mod env true
-			(".list" :: items)	: Assign left (mod right) env locallyQ
-			(".hash" :: items)	: Assign left (mod right) env locallyQ
-	
-			(callee :: paras) : piecewise {
-				[prim callee] (".set" [ex left env] [ex (mod right) env])
-				[atom callee] : piecewise {
-					locallyQ (".set" 
-						[ex (".local" callee) env] 
-						[ex (mod (".lambda" (::paras) right)) env])
-					true (".set" 
-						[ex callee env]
-						[ex (mod (".lambda" (::paras) right)) env])
-				}
-				true (".set" [ex callee env] [ex (mod (".lambda" (::paras) right)) env])
+		("local" a)       	: AssignWithMod a left right mod env true
+		(".local" a)      	: AssignWithMod a left right mod env true
+		(".list" :: items)	: Assign left (mod right) env locallyQ
+		(".hash" :: items)	: Assign left (mod right) env locallyQ
+
+		(callee :: paras) : piecewise {
+			[prim callee] (".set" [ex left env] [ex (mod right) env])
+			[atom callee] : piecewise {
+				locallyQ (".set" 
+					[ex (".local" callee) env] 
+					[ex (mod (".lambda" (::paras) right)) env])
+				true (".set" 
+					[ex callee env]
+					[ex (mod (".lambda" (::paras) right)) env])
 			}
-	
-			any : Assign ex left (mod right) env locallyQ
+			true (".set" [ex callee env] [ex (mod (".lambda" (::paras) right)) env])
+		}
+		any : Assign ex left (mod right) env locallyQ
 	}
 	define [Assign left right env locallyQ] : match left {
 		id [atom id] : piecewise {

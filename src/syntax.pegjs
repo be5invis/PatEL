@@ -28,6 +28,7 @@
 			else result.push(pivot, parts[j]), pivot = ['.quote', '']
 		};
 		if(pivot[1]) result.push(pivot);
+		if(!result.length) return ['.quote', ''];
 		if(result.length === 1 && result[0] instanceof Array && result[0][0] === '.quote') return result[0]
 		return ['+'].concat(result)
 	}
@@ -209,12 +210,12 @@ stringliteral "String Literal"
 	= "\"" inner:stringcharacter* "\"" { return joinInterpolation(inner) }
 	/ "'" inner:singlestringchar* "'" { return ['.quote', inner.join('')] }
 stringcharacter
-	= common:$([^"\\\r\n]+) { return ['.quote', common] }
+	= common:$([^"\\\r\n\(\[\)\]]+) { return ['.quote', common] }
 	/ "\\u" digits:([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9]) { 
 		return ['.quote', String.fromCharCode(parseInt(digits.join(''), 16))]
 	}
-	/ "\\" g:operate { return g }
-	/ "\\" "(" __ g:parting __ ")"  { return g }
+	/ "\\" g:group { return g }
+	/ "\\="g:parting { return g }
 	/ "\\" LINE_TERMINATOR SPACE_CHARACTER_OR_NEWLINE* "\\" { return ['.quote', ''] }
 	/ "\\" which:[^u\r\n] {
 		switch(which) {
