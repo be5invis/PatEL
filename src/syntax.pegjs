@@ -87,31 +87,34 @@ qualifier
 factor
 	= begins:POS left:prefixOp __ right:parting ends:POS { return BeginsEndsWith([left, right], begins, ends) }
 	/ parting
+lineFactor
+	= begins:POS left:prefixOp _ right:parting ends:POS { return BeginsEndsWith([left, right], begins, ends) }
+	/ parting
 prefixOp = "+" / "-" / "!"
 
-term
-	= begins:POS car:factor cdr:((__ termOp __ factor POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-termOp = $([*/%] [\-_/+*<=>!?$%_&~^@|]*)
+term    	= begins:POS car:factor cdr:((__ termOp __ factor POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+lineTerm	= begins:POS car:lineFactor cdr:((_ termOp _ lineFactor POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+termOp  	= $([*/%] [\-_/+*<=>!?$%_&~^@|]*)
 
-sum
-	= begins:POS car:term cdr:((__ sumOp __ term POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-sumOp = $([+\-] [\-_/+*<=>!?$%_&~^@|]*)
+sum    	= begins:POS car:term cdr:((__ sumOp __ term POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+lineSum	= begins:POS car:lineTerm cdr:((_ sumOp _ lineTerm POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+sumOp  	= $([+\-] [\-_/+*<=>!?$%_&~^@|]*)
 
-equality
-	= begins:POS car:sum cdr:((__ equalityOp __ sum POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-equalityOp = $([=!] [\-_/+*<=>!?$%_&~^@|]+)
+equality    	= begins:POS car:sum cdr:((__ equalityOp __ sum POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+lineEquality	= begins:POS car:lineSum cdr:((_ equalityOp _ lineSum POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+equalityOp  	= $([=!] [\-_/+*<=>!?$%_&~^@|]+)
 
-compare
-	= begins:POS car:equality cdr:((__ compareOp __ equality POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-compareOp = $([<>] [\-_/+*<=>!?$%_&~^@|]*)
+compare    	= begins:POS car:equality cdr:((__ compareOp __ equality POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+lineCompare	= begins:POS car:lineEquality cdr:((_ compareOp _ lineEquality POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+compareOp  	= $([<>] [\-_/+*<=>!?$%_&~^@|]*)
 
-both
-	= begins:POS car:compare cdr:((__ bothOp __ compare POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-bothOp = $([&] [\-_/+*<=>!?$%_&~^@|]*)
+both    	= begins:POS car:compare cdr:((__ bothOp __ compare POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+lineBoth	= begins:POS car:lineCompare cdr:((_ bothOp _ lineCompare POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+bothOp  	= $([&] [\-_/+*<=>!?$%_&~^@|]*)
 
-either
-	= begins:POS car:both cdr:((__ eitherOp __ both POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-eitherOp = $([|] [\-_/+*<=>!?$%_&~^@|]*)
+either    	= begins:POS car:both cdr:((__ eitherOp __ both POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+lineEither	= begins:POS car:lineBoth cdr:((_ eitherOp _ lineBoth POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+eitherOp  	= $([|] [\-_/+*<=>!?$%_&~^@|]*)
 
 list
 	= car:parting cdr:((__ ([,;] __)? parting)*) tail:(__ [,;])? {
@@ -126,7 +129,7 @@ invokeWithOptionalBlock
 	= begins:POS head:invoke __ rear:block ends:POS { return BeginsEndsWith(head.concat(rear), begins, ends) }
 	/ invoke
 invoke
-	= head:parting rear:(__ parting)* { 
+	= head:parting !(__ (termOp/sumOp/equalityOp/compareOp/bothOp/eitherOp)) rear:(__ parting)* { 
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
 			res.push(rear[j][1])
@@ -170,8 +173,10 @@ lineLayer
 	}
 
 simpleLine
-	= begins:POS head:linePart _ rear:block ends:POS { return BeginsEndsWith(head.concat(rear), begins, ends) }
-	/ linePart
+	= begins:POS head:linePart rear:(_ block)? ends:POS { 
+		if(rear) return BeginsEndsWith(head.concat(rear[1]), begins, ends) 
+		else return BeginsEndsWith(head, begins, ends);
+	}
 linePart
 	= begins:POS head:lineInvoke rear:(__ pipeRear POS)* ends:POS  { 
 		var res = head
@@ -190,13 +195,14 @@ pipeRear
 
 lineInvoke
 	= begins:POS "*" _ it:parting ends:POS { return BeginsEndsWith(it, begins, ends) }
-	/ begins:POS head:parting rear:(_ parting)* ends:POS { 
+	/ begins:POS head:parting !(_ (termOp/sumOp/equalityOp/compareOp/bothOp/eitherOp)) rear:(_ parting)* ends:POS { 
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
 			res.push(rear[j][1])
 		};
 		return BeginsEndsWith(res, begins, ends);
 	}
+	/ begins:POS it:lineEither ends:POS { return it }
 
 
 // Tokens
@@ -210,7 +216,7 @@ stringliteral "String Literal"
 	= "\"" inner:stringcharacter* "\"" { return joinInterpolation(inner) }
 	/ "'" inner:singlestringchar* "'" { return ['.quote', inner.join('')] }
 stringcharacter
-	= common:$([^"\\\r\n\(\[\)\]]+) { return ['.quote', common] }
+	= common:$([^"\\\r\n]+) { return ['.quote', common] }
 	/ "\\u" digits:([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9]) { 
 		return ['.quote', String.fromCharCode(parseInt(digits.join(''), 16))]
 	}

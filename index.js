@@ -8,7 +8,8 @@ var externsLib = require('./active/externs');
 exports.setDev = function(){
 	parserLib = require('./src/syntax.js');
 	exLib = require('./src/ex');
-	externsLib = require('./src/externs');	
+	externsLib = require('./src/externs');
+	process.stderr.write("Using in-development PatEL components.\n")
 }
 
 var parse = function(){ return parserLib.parse.apply(this, arguments) };
