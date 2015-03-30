@@ -1,20 +1,40 @@
 #!/usr/bin/env node
-var patel = require('../index');
+var os = require('os');
 var fs = require('fs');
 var util = require('util');
+var resumer = require('resumer');
 var yargs = require('yargs')
 	.alias('o', 'output-into')
 	.alias('?', 'help')
-	.describe('help', 'Displays this help.')
+	.alias('l', 'line')
+	.boolean(['use-dev', 'dump-ast', 'dump-expanded', 'dump-regularized', 'dump-transformed'])
+	.describe('?', 'Displays this help.')
+	.describe('l', 'Compile one-line script.')
 	.describe('o', 'Output sfd path. When absent, the result sfd is written to STDOUT.');
 
-var os = require('os');
 
 var argv = yargs.argv;
-var instream = argv._[0] ? fs.createReadStream(argv._[0]): process.stdin;
+if(argv.help){ process.stderr.write(yargs.help()); return };
+if(argv['use-dev']) { 
+	var patel = require('../index-dev');
+} else {
+	var patel = require('../index');
+}
+
+var instream = function(){
+	if(argv.l) {
+		var s = resumer();
+		s.queue(argv.l);
+		setTimeout(function(){ s.end() }, 1);
+		return s;
+	} else if(argv._[0]) {
+		return fs.createReadStream(argv._[0])
+	} else { 
+		return process.stdin
+	}
+}();
 var outstream = argv.o ? fs.createWriteStream(argv.o, { encoding: 'utf-8' }): process.stdout;
 
-if(argv['use-dev']) patel.setDev();
 
 function generateLineAndColumnMap(input){
 	var lines = [];
@@ -37,13 +57,18 @@ function deepcopy(form){
 	if(form instanceof Array) return form.map(deepcopy)
 	else return form;
 }
-
+function dump(form){
+	if(process.stdout !== outstream) outstream.write(JSON.stringify(form))
+	else outstream.write(util.inspect(deepcopy(form), {depth: null}) + '\n')
+}
 function printSourceLines(stream, lines, firstLineNumber){
 	stream.write(lines.map(function(line, k){ return '  ' + (firstLineNumber + k) + '\t| ' + line}).join('\n') + '\n')
 }
 
 var input = '';
-instream.on('data', function(buf){ input += buf.toString() })
+instream.on('data', function(buf){
+	input += buf.toString() 
+});
 instream.on('end', function(){
 	input += '\n\n\n';
 	if(argv['dump-input']) { outstream.write(input); return }
@@ -53,15 +78,14 @@ instream.on('end', function(){
 	try {
 		var ast = patel.parse(input);
 		try {
-			if(argv['dump-ast']) { outstream.write(util.inspect(deepcopy(ast), {depth: null}) + '\n'); return }
+			if(argv['dump-ast']) { dump(ast); return }
 			var xast = patel.ex(ast, gs);
 			patel.checkEvaluated(xast);
-			if(argv['dump-expanded']) { outstream.write(util.inspect(deepcopy(xast), {depth: null}) + '\n'); return }
+			if(argv['dump-expanded']) { dump(xast); return }
 			var rast = patel.regularize(xast, gs);
-			if(argv['dump-regularized']) { outstream.write(util.inspect(deepcopy(rast), {depth: null}) + '\n'); return }
+			if(argv['dump-regularized']) { dump(rast); return }
 			var tast = patel.pat2esc(rast, gs, lcmap);
-			if(argv['dump-transformed']) { outstream.write(util.inspect(tast, {depth: null}) + '\n'); return }
-
+			if(argv['dump-transformed']) { dump(tast); return }
 			var result = patel.generateCode(tast, {sourceMap: argv._[0] || '(stdin)', sourceMapWithCode: true})
 			if(argv.source_map) {
 				outstream.write(result.map.toString() + '\n');

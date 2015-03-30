@@ -17,9 +17,9 @@ define trace console.log
 define GeneratorFunction [sequent] : begin {
 	trace "Google"
 	local a : yield [get 'http://www.google.com']
-	trace "Yahoo"
-	local b : yield [get 'http://yahoo.com']
-	trace "baidu"
+	trace "typeof.net"
+	local b : yield [get 'http://typeof.net']
+	trace "Baidu"
 	local c : yield [get 'http://baidu.com']
 	trace a`0.statusCode
 	trace b`0.statusCode
@@ -28,10 +28,10 @@ define GeneratorFunction [sequent] : begin {
 
 define GeneratorFunction [parallel] : begin {
 	local a : get 'http://www.google.com'
-	local b : get 'http://yahoo.com'
+	local b : get 'http://typeof.net'
 	local c : get 'http://baidu.com'
 	local res : yield (a, b, c)
-	trace res
+	trace : res.map [lambda [x] x.0.statusCode]
 }
 
 define GeneratorFunction [somethingWrong] : begin {

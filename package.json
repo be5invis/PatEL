@@ -6,7 +6,8 @@
 	"dependencies": {
 		"patrisika": ">=0.15.0",
 		"escodegen": ">=1.1.0",
-		"yargs": ">=1.3.0"
+		"yargs": ">=1.3.0",
+		"resumer": "*"
 	},
 	"main": "./index.js"
 }

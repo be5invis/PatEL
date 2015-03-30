@@ -5,7 +5,7 @@ define-macro declare-command : syntax-rules {
 	@`[declare-command @_name] [atom _name] : begin {
 		local name [formOf _name]
 		local defineStatement @`[define-macro @name [syntax-rules {
-			@`[@@('.quote' name) @::args]  @`[shell.exec @[args.reduce [lambda [x y] @`[@x + [escapeArgument @y]]] ('.quote' @('.quote' name))]]
+			@`[@@('.quote' name) @::args]  @`[shell.exec @[args.reduce [lambda [x y] @`[@x + " " + [escapeArgument @y]]] ('.quote' @('.quote' name))]]
 		}]]
 		[env.macros.get 'define-macro'] defineStatement arguments`1
 		return @`nothing
@@ -13,4 +13,6 @@ define-macro declare-command : syntax-rules {
 }
 
 declare-command ping
+declare-command ls
+ls
 ping '127.0.0.1'

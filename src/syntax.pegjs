@@ -208,7 +208,6 @@ lineInvoke
 // Tokens
 identifier "Identifier"
 	= $((UnicodeLetter / [_$@]) (UnicodeLetter / UnicodeCombiningMark / UnicodeDigit / UnicodeConnectorPunctuation / [\-_$@])*)
-	/ "[" it:$([\-_/+*<=>!?$%_&~^@|]+) "]" { return it }
 numberliteral "Numeric Literal"
 	= ("0x" / "0X") hexdigits:$([0-9a-fA-F]+) { return ['.quote', parseInt(hexdigits, 16)] }
 	/ decimal:$([0-9]+ ("." [0-9]+)? ([eE] [+\-]? [0-9]+)?) { return ['.quote', decimal - 0] }

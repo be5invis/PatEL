@@ -386,12 +386,7 @@ define [Create] : begin {
 		otherwise (".unit")
 	}
 
-	[externs.macros.get "define-macro"] ('define-macro' 'syntax-rules' ( 'lambda' ( 'form' 'env' ) ( 'macro-match' 'form' 'env'
-		( ( '.quasiquote' ( 'syntax-rules' ( '.sliceunquote' 'patterns' ) ) )
-		  ('.list' 
-			('.quote' '.syntactic-closure')
-			( '.quasiquote' ( 'lambda' ( 'form' 'env' ) ( 'macro-match' 'form' 'env' ( '.sliceunquote' ( ( '.' 'patterns' ( '.quote' 'map' ) ) 'formOf' ) ) ) ) )
-			'env'))))) externs
+	ex [require './essential-macros.json'] externs
 
 	set externs.pFamily 'r'
 

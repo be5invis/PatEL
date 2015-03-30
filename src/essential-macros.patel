@@ -1,0 +1,6 @@
+define-macro syntax-rules : lambda [form env] : macro-match form env {
+	@`[syntax-rules @::patterns] ('.syntactic-closure' @`[lambda [form env] [macro-match form env @::[patterns.map formOf]]] env)
+}
+define-macro its : syntax-rules {
+	@`[its @property] : return @`[let [t @property] [lambda [x] x`t]]
+}
