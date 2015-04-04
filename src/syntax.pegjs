@@ -161,7 +161,7 @@ blockContent
 		return res;
 	}
 line
-	= heads:(POS linePart _ ":" _)* rear:lineLayer ends:POS {
+	= heads:(POS linePart _ ":" ![>\.`] _)* rear:lineLayer ends:POS {
 		if(!heads || !heads.length) return rear;
 		return heads.reduceRight(function(sofar, curr){ return [BeginsEndsWith(curr[1].concat(sofar), curr[0], ends)] }, rear)
 	}
@@ -193,8 +193,8 @@ linePart
 	}
 
 pipeRear
-	= "|>" _ it:lineInvoke { return {type: 'pipe', rear: it} }
-	/ "|" q:qualifier _ it:lineInvoke? { return {type:'pipe', rear: it, qualifier:q} }
+	= ":>" _ it:lineInvoke { return {type: 'pipe', rear: it} }
+	/ ":" q:qualifier _ it:lineInvoke? { return {type:'pipe', rear: it, qualifier:q} }
 
 lineInvoke
 	= begins:POS "*" _ it:parting ends:POS { return BeginsEndsWith(it, begins, ends) }
