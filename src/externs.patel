@@ -68,6 +68,7 @@ define [Create] : begin {
 		otherwise            	: reportInvalid otherwise "Invalid Lambda Formation"
 	}
 	externs.macros.put "function" : externs.macros.get "lambda"
+	externs.macros.put "->" : externs.macros.get "lambda"
 
 	externs.macros.put "if" : lambda [form env] : match form {
 		("if" test consequent)                                    	: ex ('.if' test consequent) env
@@ -116,12 +117,32 @@ define [Create] : begin {
 	}
 
 	define [AssignWithMod left right mod env locallyQ] : match left {
-		("local" a)       	: AssignWithMod a left right mod env true
-		(".local" a)      	: AssignWithMod a left right mod env true
-		(".list" :: items)	: Assign left (mod right) env locallyQ
-		(".hash" :: items)	: Assign left (mod right) env locallyQ
+		id [atom id] : piecewise {
+			locallyQ	(".set" [ex (".local" id) env] [ex (mod right) env])
+			true    	(".set" [ex left env] [ex (mod right) env])
+		}
+		(".local" a) : AssignWithMod a right mod env true
+		(".list" :: items) : begin {
+			local t [env.newt]
+			local assignments (".begin" (".set" t [ex (mod right) env]))
+			for [local j 0] [j < items.length] [inc j] {
+				assignments.push : Assign items`j ("." t (".quote" j)) env locallyQ
+			}
+			assignments.push t
+			return assignments
+		}
 
+		(".hash" :: items) : begin {
+			local t [env.newt]
+			local assignments (".begin" (".set" t [ex (mod right) env]))
+			for [local j 0] [j < items.length] [inc j] {
+				assignments.push : Assign items`j`1 ("." t items`j`0)  env locallyQ
+			}
+			assignments.push t
+			return assignments
+		}
 		(callee :: paras) : piecewise {
+			[[atom callee] && [env.macros.has callee]] : AssignWithMod [ex (callee :: paras) env] right mod env locallyQ
 			[prim callee] (".set" [ex left env] [ex (mod right) env])
 			[atom callee] : piecewise {
 				locallyQ (".set" 
@@ -133,63 +154,24 @@ define [Create] : begin {
 			}
 			true (".set" [ex callee env] [ex (mod (".lambda" (::paras) right)) env])
 		}
-		any : Assign ex left (mod right) env locallyQ
-	}
-	define [Assign left right env locallyQ] : match left {
-		id [atom id] : piecewise {
-			locallyQ (".set" [ex (".local" id) env] [ex right env])
-			true     (".set" [ex left env] [ex right env])
-		}
-
-		("local" a) : Assign a right env true
-		(".local" a) : Assign a right env true
-
-		(".list" :: items) : begin {
-			local t [env.newt]
-			local assignments (".begin" (".set" t [ex right env]))
-			for [local j 0] [j < items.length] [inc j] {
-				assignments.push : Assign items`j ("." t (".quote" j)) env locallyQ
-			}
-			assignments.push t
-			return assignments
-		}
-
-		(".hash" :: items) : begin {
-			local t [env.newt]
-			local assignments (".begin" (".set" t [ex right env]))
-			for [local j 0] [j < items.length] [inc j] {
-				assignments.push : Assign items`j`1 ("." t items`j`0)  env locallyQ
-			}
-			assignments.push t
-			return assignments
-		}
-
-		(callee :: paras) : piecewise {
-			[prim callee] (".set" [ex left env] [ex right env])
-			[atom callee] : piecewise {
-				locallyQ (".set" 
-					[ex (".local" callee) env] 
-					[ex (".lambda" (::paras) right) env])
-				true (".set" 
-					[ex callee env]
-					[ex (".lambda" (::paras) right) env])
-			}
-			true (".set" [ex callee env] [ex (".lambda" (::paras) right) env])
-		}
 		any : throw [new FormInvalidError left "Invalid Assignment Left-hand Side"]
 	}
 
+	# Form [.unquote x] means exactly x
+	define [Assign left right env locallyQ] : AssignWithMod left right ".unquote" env locallyQ
+
 	externs.macros.put "define" : lambda [form env] : match form {
-		(op modifer left right) : AssignWithMod left right modifer env true
-		(op left right) : Assign left right env true
-		(op left) [atom left] : return (".local" left)
-		any : throw [new FormInvalidError any "Invalid Assignment"]
+		@`[@op @modifer @left @right]	: AssignWithMod left right modifer env true
+		@`[@op @left @right]         	: Assign left right env true
+		@`[@op @left] [atom left]    	: return (".local" left)
+		any                          	: throw [new FormInvalidError any "Invalid Assignment"]
 	}
 	externs.macros.put "local" : externs.macros.get "define"
 	externs.macros.put "set" : lambda [form env] : match form {
 		(op left right) : Assign left right env false
 		any : throw [new FormInvalidError any "Invalid Assignment"]
 	}
+	externs.macros.put "=" : externs.macros.get "set"
 
 	externs.macros.put "inc" : lambda [form env] : match form {
 		(op id)           	[Assign id ("+" id (".quote" 1)) env false]

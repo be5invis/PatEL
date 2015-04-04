@@ -7,6 +7,10 @@
 		};
 		return BeginsEndsWith(form, begins, ends);
 	}
+	function buildAssign(car, cdr, begins, ends){
+		if(!cdr.length) return car;
+		return BeginsEndsWith([cdr[0][2], car, buildAssign(cdr[0][4], cdr.slice(1), cdr[0][0], ends)], begins, ends);
+	}
 	function BeginsEndsWith(form, begins, ends) {
 		if(form instanceof Array) {
 			form.begins = begins;
@@ -60,7 +64,7 @@ unquote = begins:POS '@' it:primitive ends:POS       	{return BeginsEndsWith(['.
 operate
 	= begins:POS "[" __ "]" ends:POS                              	{ return BeginsEndsWith([], begins, ends) }
 	/ begins:POS "[" __ it:invokeWithOptionalBlock __ "]" ends:POS	{ return BeginsEndsWith(it, begins, ends) }
-	/ begins:POS "[" __ it:either __ "]" ends:POS                 	{ return BeginsEndsWith(it, begins, ends) }
+	/ begins:POS "[" __ it:assign __ "]" ends:POS                 	{ return BeginsEndsWith(it, begins, ends) }
 
 struct
 	= begins:POS "(" __ ")" ends:POS                    	{ return BeginsEndsWith(['.list'], begins, ends) }
@@ -105,6 +109,7 @@ equality	= begins:POS car:sum cdr:((__ equalityOp __ sum POS)*) ends:POS { retur
 compare 	= begins:POS car:equality cdr:((__ compareOp __ equality POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
 both    	= begins:POS car:compare cdr:((__ bothOp __ compare POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
 either  	= begins:POS car:both cdr:((__ eitherOp __ both POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+assign  	= begins:POS car:either cdr:((POS __ "=" __ either)*) ends:POS { return buildAssign(car, cdr, begins, ends) }
 
 lineTerm    	= begins:POS car:lineFactor cdr:((_ termOp _ lineFactor POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
 lineSum     	= begins:POS car:lineTerm cdr:((_ sumOp _ lineTerm POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
@@ -112,6 +117,7 @@ lineEquality	= begins:POS car:lineSum cdr:((_ equalityOp _ lineSum POS)*) ends:P
 lineCompare 	= begins:POS car:lineEquality cdr:((_ compareOp _ lineEquality POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
 lineBoth    	= begins:POS car:lineCompare cdr:((_ bothOp _ lineCompare POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
 lineEither  	= begins:POS car:lineBoth cdr:((_ eitherOp _ lineBoth POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+lineAssign  	= begins:POS car:lineEither cdr:((POS _ "=" _ lineEither)*) ends:POS { return buildAssign(car, cdr, begins, ends) }
 
 list
 	= car:parting cdr:((__ ([,;] __)? parting)*) tail:(__ [,;])? {
@@ -126,7 +132,7 @@ invokeWithOptionalBlock
 	= begins:POS head:invoke __ rear:block ends:POS { return BeginsEndsWith(head.concat(rear), begins, ends) }
 	/ invoke
 invoke
-	= head:parting !(__ (termOp/sumOp/equalityOp/compareOp/bothOp/eitherOp)) rear:(__ parting)* { 
+	= head:parting !(__ [\-/+*<=>!?%&~^|]) rear:(__ parting)* { 
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
 			res.push(rear[j][1])
@@ -192,19 +198,19 @@ pipeRear
 
 lineInvoke
 	= begins:POS "*" _ it:parting ends:POS { return BeginsEndsWith(it, begins, ends) }
-	/ begins:POS head:parting !(_ (termOp/sumOp/equalityOp/compareOp/bothOp/eitherOp)) rear:(_ parting)* ends:POS { 
+	/ begins:POS head:parting !(_ [\-/+*<=>!?%&~^|]) rear:(_ parting)* ends:POS { 
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
 			res.push(rear[j][1])
 		};
 		return BeginsEndsWith(res, begins, ends);
 	}
-	/ begins:POS it:lineEither ends:POS { return it }
+	/ begins:POS it:lineAssign ends:POS { return it }
 
 
 // Tokens
 identifier "Identifier"
-	= $((UnicodeLetter / [_$@]) (UnicodeLetter / UnicodeCombiningMark / UnicodeDigit / UnicodeConnectorPunctuation / [\-_$@])*)
+	= $((UnicodeLetter / [_$]) (UnicodeLetter / UnicodeCombiningMark / UnicodeDigit / UnicodeConnectorPunctuation / [\-_@$])*)
 numberliteral "Numeric Literal"
 	= ("0x" / "0X") hexdigits:$([0-9a-fA-F]+) { return ['.quote', parseInt(hexdigits, 16)] }
 	/ decimal:$([0-9]+ ("." [0-9]+)? ([eE] [+\-]? [0-9]+)?) { return ['.quote', decimal - 0] }
