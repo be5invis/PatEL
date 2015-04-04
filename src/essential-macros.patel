@@ -4,3 +4,7 @@ define-macro syntax-rules : lambda [form env] : macro-match form env {
 define-macro its : syntax-rules {
 	@`[its @property] : return @`[let [t @property] [lambda [x] x`t]]
 }
+define-macro call-its : syntax-rules {
+	@`[call-its @property] : return @`[let [t @property] [lambda [x] [x`t]]]
+	@`[call-its @property @::args] : return @`[let [t @property] [a (@::args)] [lambda [x] [x`t.apply x a]]]
+}

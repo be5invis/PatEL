@@ -11,6 +11,7 @@ var yargs = require('yargs')
 	.describe('?', 'Displays this help.')
 	.describe('l', 'Compile one-line script.')
 	.describe('o', 'Output sfd path. When absent, the result sfd is written to STDOUT.');
+var tty = require('tty');
 
 
 var argv = yargs.argv;
@@ -58,7 +59,7 @@ function deepcopy(form){
 	else return form;
 }
 function dump(form){
-	if(process.stdout !== outstream) outstream.write(JSON.stringify(form))
+	if(!outstream.isTTY) outstream.write(JSON.stringify(form))
 	else outstream.write(util.inspect(deepcopy(form), {depth: null}) + '\n')
 }
 function printSourceLines(stream, lines, firstLineNumber){

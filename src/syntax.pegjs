@@ -41,7 +41,7 @@ start = __ it:blockContent __ {
 }
 // Expression
 primitiveStart
-	= identifier / numberliteral / stringliteral / "[" / "(" / "{"
+	= identifier / numberliteral / "'" / "\"" / "[" / "(" / "{" / "@`" / "@::" / "@"
 primitive
 	= group
 	/ quasiquote
@@ -58,15 +58,15 @@ sliceunquote = begins:POS '@::' it:primitive ends:POS	{return BeginsEndsWith(['.
 unquote = begins:POS '@' it:primitive ends:POS       	{return BeginsEndsWith(['.unquote', it], begins, ends)}
 
 operate
-	= begins: POS "[" __ "]" ends: POS                              	{ return BeginsEndsWith([], begins, ends) }
-	/ begins: POS "[" __ it:invokeWithOptionalBlock __ "]" ends: POS	{ return BeginsEndsWith(it, begins, ends) }
-	/ begins: POS "[" __ it:either __ "]" ends: POS                 	{ return BeginsEndsWith(it, begins, ends) }
+	= begins:POS "[" __ "]" ends:POS                              	{ return BeginsEndsWith([], begins, ends) }
+	/ begins:POS "[" __ it:invokeWithOptionalBlock __ "]" ends:POS	{ return BeginsEndsWith(it, begins, ends) }
+	/ begins:POS "[" __ it:either __ "]" ends:POS                 	{ return BeginsEndsWith(it, begins, ends) }
 
 struct
-	= begins: POS "(" __ ")" ends: POS                    	{ return BeginsEndsWith(['.list'], begins, ends) }
-	/ begins: POS "(" __ "." __ ")" ends: POS             	{ return BeginsEndsWith(['.hash'], begins, ends) }
-	/ begins: POS "(" __ it:cons __ ")" ends: POS         	{ return BeginsEndsWith(it, begins, ends) }
-	/ begins: POS "(" __ it:propertyPairs __ ")" ends: POS	{ return BeginsEndsWith(['.hash'].concat(it), begins, ends) }
+	= begins:POS "(" __ ")" ends:POS                    	{ return BeginsEndsWith(['.list'], begins, ends) }
+	/ begins:POS "(" __ "." __ ")" ends:POS             	{ return BeginsEndsWith(['.hash'], begins, ends) }
+	/ begins:POS "(" __ it:cons __ ")" ends:POS         	{ return BeginsEndsWith(it, begins, ends) }
+	/ begins:POS "(" __ it:propertyPairs __ ")" ends:POS	{ return BeginsEndsWith(['.hash'].concat(it), begins, ends) }
 	
 parting
 	= begins:POS head:primitive rear:((qualifier POS)*) ends:POS {
@@ -84,37 +84,34 @@ qualifier
 	/ "." property:operate { return property }
 	/ "`" property:primitive { return property }
 
+prefixOp = "+" / "-" / "!"
+termOp    	= $([*/%] [\-_/+*<=>!?$%_&~^@|]*)
+sumOp     	= $([+\-] [\-_/+*<=>!?$%_&~^@|]*)
+equalityOp	= $([=!] [\-_/+*<=>!?$%_&~^@|]+)
+compareOp 	= $([<>] [\-_/+*<=>!?$%_&~^@|]*)
+bothOp    	= $([&] [\-_/+*<=>!?$%_&~^@|]*)
+eitherOp  	= $([|] [\-_/+*<=>!?$%_&~^@|]*)
+
 factor
 	= begins:POS left:prefixOp __ right:parting ends:POS { return BeginsEndsWith([left, right], begins, ends) }
 	/ parting
 lineFactor
 	= begins:POS left:prefixOp _ right:parting ends:POS { return BeginsEndsWith([left, right], begins, ends) }
 	/ parting
-prefixOp = "+" / "-" / "!"
 
 term    	= begins:POS car:factor cdr:((__ termOp __ factor POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-lineTerm	= begins:POS car:lineFactor cdr:((_ termOp _ lineFactor POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-termOp  	= $([*/%] [\-_/+*<=>!?$%_&~^@|]*)
-
-sum    	= begins:POS car:term cdr:((__ sumOp __ term POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-lineSum	= begins:POS car:lineTerm cdr:((_ sumOp _ lineTerm POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-sumOp  	= $([+\-] [\-_/+*<=>!?$%_&~^@|]*)
-
-equality    	= begins:POS car:sum cdr:((__ equalityOp __ sum POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-lineEquality	= begins:POS car:lineSum cdr:((_ equalityOp _ lineSum POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-equalityOp  	= $([=!] [\-_/+*<=>!?$%_&~^@|]+)
-
-compare    	= begins:POS car:equality cdr:((__ compareOp __ equality POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-lineCompare	= begins:POS car:lineEquality cdr:((_ compareOp _ lineEquality POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-compareOp  	= $([<>] [\-_/+*<=>!?$%_&~^@|]*)
-
+sum     	= begins:POS car:term cdr:((__ sumOp __ term POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+equality	= begins:POS car:sum cdr:((__ equalityOp __ sum POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+compare 	= begins:POS car:equality cdr:((__ compareOp __ equality POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
 both    	= begins:POS car:compare cdr:((__ bothOp __ compare POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-lineBoth	= begins:POS car:lineCompare cdr:((_ bothOp _ lineCompare POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-bothOp  	= $([&] [\-_/+*<=>!?$%_&~^@|]*)
+either  	= begins:POS car:both cdr:((__ eitherOp __ both POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
 
-either    	= begins:POS car:both cdr:((__ eitherOp __ both POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-lineEither	= begins:POS car:lineBoth cdr:((_ eitherOp _ lineBoth POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-eitherOp  	= $([|] [\-_/+*<=>!?$%_&~^@|]*)
+lineTerm    	= begins:POS car:lineFactor cdr:((_ termOp _ lineFactor POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+lineSum     	= begins:POS car:lineTerm cdr:((_ sumOp _ lineTerm POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+lineEquality	= begins:POS car:lineSum cdr:((_ equalityOp _ lineSum POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+lineCompare 	= begins:POS car:lineEquality cdr:((_ compareOp _ lineEquality POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+lineBoth    	= begins:POS car:lineCompare cdr:((_ bothOp _ lineCompare POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
+lineEither  	= begins:POS car:lineBoth cdr:((_ eitherOp _ lineBoth POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
 
 list
 	= car:parting cdr:((__ ([,;] __)? parting)*) tail:(__ [,;])? {
