@@ -1,5 +1,5 @@
 // To build a runnable version, do
-// browserify index.js -o hindex.js
+// browserify index.js -o index.packed.js
 
 var patel = require('../index');
 // var inspect = require('./inspect').inspect;
@@ -10,9 +10,17 @@ var xs = patel.globals();
 var gs = new patel.Scope(xs);
 gs.declare('trace');
 gs.declare('print');
-gs.declare('globals');
+gs.declare('trace_here');
+gs.declare('print_here');
+gs.declare('$$GLOBALSCOPE$$');
+gs.declare('dump-globals');
+gs.declare('create-panel');
+gs.declare('$');
 
-var sandbox = {};
+var sandbox = {
+	'dump-globals' : function(){ return sandbox },
+	'$' : $
+};
 
 function evaluate(input){
 	input += '\n\n\n';
@@ -22,7 +30,7 @@ function evaluate(input){
 
 	var wrap = ['.begin'];
 	gs.declarations.forEachOwn(function(id, decl){
-		if(id !== 'globals') wrap.push(['.set', gs.use(id), ['.', gs.use('globals'), ['.quote', id]]])
+		if(id !== '$$GLOBALSCOPE$$') wrap.push(['.set', gs.use(id), ['.', gs.use('$$GLOBALSCOPE$$'), ['.quote', id]]])
 	});
 
 	xast = wrap.concat([xast]);
@@ -31,7 +39,7 @@ function evaluate(input){
 	var rast = patel.regularize(xast, gs, function(ret){
 		var wrap = ['.begin'];
 		gs.declarations.forEachOwn(function(id, decl){
-			if(id !== 'globals') wrap.push(['.set', ['.', gs.use('globals'), ['.quote', id]], gs.use(id)])
+			if(id !== '$$GLOBALSCOPE$$') wrap.push(['.set', ['.', gs.use('$$GLOBALSCOPE$$'), ['.quote', id]], gs.use(id)])
 		});
 		return wrap.concat([['.return', ret]])
 	}, true);
@@ -39,7 +47,7 @@ function evaluate(input){
 	var tast = patel.pat2esc(rast, gs);
 	var result = patel.generateCode(tast);
 	console.log(result)
-	return new Function(gs.castName('globals'), result).call(sandbox, sandbox)
+	return new Function(gs.castName('$$GLOBALSCOPE$$'), result).call(sandbox, sandbox)
 };
 
 (function(){
@@ -203,6 +211,11 @@ function evaluate(input){
 		sandbox.trace_here = function(x){
 			traceInto(report, x, 'output')
 			return x;
+		};
+		sandbox['create-panel'] = function(){ 
+			var div = $('<div>');
+			runningReport.append(div);
+			return div
 		};
 
 		// evaluate pass

@@ -62,6 +62,8 @@ function showupValue(obj, depth){
 	 		if(obj === null) return span('null', 'null')
 	 		if(depth <= 0) return expander(obj)
 	 		if(obj instanceof Array) return showupArray(obj, depth)
+	 		if(obj instanceof Error) return span('' + obj, 'error')
+	 		if(obj instanceof Element) return span(obj.outerHTML, 'dom')
 	 		else return showupObject(obj, depth)
 	 	}
 	}		
