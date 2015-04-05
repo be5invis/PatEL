@@ -90,7 +90,7 @@ r0_ex = require("./ex").ex, r0_deQuasiquote = require("./ex").deQuasiquote, r0_F
         }
         return void 0;
     }), r6_AssignWithMod = function(r18_left, r18_right, r18_mod, r18_env, r18_locallyQ) {
-        var r18_left, r18_right, r18_mod, r18_env, r18_locallyQ, r18_any, r18_callee, r18_paras, r18_items, r18_t, r18_assignments, r18_j, r18_a, r18_id, _r18_t0;
+        var r18_left, r18_right, r18_mod, r18_env, r18_locallyQ, r18_any, r18_callee, r18_paras, r18_whatever, r18_items, r18_t, r18_assignments, r18_j, r18_a, r18_id, _r18_t0;
         if (_r18_t0 = r18_left, r18_id = _r18_t0, r0_atom(r18_id)) return r18_locallyQ ? [ ".set", r0_ex([ ".local", r18_id ], r18_env), r0_ex([ r18_mod, r18_right ], r18_env) ] : [ ".set", r0_ex(r18_left, r18_env), r0_ex([ r18_mod, r18_right ], r18_env) ];
         if (_r18_t0 instanceof Array && 2 === _r18_t0.length && ".local" === _r18_t0[0]) return r18_a = _r18_t0[1], 
         r6_AssignWithMod(r18_a, r18_right, r18_mod, r18_env, !0);
@@ -104,6 +104,8 @@ r0_ex = require("./ex").ex, r0_deQuasiquote = require("./ex").deQuasiquote, r0_F
             r18_j = 0; r18_j < r18_items.length; r18_j += 1) r18_assignments.push(r6_Assign(r18_items[r18_j][1], [ ".", r18_t, r18_items[r18_j][0] ], r18_env, r18_locallyQ));
             return r18_assignments.push(r18_t), r18_assignments;
         }
+        if (_r18_t0 instanceof Array && _r18_t0.length >= 1 && ".revcall" === _r18_t0[0]) return r18_whatever = _r18_t0.slice(1), 
+        r6_AssignWithMod([].concat(r18_whatever), r18_right, r18_mod, r18_env, r18_locallyQ);
         if (_r18_t0 instanceof Array && _r18_t0.length >= 1) return r18_callee = _r18_t0[0], 
         r18_paras = _r18_t0.slice(1), r0_atom(r18_callee) && r18_env.macros.has(r18_callee) ? r6_AssignWithMod(r0_ex([ r18_callee ].concat(r18_paras), r18_env), r18_right, r18_mod, r18_env, r18_locallyQ) : r0_prim(r18_callee) ? [ ".set", r0_ex(r18_left, r18_env), r0_ex([ r18_mod, r18_right ], r18_env) ] : r0_atom(r18_callee) && r18_locallyQ ? [ ".set", r0_ex([ ".local", r18_callee ], r18_env), r0_ex([ r18_mod, [ ".lambda", [].concat(r18_paras), r18_right ] ], r18_env) ] : [ ".set", r0_ex(r18_callee, r18_env), r0_ex([ r18_mod, [ ".lambda", [].concat(r18_paras), r18_right ] ], r18_env) ];
         throw r18_any = _r18_t0, new r0_FormInvalidError(r18_left, "Invalid Assignment Left-hand Side");

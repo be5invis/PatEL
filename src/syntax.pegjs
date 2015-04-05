@@ -36,6 +36,30 @@
 		if(result.length === 1 && result[0] instanceof Array && result[0][0] === '.quote') return result[0]
 		return ['+'].concat(result)
 	}
+	function formGrouped(head, rear, ends){
+		if(!head) return rear;
+		for(var k = head.length - 1; k >= 0; k--){
+			rear = BeginsEndsWith(head[k][1].concat([rear]), head[k][0], ends);
+		}
+		return rear;
+	}
+	function formGroupedPart(begins, head, rear, ends){
+		var res = head
+		for(var j = 0; j < rear.length; j++) {
+			if(rear[j][1].qualifier) 
+				res = BeginsEndsWith([[".", res, rear[j][1].qualifier]].concat(rear[j][1].rear || []), begins, rear[j][2])
+			else 
+				res = BeginsEndsWith([".revcall", rear[j][1].rear[0], res].concat(rear[j][1].rear.slice(1)), begins, rear[j][2])
+		};
+		return BeginsEndsWith(res, begins, ends);
+	}
+	function formInvoke(begins, head, rear, ends){
+		var res = [head]
+		for(var j = 0; j < rear.length; j++){
+			res.push(rear[j][1])
+		};
+		return BeginsEndsWith(res, begins, ends);
+	}
 }
 
 start = __ it:blockContent __ {
@@ -62,9 +86,8 @@ sliceunquote = begins:POS '@::' it:primitive ends:POS	{return BeginsEndsWith(['.
 unquote = begins:POS '@' it:primitive ends:POS       	{return BeginsEndsWith(['.unquote', it], begins, ends)}
 
 operate
-	= begins:POS "[" __ "]" ends:POS                              	{ return BeginsEndsWith([], begins, ends) }
-	/ begins:POS "[" __ it:invokeWithOptionalBlock __ "]" ends:POS	{ return BeginsEndsWith(it, begins, ends) }
-	/ begins:POS "[" __ it:assign __ "]" ends:POS                 	{ return BeginsEndsWith(it, begins, ends) }
+	= begins:POS "[" __ "]" ends:POS              	{ return BeginsEndsWith([], begins, ends) }
+	/ begins:POS "[" __ it:grouped __ "]" ends:POS	{ return BeginsEndsWith(it, begins, ends) }
 
 struct
 	= begins:POS "(" __ ")" ends:POS                    	{ return BeginsEndsWith(['.list'], begins, ends) }
@@ -128,17 +151,6 @@ cons
 	= car:list __ "::" __ cdr:parting { return ['.conslist'].concat(car.slice(1), [cdr]) }
 	/ "::" __ cdr:parting { return ['.conslist', cdr] }
 	/ list
-invokeWithOptionalBlock
-	= begins:POS head:invoke __ rear:block ends:POS { return BeginsEndsWith(head.concat(rear), begins, ends) }
-	/ invoke
-invoke
-	= head:parting !(__ [\-/+*<=>!?%&~^|]) rear:(__ parting)* { 
-		var res = [head]
-		for(var j = 0; j < rear.length; j++){
-			res.push(rear[j][1])
-		};
-		return res;
-	}
 propertyPairs
 	= head:propertyPair rear:((__ ([,;] __)? propertyPair)*) { 
 		var res = [head]
@@ -154,58 +166,49 @@ block
 	= "{" __ it:blockContent __ "}" { return it }
 blockContent
 	= head:line rear:(STATEMENT_SEPARATOR line)* {
-		var res = head
-		for(var j = 0; j < rear.length; j++){
-			res = res.concat(rear[j][1])
-		};
-		return res;
-	}
-line
-	= heads:(POS linePart _ ":" ![>\.`] _)* rear:lineLayer ends:POS {
-		if(!heads || !heads.length) return rear;
-		return heads.reduceRight(function(sofar, curr){ return [BeginsEndsWith(curr[1].concat(sofar), curr[0], ends)] }, rear)
-	}
-
-lineLayer
-	= head:simpleLine rear:(LAYER_SEPARATOR simpleLine)* {
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
 			res.push(rear[j][1])
 		};
 		return res;
 	}
+
+line
+	= head:(POS linePart _ ":" ![>\.`] _)* rear:simpleLine ends:POS { return formGrouped(head, rear, ends) }
+grouped
+	= head:(POS groupedPart __ ":" ![>\.`] __)* rear:simpleGrouped ends:POS { return formGrouped(head, rear, ends) }
 
 simpleLine
 	= begins:POS head:linePart rear:(_ block)? ends:POS { 
 		if(rear) return BeginsEndsWith(head.concat(rear[1]), begins, ends) 
 		else return BeginsEndsWith(head, begins, ends);
 	}
-linePart
-	= begins:POS head:lineInvoke rear:(__ pipeRear POS)* ends:POS  { 
-		var res = head
-		for(var j = 0; j < rear.length; j++) {
-			if(rear[j][1].qualifier) 
-				res = BeginsEndsWith([[".", res, rear[j][1].qualifier]].concat(rear[j][1].rear || []), begins, rear[j][2])
-			else 
-				res = BeginsEndsWith([rear[j][1].rear[0]].concat([res], rear[j][1].rear.slice(1)), begins, rear[j][2])
-		};
-		return BeginsEndsWith(res, begins, ends);
+simpleGrouped
+	= begins:POS head:groupedPart rear:(__ block)? ends:POS { 
+		if(rear) return BeginsEndsWith(head.concat(rear[1]), begins, ends) 
+		else return BeginsEndsWith(head, begins, ends);
 	}
 
-pipeRear
+linePart
+	= begins:POS head:lineInvoke rear:(__ linePipeRear POS)* ends:POS { return formGroupedPart(begins, head, rear, ends) }
+groupedPart
+	= begins:POS head:invoke rear:(__ pipeRear POS)* ends:POS { return formGroupedPart(begins, head, rear, ends) }
+
+linePipeRear
 	= ":>" _ it:lineInvoke { return {type: 'pipe', rear: it} }
 	/ ":" q:qualifier _ it:lineInvoke? { return {type:'pipe', rear: it, qualifier:q} }
+pipeRear
+	= ":>" __ it:invoke { return {type: 'pipe', rear: it} }
+	/ ":" q:qualifier __ it:invoke? { return {type:'pipe', rear: it, qualifier:q} }
 
 lineInvoke
 	= begins:POS "*" _ it:parting ends:POS { return BeginsEndsWith(it, begins, ends) }
-	/ begins:POS head:parting !(_ [\-/+*<=>!?%&~^|]) rear:(_ parting)* ends:POS { 
-		var res = [head]
-		for(var j = 0; j < rear.length; j++){
-			res.push(rear[j][1])
-		};
-		return BeginsEndsWith(res, begins, ends);
-	}
+	/ begins:POS head:parting !(_ [\-/+*<=>!?%&~^|]) rear:(_ parting)* ends:POS { return formInvoke(begins, head, rear, ends) }
 	/ begins:POS it:lineAssign ends:POS { return it }
+invoke
+	= begins:POS "*" __ it:parting ends:POS { return BeginsEndsWith(it, begins, ends) }
+	/ begins:POS head:parting !(__ [\-/+*<=>!?%&~^|]) rear:(__ parting)* ends:POS { return formInvoke(begins, head, rear, ends) }
+	/ begins:POS it:assign ends:POS { return it }
 
 
 // Tokens

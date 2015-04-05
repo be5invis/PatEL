@@ -36,7 +36,7 @@ r0_Scope = require("patrisika").Scope, r0_atom = function(r1_x) {
         return r0_deQuasiquote(r7_c, r6_level);
     })))) : (r6_otherwise = _r6_t0, [ ".quote", r6_otherwise ]);
 }, r0_ex = r0_NodeTranslation(function(r9_form, r9_env) {
-    var r9_form, r9_env, r9_any, r9_x, r9_callee, r9_args, r9_a, r9_j, r9_allKeysAreQuotes, r9_key, r9_value, r9_otherwise, r9_block, r9_param, r9_handler, r9_body, r9_params, r9_derived, r9_c, r9_e, _r9_t0, _r9_t1, _r9_t14, _r9_t15, _r9_t16, _r9_t21, _r9_t22;
+    var r9_form, r9_env, r9_any, r9_x, r9_callee, r9_args, r9_a, r9_j, r9_arg0, r9_args1, r9_t, r9_allKeysAreQuotes, r9_key, r9_value, r9_otherwise, r9_block, r9_param, r9_handler, r9_body, r9_params, r9_derived, r9_c, r9_e, _r9_t0, _r9_t1, _r9_t14, _r9_t15, _r9_t16, _r9_t21, _r9_t23, _r9_t24;
     if (_r9_t16 = arguments, _r9_t15 = this, _r9_t0 = r9_form, _r9_t0 instanceof Array && _r9_t0.length >= 1 && ".quote" === _r9_t0[0]) return r9_x = _r9_t0.slice(1), 
     [ ".quote" ].concat(r9_x);
     if (_r9_t0 instanceof Array && 2 === _r9_t0.length && ".quasiquote" === _r9_t0[0]) return r9_x = _r9_t0[1], 
@@ -81,9 +81,12 @@ r0_Scope = require("patrisika").Scope, r0_atom = function(r1_x) {
     }
     if (_r9_t0 instanceof Array && 2 === _r9_t0.length && ".local" === _r9_t0[0]) return r9_x = _r9_t0[1], 
     r9_env.declare(r9_x), r9_env.use(r9_x);
+    if (_r9_t0 instanceof Array && _r9_t0.length >= 3 && ".revcall" === _r9_t0[0]) return r9_callee = _r9_t0[1], 
+    r9_arg0 = _r9_t0[2], r9_args1 = _r9_t0.slice(3), r0_atom(r9_callee) && r9_env.macros.has(r9_callee) ? r9_env.macros.get(r9_callee)(r9_form.slice(1), r9_env) : (_r9_t21 = void 0, 
+    r9_t = r9_env.newt(), [ ".begin", [ ".set", r9_t, r0_ex(r9_arg0, r9_env) ], r0_ex([ r9_callee, r9_t ].concat(r9_args1), r9_env) ]);
     if (_r9_t0 instanceof Array && _r9_t0.length >= 1) {
         if (r9_callee = _r9_t0[0], r9_args = _r9_t0.slice(1), r0_atom(r9_callee) && r9_env.macros.has(r9_callee)) return r9_env.macros.get(r9_callee)(r9_form, r9_env);
-        for (_r9_t21 = void 0, _r9_t22 = r0_prim(r9_callee) ? void 0 : r9_callee = r0_ex(r9_callee, r9_env), 
+        for (_r9_t23 = void 0, _r9_t24 = r0_prim(r9_callee) ? void 0 : r9_callee = r0_ex(r9_callee, r9_env), 
         r9_a = [ r9_callee ], r9_j = 1; r9_j < r9_form.length; r9_j += 1) r9_a[r9_j] = r0_ex(r9_form[r9_j], r9_env);
         return r9_a;
     }

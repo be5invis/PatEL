@@ -141,6 +141,7 @@ define [Create] : begin {
 			assignments.push t
 			return assignments
 		}
+		(".revcall" :: whatever) : AssignWithMod (:: whatever) right mod env locallyQ
 		(callee :: paras) : piecewise {
 			[[atom callee] && [env.macros.has callee]] : AssignWithMod [ex (callee :: paras) env] right mod env locallyQ
 			[prim callee] (".set" [ex left env] [ex (mod right) env])

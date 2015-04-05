@@ -91,6 +91,13 @@ define ex : NodeTranslation : lambda [form env] : match form {
 		env.declare x
 		return [env.use x]
 	}
+	(".revcall" callee arg0 :: args1) : begin {
+		if [and [atom callee] [env.macros.has callee]] : begin {
+			return [[env.macros.get callee] [form.slice 1] env]
+		}
+		local t : env.newt
+		return ('.begin' ('.set' t [ex arg0 env]) [ex (callee t :: args1) env])
+	}
 	(callee :: args) : begin {
 		if [and [atom callee] [env.macros.has callee]] : begin {
 			return [[env.macros.get callee] form env]
