@@ -46,8 +46,10 @@ r0_ex = require("./ex").ex, r0_deQuasiquote = require("./ex").deQuasiquote, r0_F
     r6_externs.macros.put("list", r6_operatorRename(".list")), r6_externs.macros.put("typeof", r6_operatorRename(".typeof")), 
     r6_externs.macros.put("quasiquote", r6_operatorRename(".quasiquote")), r6_externs.macros.put("syntax", r6_operatorRename(".quasiquote")), 
     r6_externs.macros.put("lambda", function(r11_form, r11_env) {
-        var r11_form, r11_env, r11_otherwise, r11_car, r11_body, r11_parameters, _r11_t0;
-        return _r11_t0 = r11_form, _r11_t0 instanceof Array && 3 === _r11_t0.length ? (r11_car = _r11_t0[0], 
+        var r11_form, r11_env, r11_otherwise, r11_car, r11_body, r11_parameters, _r11_t0, _r11_t1, _r11_t2, _r11_t3;
+        return _r11_t0 = r11_form, _r11_t1 = !1, _r11_t0 instanceof Array && 3 === _r11_t0.length ? (r11_car = _r11_t0[0], 
+        r11_parameters = _r11_t0[1], r11_body = _r11_t0[2], _r11_t3 = _r11_t1 = r0_atom(r11_parameters) ? !0 : !1, 
+        _r11_t2 = _r11_t3) : _r11_t2 = void 0, _r11_t1 ? r0_ex([ ".lambda", [ r11_parameters ], r11_body ], r11_env) : _r11_t0 instanceof Array && 3 === _r11_t0.length ? (r11_car = _r11_t0[0], 
         r11_parameters = _r11_t0[1], r11_body = _r11_t0[2], r0_ex([ ".lambda", r11_parameters, r11_body ], r11_env)) : _r11_t0 instanceof Array && 2 === _r11_t0.length ? (r11_car = _r11_t0[0], 
         r11_body = _r11_t0[1], r0_ex([ ".lambda", [], r11_body ], r11_env)) : _r11_t0 instanceof Array && 1 === _r11_t0.length ? (r11_car = _r11_t0[0], 
         r0_ex([ ".lambda", [], [ ".unit" ] ], r11_body)) : (r11_otherwise = _r11_t0, r6_reportInvalid(r11_otherwise, "Invalid Lambda Formation"));

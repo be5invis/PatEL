@@ -62,10 +62,11 @@ define [Create] : begin {
 	externs.macros.put "syntax" : operatorRename ".quasiquote"
 
 	externs.macros.put "lambda" : lambda [form env] : match form {
-		(car parameters body)	: ex ('.lambda' parameters body) env
-		(car body)           	: ex ('.lambda' () body) env
-		(car)                	: ex ('.lambda' () ('.unit')) body
-		otherwise            	: reportInvalid otherwise "Invalid Lambda Formation"
+		(car parameters body) [atom parameters]	: ex ('.lambda' (parameters) body) env
+		(car parameters body)                  	: ex ('.lambda' parameters body) env
+		(car body)                             	: ex ('.lambda' () body) env
+		(car)                                  	: ex ('.lambda' () ('.unit')) body
+		otherwise                              	: reportInvalid otherwise "Invalid Lambda Formation"
 	}
 	externs.macros.put "function" : externs.macros.get "lambda"
 	externs.macros.put "->" : externs.macros.get "lambda"
