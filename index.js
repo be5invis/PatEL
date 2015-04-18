@@ -28,10 +28,8 @@ function clamp(x, l, h){
 	return x;
 }
 
-function evaluate(input){
-	input += '\n\n\n';
+function evaluate(ast){
 	var resultInfo = {};
-	var ast = patel.parse(input);
 	var xast = patel.ex(ast, gs);
 
 	var wrap = ['.begin'];
@@ -150,10 +148,7 @@ function evaluate(input){
 		// Input box resizing mechanism
 		if(e.key === 'Enter' || e.keyCode === 13){
 			e.preventDefault();
-			if(!(e.shiftKey || e.ctrlKey) && !pendingExecution){ // entering an ENTER
-				insertAtCaret(inputArea, "\n" + getCurrentLineBlanks(inputArea));
-			}
-			enterDown = true;
+			insertAtCaret(inputArea, "\n" + getCurrentLineBlanks(inputArea));
 		} else if(e.key === 'Tab' || e.keyCode === 9){
 			e.preventDefault();
 			insertAtCaret(inputArea, '    ');
@@ -164,36 +159,33 @@ function evaluate(input){
 	inputArea.addEventListener('keyup', function(e){
 		// Execution handler mechanism
 		pendingExecution  = false;
-		if(e.key === 'Enter' || e.keyIdentifier === 'Enter' || e.keyCode === 13){
-			enterDown = false;
-			if(e.shiftKey || e.ctrlKey) {
-				e.preventDefault();
-				prepareExecution(inputArea);
-			}
-		} else if(e.key === 'Shift' || e.keyIdentifier === 'Shift' || e.keyCode === 16 ||
-		          e.key === 'Control' || e.keyIdentifier === 'Control' || e.keyCode === 17){
-			if(enterDown) {
-				e.preventDefault();
-				prepareExecution(inputArea);
-			}
-		} else if(!inputAreaContentModified && (e.key === "Up Arrow" || e.keyIdentifier === "Up Arrow" || e.keyCode === 38)){
+		if(!inputAreaContentModified && (e.key === "Up Arrow" || e.keyIdentifier === "Up Arrow" || e.keyCode === 38)){
 			e.preventDefault();
-			inputArea.value = inputHistory[(historyIndex = clamp(historyIndex - 1, 0, inputHistory.length - 1))]
+			inputArea.value = inputHistory[(historyIndex = clamp(historyIndex - 1, 0, inputHistory.length - 1))];
+			heightResizer.tick();
 		} else if(!inputAreaContentModified && (e.key === "Down Arrow" || e.keyIdentifier === "Down Arrow" || e.keyCode === 40)){
 			e.preventDefault();
-			inputArea.value = inputHistory[(historyIndex = clamp(historyIndex + 1, 0, inputHistory.length - 1))]
+			inputArea.value = inputHistory[(historyIndex = clamp(historyIndex + 1, 0, inputHistory.length - 1))];
+			heightResizer.tick();
 		} else if(!inputAreaContentModified && (e.key === "Home" || e.keyIdentifier === "Home" || e.keyCode === 36)){
 			e.preventDefault();
-			inputArea.value = inputHistory[(historyIndex = 0)]
+			inputArea.value = inputHistory[(historyIndex = 0)];
+			heightResizer.tick();
 		} else if(!inputAreaContentModified && (e.key === "End" || e.keyIdentifier === "End" || e.keyCode === 35)){
 			e.preventDefault();
-			inputArea.value = inputHistory[(historyIndex = inputHistory.length - 1)]
+			inputArea.value = inputHistory[(historyIndex = inputHistory.length - 1)];
+			heightResizer.tick();
+		} else if(e.key === "Enter" || e.keyIdentifier === "Enter" || e.keyCode === 13) {
+			if(getCaretPos(inputArea) >= inputArea.value.length) {
+				e.preventDefault();
+				if(!prepareExecution(inputArea)){
+					inputArea.value = '';
+				}
+			}
 		} else if(!(
-			e.key === "Left Arrow" || e.keyIdentifier === "Left Arrow" || e.keyCode === 37 ||
-			e.key === "Right Arrow" || e.keyIdentifier === "Right Arrow" || e.keyCode === 39 ||
-			e.key === "PageUp" || e.keyIdentifier === "PageUp" || e.keyCode === 33 ||
-			e.key === "PageDown" || e.keyIdentifier === "PageDown" || e.keyCode === 34 ||
-			e.key === "Alt" || e.keyIdentifier === "Alt" || e.keyCode === 18
+			e.key === "Alt" || e.keyIdentifier === "Alt" || e.keyCode === 18 ||
+			e.key === 'Shift' || e.keyIdentifier === 'Shift' || e.keyCode === 16 ||
+			e.key === 'Control' || e.keyIdentifier === 'Control' || e.keyCode === 17
 		)){
 			inputAreaContentModified = true;
 		}
@@ -203,10 +195,18 @@ function evaluate(input){
 	var historyIndex = 0;
 	function prepareExecution(inputArea){
 		pendingExecution = true;
-		var input = inputArea.value;
-		inputHistory.push(input);
-		inputArea.value = '';
-		setTimeout(function(){ run(input) }, 0)
+		var input = inputArea.value.trimRight();
+		try {
+			var ast = patel.parse(input + '\n\n\n');
+			setTimeout(function(){ 
+				if(inputHistory[inputHistory.length - 1] !== input) inputHistory.push(input);
+				resetInput();
+				run(input, ast)
+			}, 0);
+		} catch(e) {
+			if(!e.found) return true;	// Parser throws error at the end of the input
+			                         	// indicates incomplete input script
+		}
 	};
 	function resetInput(){
 		pendingExecution = false;
@@ -224,9 +224,8 @@ function evaluate(input){
 		report.append($('<pre>').text(content).addClass(cls));
 	}
 
-	function run(input){
+	function run(input, ast){
 		n++;
-		resetInput();
 		var correct = true;
 		var result, err;
 		var report = $('<div>').addClass('report');
@@ -259,7 +258,7 @@ function evaluate(input){
 
 		// evaluate pass
 		try {
-			result = evaluate(input);
+			result = evaluate(ast);
 		} catch(e) {
 			correct = false;
 			err = e;
