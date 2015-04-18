@@ -22,6 +22,12 @@ var sandbox = {
 	'$' : $
 };
 
+function clamp(x, l, h){
+	if(x < l) return l;
+	if(x > h) return h;
+	return x;
+}
+
 function evaluate(input){
 	input += '\n\n\n';
 	var resultInfo = {};
@@ -116,7 +122,8 @@ function evaluate(input){
 	}
 
 	var enterDown = false;
-	var justExec  = false;
+	var pendingExecution  = false;
+	var inputAreaContentModified = false;
 
 	var heightResizer = function(){
 		var handler = null;
@@ -143,40 +150,73 @@ function evaluate(input){
 		// Input box resizing mechanism
 		if(e.key === 'Enter' || e.keyCode === 13){
 			e.preventDefault();
-			if(!(e.shiftKey || e.ctrlKey) && !justExec){ // entering an ENTER
+			if(!(e.shiftKey || e.ctrlKey) && !pendingExecution){ // entering an ENTER
 				insertAtCaret(inputArea, "\n" + getCurrentLineBlanks(inputArea));
 			}
 			enterDown = true;
 		} else if(e.key === 'Tab' || e.keyCode === 9){
 			e.preventDefault();
-			insertAtCaret(inputArea, '\t');
+			insertAtCaret(inputArea, '    ');
 		};
 		heightResizer.tick();
 	}, false);
 
 	inputArea.addEventListener('keyup', function(e){
 		// Execution handler mechanism
-		justExec  = false;
+		pendingExecution  = false;
 		if(e.key === 'Enter' || e.keyIdentifier === 'Enter' || e.keyCode === 13){
 			enterDown = false;
 			if(e.shiftKey || e.ctrlKey) {
 				e.preventDefault();
-				setTimeout(run, 0);
-				justExec = true
+				prepareExecution(inputArea);
 			}
 		} else if(e.key === 'Shift' || e.keyIdentifier === 'Shift' || e.keyCode === 16 ||
 		          e.key === 'Control' || e.keyIdentifier === 'Control' || e.keyCode === 17){
 			if(enterDown) {
 				e.preventDefault();
-				setTimeout(run, 0);	
-				justExec = true    		
+				prepareExecution(inputArea);
 			}
+		} else if(!inputAreaContentModified && (e.key === "Up Arrow" || e.keyIdentifier === "Up Arrow" || e.keyCode === 38)){
+			e.preventDefault();
+			inputArea.value = inputHistory[(historyIndex = clamp(historyIndex - 1, 0, inputHistory.length - 1))]
+		} else if(!inputAreaContentModified && (e.key === "Down Arrow" || e.keyIdentifier === "Down Arrow" || e.keyCode === 40)){
+			e.preventDefault();
+			inputArea.value = inputHistory[(historyIndex = clamp(historyIndex + 1, 0, inputHistory.length - 1))]
+		} else if(!inputAreaContentModified && (e.key === "Home" || e.keyIdentifier === "Home" || e.keyCode === 36)){
+			e.preventDefault();
+			inputArea.value = inputHistory[(historyIndex = 0)]
+		} else if(!inputAreaContentModified && (e.key === "End" || e.keyIdentifier === "End" || e.keyCode === 35)){
+			e.preventDefault();
+			inputArea.value = inputHistory[(historyIndex = inputHistory.length - 1)]
+		} else if(!(
+			e.key === "Left Arrow" || e.keyIdentifier === "Left Arrow" || e.keyCode === 37 ||
+			e.key === "Right Arrow" || e.keyIdentifier === "Right Arrow" || e.keyCode === 39 ||
+			e.key === "PageUp" || e.keyIdentifier === "PageUp" || e.keyCode === 33 ||
+			e.key === "PageDown" || e.keyIdentifier === "PageDown" || e.keyCode === 34 ||
+			e.key === "Alt" || e.keyIdentifier === "Alt" || e.keyCode === 18
+		)){
+			inputAreaContentModified = true;
 		}
 	}, false);
 
+	var inputHistory = [];
+	var historyIndex = 0;
+	function prepareExecution(inputArea){
+		pendingExecution = true;
+		var input = inputArea.value;
+		inputHistory.push(input);
+		inputArea.value = '';
+		setTimeout(function(){ run(input) }, 0)
+	};
+	function resetInput(){
+		pendingExecution = false;
+		inputAreaContentModified = false;
+		historyIndex = inputHistory.length;
+	}
+	// EXECUTION AND REPORTING
+
 	var n = 0;
 	var runningReport = null;
-
 	function traceInto(report, content, cls){
 		report.append($('<pre>').append($('<div>').append(showup(content, 3)).addClass('trace')).addClass(cls));
 	}
@@ -184,10 +224,9 @@ function evaluate(input){
 		report.append($('<pre>').text(content).addClass(cls));
 	}
 
-	function run(){
-		justExec = false;
-		var input = inputArea.value;
+	function run(input){
 		n++;
+		resetInput();
 		var correct = true;
 		var result, err;
 		var report = $('<div>').addClass('report');
@@ -221,11 +260,9 @@ function evaluate(input){
 		// evaluate pass
 		try {
 			result = evaluate(input);
-			inputArea.value = '';
 		} catch(e) {
 			correct = false;
 			err = e;
-			inputArea.value = input;
 		};
 		
 		report.append($('<label>').text('Out [' + n + ']:').addClass('output'));
