@@ -42,10 +42,12 @@ function expander(obj){
 	var el = $('<a>');
 	var shown = false;
 	el.text('...');
+	el.addClass('active');
 	el.on('click', function(){
 		if(!shown) {
 			$(this).empty().append(showupValue(obj, 1));
-			shown = true
+			shown = true;
+			el.removeClass('active');
 		}
 		return false;
 	})
