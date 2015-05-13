@@ -68,8 +68,6 @@ start = __ it:blockContent __ {
 	return program
 }
 // Expression
-primitiveStart
-	= identifier / numberliteral / "'" / "\"" / "[" / "(" / "{" / "@`" / "@::" / "@"
 primitive
 	= group
 	/ quasiquote
@@ -212,15 +210,26 @@ invoke
 
 
 // Tokens
-identifier "Identifier"
+identifier "Name"
 	= $((UnicodeLetter / [_$]) (UnicodeLetter / UnicodeCombiningMark / UnicodeDigit / UnicodeConnectorPunctuation / [\-_@$])*)
 numberliteral "Numeric Literal"
-	= ("0x" / "0X") hexdigits:$([0-9a-fA-F]+) { return ['.quote', parseInt(hexdigits, 16)] }
-	/ decimal:$([0-9]+ ("." [0-9]+)? ([eE] [+\-]? [0-9]+)?) { return ['.quote', decimal - 0] }
+	= begins:POS ("0x" / "0X") hexdigits:$([0-9a-fA-F]+)  ends:POS {
+		return BeginsEndsWith(['.quote', parseInt(hexdigits, 16)] , begins, ends)
+	}
+	/ begins:POS ("0b" / "0B") bindigits:$([01]+) ends:POS {
+		return BeginsEndsWith(['.quote', parseInt(bindigits, 2)], begins, ends)
+	}
+	/ begins:POS decimal:$([0-9]+ ("." [0-9]+)? ([eE] [+\-]? [0-9]+)?) ends:POS {
+		return BeginsEndsWith(['.quote', decimal - 0], begins, ends)
+	}
 stringliteral "String Literal"
-	= "\"" inner:stringcharacter* "\"" { return joinInterpolation(inner) }
-	/ "'" inner:singlestringchar* "'" { return ['.quote', inner.join('')] }
-stringcharacter
+	= begins:POS "\"" inner:stringCharacter* "\""  ends:POS {
+		return BeginsEndsWith(joinInterpolation(inner) , begins, ends)
+	}
+	/ begins:POS "'" inner:singleStringCharacter* "'"  ends:POS {
+		return BeginsEndsWith(['.quote', inner.join('')] , begins, ends)
+	}
+stringCharacter
 	= common:$([^"\\\r\n]+) { return ['.quote', common] }
 	/ "\\u" digits:([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9]) { 
 		return ['.quote', String.fromCharCode(parseInt(digits.join(''), 16))]
@@ -239,7 +248,7 @@ stringcharacter
 			default: return ['.quote', "\\" + which];
 		}
 	}
-singlestringchar
+singleStringCharacter
 	= [^']
 	/ "''" { return "'" }
 

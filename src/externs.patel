@@ -7,18 +7,7 @@ define util [require "util"]
 define ex [require "./ex"].ex
 define deQuasiquote [require "./ex"].deQuasiquote
 
-define [FormInvalidError form reason] : begin {
-	set this.reason reason
-	set this.message reason
-	set this.relatedForm form
-	if [form && form.begins >= 0 && form.ends >= 0] : begin {
-		set this.begins form.begins
-		set this.ends form.ends
-		inc this.message by ["\nAround (" + this.begins + " -- " + this.ends + ")"]
-	}
-	return null
-}
-set FormInvalidError.prototype : Object.create Error.prototype
+define FormInvalidError patrisika.FormInvalidError
 
 define [wrapForSyntacticClosure fn] : lambda [x] : match x {
 	(".syntactic-closure" c e)	: fn c

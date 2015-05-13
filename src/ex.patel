@@ -2,18 +2,7 @@ define Scope [require "patrisika"].Scope
 define [atom x] [[typeof x] == "string"]
 define [prim x] [[atom x] && x !== "&" && x !== "&!" && [x`0 === "." || [[regex "^\W+"].test x]]]
 
-define [FormInvalidError form reason] : begin {
-	set this.reason reason
-	set this.message reason
-	set this.relatedForm form
-	if [form && form.begins >= 0 && form.ends >= 0] : begin {
-		set this.begins form.begins
-		set this.ends form.ends
-		inc this.message by ["\nAround (" + this.begins + " -- " + this.ends + ")"]
-	}
-	return null
-}
-set FormInvalidError.prototype : Object.create Error.prototype
+define FormInvalidError [require "patrisika"].FormInvalidError
 
 define [NodeTranslation fn] : lambda [form] : begin {
 	local res : fn.apply this arguments
