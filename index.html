@@ -12,6 +12,21 @@
 	main p img {
 		vertical-align: middle;
 	}
+	#editingArea {
+		line-height: 1.5em;
+		border-top: 1px solid black;
+		position: relative;
+	}
+	#incomingSyntaxError {
+		position: absolute;
+		left: 0;
+		right: 0;
+		z-index: -1;
+		height: 1.5em;
+	}
+	#incomingSyntaxError.active {
+		background: #fee;
+	}
 	#incoming {
 		font-size: 1rem;
 		display: block;
@@ -19,7 +34,6 @@
 		margin: 0;
 		padding: 0.5em 0;
 		border: none;
-		border-top: 1px solid black;
 		line-height: 1.5rem;
 		min-height: 1.5rem;
 		overflow-x: hidden;
@@ -27,6 +41,7 @@
 		tab-size: 2em;
 		outline: none;
 		resize: none;
+		background: none;
 	}
 	.report {
 		position: relative;
@@ -107,13 +122,16 @@
 </style>
 <body>
 <main>
-<p>Online Interactive Patrisika Example Language environment, ver 0.16.0.</p>
-<p>Powered by <img src="https://rawgit.com/be5invis/patrisika/7f2783ca91ccaa7481c8ea8c1ed4f0d881ceaff8/resources/patrisika-logo.svg" height="24" width="24"/> Patrisika r0.15.0.</p>
+<p>Online Interactive Patrisika Example Language environment, ver 0.17.0.</p>
+<p>Powered by <img src="https://rawgit.com/be5invis/patrisika/7f2783ca91ccaa7481c8ea8c1ed4f0d881ceaff8/resources/patrisika-logo.svg" height="24" width="24"/> Patrisika r0.17.0.</p>
 <p>Copyright (c) 2014-2015 Belleve Invis.</p>
 <div id="existing-results"></div>
 <div class="report input">
 <label id="label-for-input">In [1]:</label>
+<div id="editingArea">
 <textarea name="incoming" id="incoming" cols="30" rows="1" placeholder="Execute by Enter"></textarea>
+<div id="incomingSyntaxError"></div>
+</div>
 </div>
 </main>
 <script src="index.packed.js"></script>

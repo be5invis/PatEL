@@ -197,6 +197,7 @@ function evaluate(ast){
 		pendingExecution = true;
 		var input = inputArea.value.trimRight();
 		try {
+			$('#incomingSyntaxError').removeClass('active');
 			var ast = patel.parse(input + '\n\n\n');
 			setTimeout(function(){ 
 				if(inputHistory[inputHistory.length - 1] !== input) inputHistory.push(input);
@@ -204,8 +205,13 @@ function evaluate(ast){
 				run(input, ast)
 			}, 0);
 		} catch(e) {
+			console.log(e)
 			if(!e.found) return true;	// Parser throws error at the end of the input
-			                         	// indicates incomplete input script
+			                         	// indicates incomplete input
+			// Otherwise, report a syntax error
+			$('#incomingSyntaxError').addClass('active');
+			$('#incomingSyntaxError').css({top: ((e.line - 1) * 1.5 + 0.5) + 'em'})
+			return true;
 		}
 	};
 	function resetInput(){
