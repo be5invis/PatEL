@@ -7,9 +7,11 @@ define-macro start-task : lambda [form env] : macro-match form env {
 	@`[start-task @task] @`[@task.then [lambda [] nothing]]
 }
 
-define [GeneratorFunction fn] : begin {
-	set fn.constructor (.name "GeneratorFunction")
-	fn
+define-macro GeneratorFunction : syntax-rules {
+	@`[GeneratorFunction @fn] @`[let [f @fn] : begin {
+		set f.constructor (.name "GeneratorFunction")
+		f
+	}]
 }
 
 define trace console.log
@@ -21,9 +23,9 @@ define GeneratorFunction [sequent] : begin {
 	local b : yield [get 'http://typeof.net']
 	trace "Baidu"
 	local c : yield [get 'http://baidu.com']
-	trace a`0.statusCode
-	trace b`0.statusCode
-	trace c`0.statusCode
+	trace a.0.statusCode
+	trace b.0.statusCode
+	trace c.0.statusCode
 }
 
 define GeneratorFunction [parallel] : begin {
@@ -35,10 +37,14 @@ define GeneratorFunction [parallel] : begin {
 }
 
 define GeneratorFunction [somethingWrong] : begin {
-	try : begin {
-		local res : yield [get "http://badhost.invalid"]
-		trace res
-	}, ex, begin { trace ex.code }
+	try {
+		begin {
+			local res : yield [get "http://badhost.invalid"]
+			trace res
+		} 
+		ex
+		begin { trace ex.code }
+	}
 }
 
 start-task [co sequent]

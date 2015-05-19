@@ -98,6 +98,7 @@ define ex : NodeTranslation : lambda [form env] : match form {
 		}
 		return a
 	}
+	x [[atom x] && [env.macros.has x] && [env.macros.get x].invokeAsAtom] : return [[env.macros.get x].invokeAsAtom]
 	x [[atom x] && [env.macros.has x] && [not [[env.macros.get x] <@ Function]]] : return [env.macros.get x]
 	x [prim x] : return x
 	x [atom x] : return [env.use x]
