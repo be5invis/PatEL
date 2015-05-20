@@ -146,13 +146,16 @@ function evaluate(ast){
 
 	inputArea.addEventListener('keydown', function(e){
 		// Input box resizing mechanism
-		if(e.key === 'Enter' || e.keyCode === 13){
-			e.preventDefault();
-			insertAtCaret(inputArea, "\n" + getCurrentLineBlanks(inputArea));
+		if(e.key === 'Enter' || e.keyCode === 13) {
+			if(!e.ctrlKey) {
+				e.preventDefault();
+				insertAtCaret(inputArea, "\n" + getCurrentLineBlanks(inputArea));				
+			}
 		} else if(e.key === 'Tab' || e.keyCode === 9){
 			e.preventDefault();
 			insertAtCaret(inputArea, '    ');
 		};
+		$('#incomingSyntaxError').removeClass('active');
 		heightResizer.tick();
 	}, false);
 
@@ -162,21 +165,25 @@ function evaluate(ast){
 		if(!inputAreaContentModified && (e.key === "Up Arrow" || e.keyIdentifier === "Up Arrow" || e.keyCode === 38)){
 			e.preventDefault();
 			inputArea.value = inputHistory[(historyIndex = clamp(historyIndex - 1, 0, inputHistory.length - 1))];
+			$('#incomingSyntaxError').removeClass('active');
 			heightResizer.tick();
 		} else if(!inputAreaContentModified && (e.key === "Down Arrow" || e.keyIdentifier === "Down Arrow" || e.keyCode === 40)){
 			e.preventDefault();
 			inputArea.value = inputHistory[(historyIndex = clamp(historyIndex + 1, 0, inputHistory.length - 1))];
+			$('#incomingSyntaxError').removeClass('active');
 			heightResizer.tick();
 		} else if(!inputAreaContentModified && (e.key === "Home" || e.keyIdentifier === "Home" || e.keyCode === 36)){
 			e.preventDefault();
 			inputArea.value = inputHistory[(historyIndex = 0)];
+			$('#incomingSyntaxError').removeClass('active');
 			heightResizer.tick();
 		} else if(!inputAreaContentModified && (e.key === "End" || e.keyIdentifier === "End" || e.keyCode === 35)){
 			e.preventDefault();
 			inputArea.value = inputHistory[(historyIndex = inputHistory.length - 1)];
+			$('#incomingSyntaxError').removeClass('active');
 			heightResizer.tick();
 		} else if(e.key === "Enter" || e.keyIdentifier === "Enter" || e.keyCode === 13) {
-			if(getCaretPos(inputArea) >= inputArea.value.length) {
+			if(getCaretPos(inputArea) >= inputArea.value.length || e.ctrlKey) {
 				e.preventDefault();
 				if(!prepareExecution(inputArea)){
 					inputArea.value = '';
@@ -197,7 +204,6 @@ function evaluate(ast){
 		pendingExecution = true;
 		var input = inputArea.value.trimRight();
 		try {
-			$('#incomingSyntaxError').removeClass('active');
 			var ast = patel.parse(input + '\n\n\n');
 			setTimeout(function(){ 
 				if(inputHistory[inputHistory.length - 1] !== input) inputHistory.push(input);
@@ -211,6 +217,7 @@ function evaluate(ast){
 			// Otherwise, report a syntax error
 			$('#incomingSyntaxError').addClass('active');
 			$('#incomingSyntaxError').css({top: ((e.line - 1) * 1.5 + 0.5) + 'em'})
+			$('#incomingSyntaxError').html(e.message);
 			return true;
 		}
 	};
