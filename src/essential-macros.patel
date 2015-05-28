@@ -8,3 +8,9 @@ define-macro call-its : syntax-rules {
 	@`[call-its @property] : return @`[let [t @property] [lambda [x] [x`t]]]
 	@`[call-its @property @::args] : return @`[let [t @property] [a (@::args)] [lambda [x] [x`t.apply x a]]]
 }
+define-macro items-of : syntax-rules {
+	@`[items-of @obj] : return @`[let [t @obj] [[lambda [] [begin
+		[local n t.length]
+		[for [local i 0] [i < n] [i = i + 1] [yield t`i]]
+	]]]]
+}

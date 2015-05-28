@@ -182,6 +182,21 @@ define [Create] : begin {
 	}
 
 	externs.macros.put "foreach" : lambda [form env] : match form {
+		("foreach" varid ("items-of" list) body) [[env.macros.get "items-of"] == [externs.macros.get "items-of"]] : begin {
+			local tR [env.newt]
+			local tN [env.newt]
+			local tI [env.newt]
+			return (".begin"
+				(".set" tR [ex list env])
+				(".set" tN ("." tR (".quote" "length")))
+				(".set" tI (".quote" 0))
+				(".while"
+					("<" tI tN)
+					(".begin"
+						[Assign varid ("." tR tI) env false]
+						[ex body env]
+						(".set" tI ("+" tI (".quote" 1))))))
+		}
 		("foreach" varid range body) : begin {
 			local tR [env.newt]
 			local t  [env.newt]
@@ -320,6 +335,7 @@ define [Create] : begin {
 	}
 
 	externs.macros.put "define-macro" : lambda [form env] : match form {
+		(op (".quote" str) body) : ex (op str body) env
 		(op name body) [atom name] : begin {
 			local ds [new Scope env]
 			ds.declare "atom" true
