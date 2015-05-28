@@ -110,13 +110,13 @@ qualifier
 	/ "`" property:primitive { return property }
 
 prefixOp = "+" / "-" / "!"
-factorOp  	= $([?@^] [\-_/+*<=>!?%_&~^@|]*)
-termOp    	= $([*/%] [\-_/+*<=>!?%_&~^@|]*)
-sumOp     	= $([+\-] [\-_/+*<=>!?%_&~^@|]*)
-equalityOp	= $([=!] [\-_/+*<=>!?%_&~^@|]+)
-compareOp 	= $([<>] [\-_/+*<=>!?%_&~^@|]*)
-bothOp    	= $([&] [\-_/+*<=>!?%_&~^@|]*)
-eitherOp  	= $([|] [\-_/+*<=>!?%_&~^@|]*)
+factorOp  	= $([?^] [\-_/+*<=>!?%_&~^|]*)
+termOp    	= $([*/%] [\-_/+*<=>!?%_&~^|]*)
+sumOp     	= $([+\-] [\-_/+*<=>!?%_&~^|]*)
+equalityOp	= $([=!] [\-_/+*<=>!?%_&~^|]+)
+compareOp 	= $([<>] [\-_/+*<=>!?%_&~^|]*)
+bothOp    	= $([&] [\-_/+*<=>!?%_&~^|]*)
+eitherOp  	= $([|] [\-_/+*<=>!?%_&~^|]*)
 
 parted
 	= begins:POS left:prefixOp __ right:parting ends:POS { return BeginsEndsWith([left, right], begins, ends) }
