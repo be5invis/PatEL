@@ -31,7 +31,7 @@
         };
     };
     r0_Create = function _r0_t3() {
-        var r5_externs, r5_operatorRename, r5_reportInvalid, r5_AssignWithMod, r5_Assign, r5_boole, _r5_t0, _r5_t1, _r5_t2, _r5_t3, _r5_t4, _r5_t5, _r5_t6, _r5_t7, _r5_t8, _r5_t9, _r5_t10, _r5_t11, _r5_t12, _r5_t13, _r5_t14, _r5_t15, _r5_t16, _r5_t17, _r5_t18, _r5_t19, _r5_t20, _r5_t21;
+        var r5_externs, r5_operatorRename, r5_reportInvalid, r5_AssignWithMod, r5_Assign, r5_boole, _r5_t0, _r5_t1, _r5_t2, _r5_t3, _r5_t4, _r5_t5, _r5_t6, _r5_t7, _r5_t8, _r5_t9, _r5_t10, _r5_t11, _r5_t12, _r5_t13, _r5_t14, _r5_t15, _r5_t16, _r5_t17, _r5_t18, _r5_t19, _r5_t20;
         r5_externs = r0_patrisika['DefaultExterns']();
         r5_externs['castName'] = function _r5_t0(r6_name) {
             var r6_name;
@@ -588,136 +588,6 @@
             } else
                 return void 0;
         });
-        r5_externs['macros']['put']('foreach', function _r5_t16(r24_form, r24_env) {
-            var r24_form, r24_env, r24_varid, r24_range, r24_body, r24_tR, r24_t, r24_list, r24_tN, r24_tI, _r24_t0, _r24_t1, _r24_t2, _r24_t3, _r24_t4, _r24_t5;
-            _r24_t0 = r24_form;
-            _r24_t1 = false;
-            if (_r24_t0 instanceof Array && _r24_t0['length'] === 4 && 'foreach' === _r24_t0[0] && (_r24_t0[2] instanceof Array && _r24_t0[2]['length'] === 2 && 'items-of' === _r24_t0[2][0])) {
-                r24_varid = _r24_t0[1];
-                r24_list = _r24_t0[2][1];
-                r24_body = _r24_t0[3];
-                if (r24_env['macros']['get']('items-of') === r5_externs['macros']['get']('items-of'))
-                    _r24_t3 = _r24_t1 = true;
-                else
-                    _r24_t3 = _r24_t1 = false;
-                _r24_t2 = _r24_t3;
-            } else
-                _r24_t2 = void 0;
-            if (_r24_t1) {
-                r24_tR = r24_env['newt']();
-                r24_tN = r24_env['newt']();
-                r24_tI = r24_env['newt']();
-                return [
-                    '.begin',
-                    [
-                        '.set',
-                        r24_tR,
-                        r0_ex(r24_list, r24_env)
-                    ],
-                    [
-                        '.set',
-                        r24_tN,
-                        [
-                            '.',
-                            r24_tR,
-                            [
-                                '.quote',
-                                'length'
-                            ]
-                        ]
-                    ],
-                    [
-                        '.set',
-                        r24_tI,
-                        [
-                            '.quote',
-                            0
-                        ]
-                    ],
-                    [
-                        '.while',
-                        [
-                            '<',
-                            r24_tI,
-                            r24_tN
-                        ],
-                        [
-                            '.begin',
-                            r5_Assign(r24_varid, [
-                                '.',
-                                r24_tR,
-                                r24_tI
-                            ], r24_env, false),
-                            r0_ex(r24_body, r24_env),
-                            [
-                                '.set',
-                                r24_tI,
-                                [
-                                    '+',
-                                    r24_tI,
-                                    [
-                                        '.quote',
-                                        1
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ];
-            } else if (_r24_t0 instanceof Array && _r24_t0['length'] === 4 && 'foreach' === _r24_t0[0]) {
-                r24_varid = _r24_t0[1];
-                r24_range = _r24_t0[2];
-                r24_body = _r24_t0[3];
-                r24_tR = r24_env['newt']();
-                r24_t = r24_env['newt']();
-                return [
-                    '.begin',
-                    [
-                        '.set',
-                        r24_tR,
-                        r0_ex(r24_range, r24_env)
-                    ],
-                    [
-                        '.while',
-                        [
-                            '!',
-                            [
-                                '.',
-                                [
-                                    '.set',
-                                    r24_t,
-                                    [[
-                                            '.',
-                                            r24_tR,
-                                            [
-                                                '.quote',
-                                                'next'
-                                            ]
-                                        ]]
-                                ],
-                                [
-                                    '.quote',
-                                    'done'
-                                ]
-                            ]
-                        ],
-                        [
-                            '.begin',
-                            r5_Assign(r24_varid, [
-                                '.',
-                                r24_t,
-                                [
-                                    '.quote',
-                                    'value'
-                                ]
-                            ], r24_env, false),
-                            r0_ex(r24_body, r24_env)
-                        ]
-                    ]
-                ];
-            } else
-                return void 0;
-        });
         r5_externs['macros']['put']('this', ['.thisp']);
         r5_externs['macros']['put']('arguments', ['.argsp']);
         r5_externs['macros']['put']('nothing', ['.unit']);
@@ -734,104 +604,104 @@
             '.quote',
             false
         ]);
-        r5_boole = function _r5_t17(r25_x) {
-            var r25_x;
-            return !!r25_x;
+        r5_boole = function _r5_t16(r24_x) {
+            var r24_x;
+            return !!r24_x;
         };
-        r5_externs['macros']['put']('match', function _r5_t18(r26_form, r26_env, r26_wrapper) {
-            var r26_form, r26_env, r26_wrapper, r26_pairs, r26_t, r26_matchQ, r26_f, r26_j, r26_any, r26_pattern, r26_guard, r26_body, r26_pat, r26_cond, r26_tc, _r26_t0, _r26_t1, _r26_t2, _r26_t3, _r26_t4, _r26_t5, _r26_t6, _r26_t7;
-            r26_pairs = r26_form['slice'](2);
-            r26_t = r26_env['newt']();
-            r26_matchQ = function _r26_t1(r27_pattern) {
-                var r27_pattern, r27_callee, r27_subpatterns, r27_ms, r27_t, r27_final, r27_whatever, r27_x, r27_id, _r27_t0, _r27_t1, _r27_t2, _r27_t3, _r27_t4, _r27_t5, _r27_t6, _r27_t7, _r27_t8, _r27_t9, _r27_t10, _r27_t11, _r27_t12, _r27_t13, _r27_t14, _r27_t15, _r27_t16, _r27_t17, _r27_t18, _r27_t19;
-                _r27_t0 = r27_pattern;
-                r27_id = _r27_t0;
-                if (r0_atom(r27_id))
+        r5_externs['macros']['put']('match', function _r5_t17(r25_form, r25_env, r25_wrapper) {
+            var r25_form, r25_env, r25_wrapper, r25_pairs, r25_t, r25_matchQ, r25_f, r25_j, r25_any, r25_pattern, r25_guard, r25_body, r25_pat, r25_cond, r25_tc, _r25_t0, _r25_t1, _r25_t2, _r25_t3, _r25_t4, _r25_t5, _r25_t6, _r25_t7;
+            r25_pairs = r25_form['slice'](2);
+            r25_t = r25_env['newt']();
+            r25_matchQ = function _r25_t1(r26_pattern) {
+                var r26_pattern, r26_callee, r26_subpatterns, r26_ms, r26_t, r26_final, r26_whatever, r26_x, r26_id, _r26_t0, _r26_t1, _r26_t2, _r26_t3, _r26_t4, _r26_t5, _r26_t6, _r26_t7, _r26_t8, _r26_t9, _r26_t10, _r26_t11, _r26_t12, _r26_t13, _r26_t14, _r26_t15, _r26_t16, _r26_t17, _r26_t18, _r26_t19;
+                _r26_t0 = r26_pattern;
+                r26_id = _r26_t0;
+                if (r0_atom(r26_id))
                     return {
-                        'whether': function _r27_t2(r44_x) {
-                            var r44_x;
+                        'whether': function _r26_t2(r43_x) {
+                            var r43_x;
                             return null;
                         },
-                        'assign': function _r27_t3(r45_x, r45_flag) {
-                            var r45_x, r45_flag, _r45_t0, _r45_t1, _r45_t2;
-                            _r45_t0 = '.set';
-                            _r45_t1 = r0_ex([
+                        'assign': function _r26_t3(r44_x, r44_flag) {
+                            var r44_x, r44_flag, _r44_t0, _r44_t1, _r44_t2;
+                            _r44_t0 = '.set';
+                            _r44_t1 = r0_ex([
                                 '.local',
-                                r27_pattern
-                            ], r26_env);
-                            if (r26_wrapper && !r45_flag)
-                                _r45_t2 = [
-                                    r26_wrapper,
-                                    r45_x
+                                r26_pattern
+                            ], r25_env);
+                            if (r25_wrapper && !r44_flag)
+                                _r44_t2 = [
+                                    r25_wrapper,
+                                    r44_x
                                 ];
                             else
-                                _r45_t2 = r45_x;
+                                _r44_t2 = r44_x;
                             return [
-                                _r45_t0,
-                                _r45_t1,
-                                _r45_t2
+                                _r44_t0,
+                                _r44_t1,
+                                _r44_t2
                             ];
                         }
                     };
-                else if (_r27_t0 instanceof Array && _r27_t0['length'] === 2 && '.quote' === _r27_t0[0]) {
-                    r27_x = _r27_t0[1];
+                else if (_r26_t0 instanceof Array && _r26_t0['length'] === 2 && '.quote' === _r26_t0[0]) {
+                    r26_x = _r26_t0[1];
                     return {
-                        'whether': function _r27_t5(r42_x) {
-                            var r42_x;
+                        'whether': function _r26_t5(r41_x) {
+                            var r41_x;
                             return [
                                 '===',
-                                r0_ex(r27_pattern, r26_env),
-                                r42_x
+                                r0_ex(r26_pattern, r25_env),
+                                r41_x
                             ];
                         },
-                        'assign': function _r27_t6(r43_x, r43_flag) {
-                            var r43_x, r43_flag;
+                        'assign': function _r26_t6(r42_x, r42_flag) {
+                            var r42_x, r42_flag;
                             return ['.unit'];
                         }
                     };
-                } else if (_r27_t0 instanceof Array && _r27_t0['length'] >= 1 && '.' === _r27_t0[0]) {
-                    r27_whatever = _r27_t0['slice'](1);
+                } else if (_r26_t0 instanceof Array && _r26_t0['length'] >= 1 && '.' === _r26_t0[0]) {
+                    r26_whatever = _r26_t0['slice'](1);
                     return {
-                        'whether': function _r27_t8(r40_x) {
-                            var r40_x;
+                        'whether': function _r26_t8(r39_x) {
+                            var r39_x;
                             return null;
                         },
-                        'assign': function _r27_t9(r41_x, r41_flag) {
-                            var r41_x, r41_flag, _r41_t0, _r41_t1, _r41_t2;
-                            _r41_t0 = '.set';
-                            _r41_t1 = r0_ex(r27_pattern, r26_env);
-                            if (r26_wrapper && !r41_flag)
-                                _r41_t2 = [
-                                    r26_wrapper,
-                                    r41_x
+                        'assign': function _r26_t9(r40_x, r40_flag) {
+                            var r40_x, r40_flag, _r40_t0, _r40_t1, _r40_t2;
+                            _r40_t0 = '.set';
+                            _r40_t1 = r0_ex(r26_pattern, r25_env);
+                            if (r25_wrapper && !r40_flag)
+                                _r40_t2 = [
+                                    r25_wrapper,
+                                    r40_x
                                 ];
                             else
-                                _r41_t2 = r41_x;
+                                _r40_t2 = r40_x;
                             return [
-                                _r41_t0,
-                                _r41_t1,
-                                _r41_t2
+                                _r40_t0,
+                                _r40_t1,
+                                _r40_t2
                             ];
                         }
                     };
-                } else if (_r27_t0 instanceof Array && _r27_t0['length'] >= 1 && '.list' === _r27_t0[0]) {
-                    r27_subpatterns = _r27_t0['slice'](1);
-                    r27_ms = r27_subpatterns['map'](r26_matchQ);
+                } else if (_r26_t0 instanceof Array && _r26_t0['length'] >= 1 && '.list' === _r26_t0[0]) {
+                    r26_subpatterns = _r26_t0['slice'](1);
+                    r26_ms = r26_subpatterns['map'](r25_matchQ);
                     return {
-                        'whether': function _r27_t11(r36_x) {
-                            var r36_x, _r36_t0;
+                        'whether': function _r26_t11(r35_x) {
+                            var r35_x, _r35_t0;
                             return [
                                 '&&',
                                 [
                                     '.is',
-                                    r36_x,
+                                    r35_x,
                                     r5_externs['use']('Array')
                                 ],
                                 [
                                     '===',
                                     [
                                         '.',
-                                        r36_x,
+                                        r35_x,
                                         [
                                             '.quote',
                                             'length'
@@ -839,55 +709,55 @@
                                     ],
                                     [
                                         '.quote',
-                                        r27_ms['length']
+                                        r26_ms['length']
                                     ]
                                 ]
-                            ]['concat'](r27_ms['map'](function _r36_t0(r37_p, r37_j) {
-                                var r37_p, r37_j;
-                                return r37_p['whether']([
+                            ]['concat'](r26_ms['map'](function _r35_t0(r36_p, r36_j) {
+                                var r36_p, r36_j;
+                                return r36_p['whether']([
                                     '.',
-                                    r36_x,
+                                    r35_x,
                                     [
                                         '.quote',
-                                        r37_j
+                                        r36_j
                                     ]
                                 ]);
                             }))['filter'](r5_boole);
                         },
-                        'assign': function _r27_t12(r38_x, r38_flag) {
-                            var r38_x, r38_flag, _r38_t0;
-                            return ['.begin']['concat'](r27_ms['map'](function _r38_t0(r39_p, r39_j) {
-                                var r39_p, r39_j;
-                                return r39_p['assign']([
+                        'assign': function _r26_t12(r37_x, r37_flag) {
+                            var r37_x, r37_flag, _r37_t0;
+                            return ['.begin']['concat'](r26_ms['map'](function _r37_t0(r38_p, r38_j) {
+                                var r38_p, r38_j;
+                                return r38_p['assign']([
                                     '.',
-                                    r38_x,
+                                    r37_x,
                                     [
                                         '.quote',
-                                        r39_j
+                                        r38_j
                                     ]
-                                ], r38_flag);
+                                ], r37_flag);
                             }));
                         }
                     };
-                } else if (_r27_t0 instanceof Array && _r27_t0['length'] >= 1 && '.conslist' === _r27_t0[0]) {
-                    r27_subpatterns = _r27_t0['slice'](1);
-                    r27_ms = r27_pattern['slice'](1, 0 - 1)['map'](r26_matchQ);
-                    r27_final = r26_matchQ(r27_pattern[r27_pattern['length'] - 1]);
+                } else if (_r26_t0 instanceof Array && _r26_t0['length'] >= 1 && '.conslist' === _r26_t0[0]) {
+                    r26_subpatterns = _r26_t0['slice'](1);
+                    r26_ms = r26_pattern['slice'](1, 0 - 1)['map'](r25_matchQ);
+                    r26_final = r25_matchQ(r26_pattern[r26_pattern['length'] - 1]);
                     return {
-                        'whether': function _r27_t14(r32_x) {
-                            var r32_x, _r32_t0;
+                        'whether': function _r26_t14(r31_x) {
+                            var r31_x, _r31_t0;
                             return [
                                 '&&',
                                 [
                                     '.is',
-                                    r32_x,
+                                    r31_x,
                                     r5_externs['use']('Array')
                                 ],
                                 [
                                     '>=',
                                     [
                                         '.',
-                                        r32_x,
+                                        r31_x,
                                         [
                                             '.quote',
                                             'length'
@@ -895,23 +765,23 @@
                                     ],
                                     [
                                         '.quote',
-                                        r27_ms['length']
+                                        r26_ms['length']
                                     ]
                                 ]
-                            ]['concat'](r27_ms['map'](function _r32_t0(r33_p, r33_j) {
-                                var r33_p, r33_j;
-                                return r33_p['whether']([
+                            ]['concat'](r26_ms['map'](function _r31_t0(r32_p, r32_j) {
+                                var r32_p, r32_j;
+                                return r32_p['whether']([
                                     '.',
-                                    r32_x,
+                                    r31_x,
                                     [
                                         '.quote',
-                                        r33_j
+                                        r32_j
                                     ]
                                 ]);
-                            })['concat']([r27_final['whether']([
+                            })['concat']([r26_final['whether']([
                                     [
                                         '.',
-                                        r32_x,
+                                        r31_x,
                                         [
                                             '.quote',
                                             'slice'
@@ -919,34 +789,34 @@
                                     ],
                                     [
                                         '.quote',
-                                        r26_j
+                                        r25_j
                                     ]
                                 ])]))['filter'](r5_boole);
                         },
-                        'assign': function _r27_t15(r34_x, r34_flag) {
-                            var r34_x, r34_flag, _r34_t0, _r34_t1, _r34_t2, _r34_t3, _r34_t4, _r34_t5, _r34_t6, _r34_t7, _r34_t8;
-                            _r34_t1 = ['.begin']['concat'](r27_ms['map'](function _r34_t0(r35_p, r35_j) {
-                                var r35_p, r35_j;
-                                return r35_p['assign']([
+                        'assign': function _r26_t15(r33_x, r33_flag) {
+                            var r33_x, r33_flag, _r33_t0, _r33_t1, _r33_t2, _r33_t3, _r33_t4, _r33_t5, _r33_t6, _r33_t7, _r33_t8;
+                            _r33_t1 = ['.begin']['concat'](r26_ms['map'](function _r33_t0(r34_p, r34_j) {
+                                var r34_p, r34_j;
+                                return r34_p['assign']([
                                     '.',
-                                    r34_x,
+                                    r33_x,
                                     [
                                         '.quote',
-                                        r35_j
+                                        r34_j
                                     ]
                                 ]);
                             }));
-                            _r34_t2 = _r34_t1['concat'];
-                            _r34_t3 = r27_final;
-                            _r34_t4 = _r34_t3['assign'];
-                            if (r26_wrapper && !r34_flag)
-                                _r34_t5 = [
+                            _r33_t2 = _r33_t1['concat'];
+                            _r33_t3 = r26_final;
+                            _r33_t4 = _r33_t3['assign'];
+                            if (r25_wrapper && !r33_flag)
+                                _r33_t5 = [
                                     [
                                         '.',
                                         [
                                             [
                                                 '.',
-                                                r34_x,
+                                                r33_x,
                                                 [
                                                     '.quote',
                                                     'slice'
@@ -954,7 +824,7 @@
                                             ],
                                             [
                                                 '.quote',
-                                                r27_ms['length']
+                                                r26_ms['length']
                                             ]
                                         ],
                                         [
@@ -962,13 +832,13 @@
                                             'map'
                                         ]
                                     ],
-                                    r26_wrapper
+                                    r25_wrapper
                                 ];
                             else
-                                _r34_t5 = [
+                                _r33_t5 = [
                                     [
                                         '.',
-                                        r34_x,
+                                        r33_x,
                                         [
                                             '.quote',
                                             'slice'
@@ -976,123 +846,123 @@
                                     ],
                                     [
                                         '.quote',
-                                        r27_ms['length']
+                                        r26_ms['length']
                                     ]
                                 ];
-                            _r34_t6 = true;
-                            _r34_t7 = _r34_t4['call'](_r34_t3, _r34_t5, _r34_t6);
-                            _r34_t8 = [_r34_t7];
-                            return _r34_t2['call'](_r34_t1, _r34_t8);
+                            _r33_t6 = true;
+                            _r33_t7 = _r33_t4['call'](_r33_t3, _r33_t5, _r33_t6);
+                            _r33_t8 = [_r33_t7];
+                            return _r33_t2['call'](_r33_t1, _r33_t8);
                         }
                     };
-                } else if (_r27_t0 instanceof Array && _r27_t0['length'] >= 1 && '.quasiquote' === _r27_t0[0]) {
-                    r27_subpatterns = _r27_t0['slice'](1);
-                    return r26_matchQ(r0_deQuasiquote(r27_pattern[1], 0));
-                } else if (_r27_t0 instanceof Array && _r27_t0['length'] >= 1) {
-                    r27_callee = _r27_t0[0];
-                    r27_subpatterns = _r27_t0['slice'](1);
-                    r27_ms = r27_subpatterns['map'](r26_matchQ);
-                    r27_t = r26_env['newt']();
+                } else if (_r26_t0 instanceof Array && _r26_t0['length'] >= 1 && '.quasiquote' === _r26_t0[0]) {
+                    r26_subpatterns = _r26_t0['slice'](1);
+                    return r25_matchQ(r0_deQuasiquote(r26_pattern[1], 0));
+                } else if (_r26_t0 instanceof Array && _r26_t0['length'] >= 1) {
+                    r26_callee = _r26_t0[0];
+                    r26_subpatterns = _r26_t0['slice'](1);
+                    r26_ms = r26_subpatterns['map'](r25_matchQ);
+                    r26_t = r25_env['newt']();
                     return {
-                        'whether': function _r27_t18(r28_x) {
-                            var r28_x, _r28_t0;
+                        'whether': function _r26_t18(r27_x) {
+                            var r27_x, _r27_t0;
                             return [
                                 '&&',
                                 [
                                     '.set',
-                                    r27_t,
+                                    r26_t,
                                     [
                                         [
                                             '.',
-                                            r0_ex(r27_callee, r26_env),
+                                            r0_ex(r26_callee, r25_env),
                                             [
                                                 '.quote',
                                                 'unapply'
                                             ]
                                         ],
-                                        r28_x,
+                                        r27_x,
                                         [
                                             '.quote',
-                                            r27_ms['length']
+                                            r26_ms['length']
                                         ]
                                     ]
                                 ]
-                            ]['concat'](r27_ms['map'](function _r28_t0(r29_p, r29_j) {
-                                var r29_p, r29_j;
-                                return r29_p['whether']([
+                            ]['concat'](r26_ms['map'](function _r27_t0(r28_p, r28_j) {
+                                var r28_p, r28_j;
+                                return r28_p['whether']([
                                     '.',
-                                    r27_t,
+                                    r26_t,
                                     [
                                         '.quote',
-                                        r29_j
+                                        r28_j
                                     ]
                                 ]);
                             }))['filter'](r5_boole);
                         },
-                        'assign': function _r27_t19(r30_x, r30_flag) {
-                            var r30_x, r30_flag, _r30_t0;
-                            return ['.begin']['concat'](r27_ms['map'](function _r30_t0(r31_p, r31_j) {
-                                var r31_p, r31_j;
-                                return r31_p['assign']([
+                        'assign': function _r26_t19(r29_x, r29_flag) {
+                            var r29_x, r29_flag, _r29_t0;
+                            return ['.begin']['concat'](r26_ms['map'](function _r29_t0(r30_p, r30_j) {
+                                var r30_p, r30_j;
+                                return r30_p['assign']([
                                     '.',
-                                    r27_t,
+                                    r26_t,
                                     [
                                         '.quote',
-                                        r31_j
+                                        r30_j
                                     ]
-                                ], r30_flag);
+                                ], r29_flag);
                             }));
                         }
                     };
                 } else
                     return void 0;
             };
-            r26_f = ['.unit'];
-            r26_j = r26_pairs['length'] - 1;
-            for (; r26_j >= 0; r26_j = r26_j - 1) {
-                _r26_t0 = r26_pairs[r26_j];
-                if (_r26_t0 instanceof Array && _r26_t0['length'] === 2) {
-                    r26_pattern = _r26_t0[0];
-                    r26_body = _r26_t0[1];
-                    r26_pat = r26_matchQ(r26_pattern);
-                    r26_cond = r26_pat['whether'](r26_t);
-                    if (r26_cond)
-                        _r26_t3 = [
+            r25_f = ['.unit'];
+            r25_j = r25_pairs['length'] - 1;
+            for (; r25_j >= 0; r25_j = r25_j - 1) {
+                _r25_t0 = r25_pairs[r25_j];
+                if (_r25_t0 instanceof Array && _r25_t0['length'] === 2) {
+                    r25_pattern = _r25_t0[0];
+                    r25_body = _r25_t0[1];
+                    r25_pat = r25_matchQ(r25_pattern);
+                    r25_cond = r25_pat['whether'](r25_t);
+                    if (r25_cond)
+                        _r25_t3 = [
                             '.if',
-                            r26_cond,
+                            r25_cond,
                             [
                                 '.begin',
-                                r26_pat['assign'](r26_t),
-                                r0_ex(r26_body, r26_env)
+                                r25_pat['assign'](r25_t),
+                                r0_ex(r25_body, r25_env)
                             ],
-                            r26_f
+                            r25_f
                         ];
                     else {
                         if (true)
-                            _r26_t4 = [
+                            _r25_t4 = [
                                 '.begin',
-                                r26_pat['assign'](r26_t),
-                                r0_ex(r26_body, r26_env)
+                                r25_pat['assign'](r25_t),
+                                r0_ex(r25_body, r25_env)
                             ];
                         else
-                            _r26_t4 = void 0;
-                        _r26_t3 = _r26_t4;
+                            _r25_t4 = void 0;
+                        _r25_t3 = _r25_t4;
                     }
-                    _r26_t2 = _r26_t3;
+                    _r25_t2 = _r25_t3;
                 } else {
-                    if (_r26_t0 instanceof Array && _r26_t0['length'] === 3) {
-                        r26_pattern = _r26_t0[0];
-                        r26_guard = _r26_t0[1];
-                        r26_body = _r26_t0[2];
-                        r26_pat = r26_matchQ(r26_pattern);
-                        r26_cond = r26_pat['whether'](r26_t);
-                        if (r26_cond) {
-                            r26_tc = r26_env['newt']();
-                            _r26_t6 = [
+                    if (_r25_t0 instanceof Array && _r25_t0['length'] === 3) {
+                        r25_pattern = _r25_t0[0];
+                        r25_guard = _r25_t0[1];
+                        r25_body = _r25_t0[2];
+                        r25_pat = r25_matchQ(r25_pattern);
+                        r25_cond = r25_pat['whether'](r25_t);
+                        if (r25_cond) {
+                            r25_tc = r25_env['newt']();
+                            _r25_t6 = [
                                 '.begin',
                                 [
                                     '.set',
-                                    r26_tc,
+                                    r25_tc,
                                     [
                                         '.quote',
                                         false
@@ -1100,16 +970,16 @@
                                 ],
                                 [
                                     '.if',
-                                    r26_cond,
+                                    r25_cond,
                                     [
                                         '.begin',
-                                        r26_pat['assign'](r26_t),
+                                        r25_pat['assign'](r25_t),
                                         [
                                             '.if',
-                                            r0_ex(r26_guard, r26_env),
+                                            r0_ex(r25_guard, r25_env),
                                             [
                                                 '.set',
-                                                r26_tc,
+                                                r25_tc,
                                                 [
                                                     '.quote',
                                                     true
@@ -1117,7 +987,7 @@
                                             ],
                                             [
                                                 '.set',
-                                                r26_tc,
+                                                r25_tc,
                                                 [
                                                     '.quote',
                                                     false
@@ -1128,157 +998,158 @@
                                 ],
                                 [
                                     '.if',
-                                    r26_tc,
-                                    r0_ex(r26_body, r26_env),
-                                    r26_f
+                                    r25_tc,
+                                    r0_ex(r25_body, r25_env),
+                                    r25_f
                                 ]
                             ];
                         } else {
                             if (true)
-                                _r26_t7 = [
+                                _r25_t7 = [
                                     '.begin',
-                                    r26_pat['assign'](r26_t),
+                                    r25_pat['assign'](r25_t),
                                     [
                                         '.if',
-                                        r0_ex(r26_guard, r26_env),
-                                        r0_ex(r26_body, r26_env),
-                                        r26_f
+                                        r0_ex(r25_guard, r25_env),
+                                        r0_ex(r25_body, r25_env),
+                                        r25_f
                                     ]
                                 ];
                             else
-                                _r26_t7 = void 0;
-                            _r26_t6 = _r26_t7;
+                                _r25_t7 = void 0;
+                            _r25_t6 = _r25_t7;
                         }
-                        _r26_t5 = _r26_t6;
+                        _r25_t5 = _r25_t6;
                     } else {
-                        r26_any = _r26_t0;
-                        _r26_t5 = r26_f;
+                        r25_any = _r25_t0;
+                        _r25_t5 = r25_f;
                     }
-                    _r26_t2 = _r26_t5;
+                    _r25_t2 = _r25_t5;
                 }
-                r26_f = _r26_t2;
+                r25_f = _r25_t2;
             }
             return [
                 '.begin',
                 [
                     '.set',
-                    r26_t,
-                    r0_ex(r26_form[1], r26_env)
+                    r25_t,
+                    r0_ex(r25_form[1], r25_env)
                 ],
-                r26_f
+                r25_f
             ];
         });
-        r5_externs['macros']['put']('regex', function _r5_t19(r46_form, r46_env) {
-            var r46_form, r46_env, r46_args, r46_s, r46_flag, _r46_t0, _r46_t1, _r46_t2, _r46_t3;
-            _r46_t0 = r46_form;
-            if (_r46_t0 instanceof Array && _r46_t0['length'] === 2 && 'regex' === _r46_t0[0] && (_r46_t0[1] instanceof Array && _r46_t0[1]['length'] === 2 && '.quote' === _r46_t0[1][0])) {
-                r46_s = _r46_t0[1][1];
+        r5_externs['macros']['put']('regex', function _r5_t18(r45_form, r45_env) {
+            var r45_form, r45_env, r45_args, r45_s, r45_flag, _r45_t0, _r45_t1, _r45_t2, _r45_t3;
+            _r45_t0 = r45_form;
+            if (_r45_t0 instanceof Array && _r45_t0['length'] === 2 && 'regex' === _r45_t0[0] && (_r45_t0[1] instanceof Array && _r45_t0[1]['length'] === 2 && '.quote' === _r45_t0[1][0])) {
+                r45_s = _r45_t0[1][1];
                 return [
                     '.quote',
-                    new RegExp(r46_s)
+                    new RegExp(r45_s)
                 ];
-            } else if (_r46_t0 instanceof Array && _r46_t0['length'] === 3 && 'regex' === _r46_t0[0] && (_r46_t0[1] instanceof Array && _r46_t0[1]['length'] === 2 && '.quote' === _r46_t0[1][0]) && (_r46_t0[2] instanceof Array && _r46_t0[2]['length'] === 2 && '.quote' === _r46_t0[2][0])) {
-                r46_s = _r46_t0[1][1];
-                r46_flag = _r46_t0[2][1];
+            } else if (_r45_t0 instanceof Array && _r45_t0['length'] === 3 && 'regex' === _r45_t0[0] && (_r45_t0[1] instanceof Array && _r45_t0[1]['length'] === 2 && '.quote' === _r45_t0[1][0]) && (_r45_t0[2] instanceof Array && _r45_t0[2]['length'] === 2 && '.quote' === _r45_t0[2][0])) {
+                r45_s = _r45_t0[1][1];
+                r45_flag = _r45_t0[2][1];
                 return [
                     '.quote',
-                    new RegExp(r46_s, r46_flag)
+                    new RegExp(r45_s, r45_flag)
                 ];
-            } else if (_r46_t0 instanceof Array && _r46_t0['length'] >= 1 && 'regex' === _r46_t0[0]) {
-                r46_args = _r46_t0['slice'](1);
+            } else if (_r45_t0 instanceof Array && _r45_t0['length'] >= 1 && 'regex' === _r45_t0[0]) {
+                r45_args = _r45_t0['slice'](1);
                 return [
                     '.new',
                     r5_externs['use']('RegExp')
-                ]['concat'](r46_args);
+                ]['concat'](r45_args);
             } else
                 return void 0;
         });
-        r5_externs['macros']['put']('define-macro', function _r5_t20(r47_form, r47_env) {
-            var r47_form, r47_env, r47_otherwise, r47_op, r47_name, r47_body, r47_ds, r47_macroG, r47_macroFn, r47_str, _r47_t0, _r47_t1, _r47_t2, _r47_t3, _r47_t4, _r47_t5, _r47_t6, _r47_t7, _r47_t8, _r47_t9;
-            _r47_t0 = r47_form;
-            if (_r47_t0 instanceof Array && _r47_t0['length'] === 3 && (_r47_t0[1] instanceof Array && _r47_t0[1]['length'] === 2 && '.quote' === _r47_t0[1][0])) {
-                r47_op = _r47_t0[0];
-                r47_str = _r47_t0[1][1];
-                r47_body = _r47_t0[2];
+        r5_externs['macros']['put']('define-macro', function _r5_t19(r46_form, r46_env) {
+            var r46_form, r46_env, r46_otherwise, r46_op, r46_name, r46_body, r46_ds, r46_macroG, r46_macroFn, r46_str, _r46_t0, _r46_t1, _r46_t2, _r46_t3, _r46_t4, _r46_t5, _r46_t6, _r46_t7, _r46_t8, _r46_t9;
+            _r46_t0 = r46_form;
+            if (_r46_t0 instanceof Array && _r46_t0['length'] === 3 && (_r46_t0[1] instanceof Array && _r46_t0[1]['length'] === 2 && '.quote' === _r46_t0[1][0])) {
+                r46_op = _r46_t0[0];
+                r46_str = _r46_t0[1][1];
+                r46_body = _r46_t0[2];
                 return r0_ex([
-                    r47_op,
-                    r47_str,
-                    r47_body
-                ], r47_env);
+                    r46_op,
+                    r46_str,
+                    r46_body
+                ], r46_env);
             } else {
-                _r47_t1 = false;
-                if (_r47_t0 instanceof Array && _r47_t0['length'] === 3) {
-                    r47_op = _r47_t0[0];
-                    r47_name = _r47_t0[1];
-                    r47_body = _r47_t0[2];
-                    if (r0_atom(r47_name))
-                        _r47_t4 = _r47_t1 = true;
+                _r46_t1 = false;
+                if (_r46_t0 instanceof Array && _r46_t0['length'] === 3) {
+                    r46_op = _r46_t0[0];
+                    r46_name = _r46_t0[1];
+                    r46_body = _r46_t0[2];
+                    if (r0_atom(r46_name))
+                        _r46_t4 = _r46_t1 = true;
                     else
-                        _r47_t4 = _r47_t1 = false;
-                    _r47_t3 = _r47_t4;
+                        _r46_t4 = _r46_t1 = false;
+                    _r46_t3 = _r46_t4;
                 } else
-                    _r47_t3 = void 0;
-                if (_r47_t1) {
-                    r47_ds = new r0_Scope(r47_env);
-                    r47_ds['declare']('atom', true);
-                    r47_ds['declare']('prim', true);
-                    r47_ds['declare']('formOf', true);
-                    r47_ds['declare']('scopeOf', true);
-                    r47_macroG = new Function(r47_ds['castName']('atom'), r47_ds['castName']('prim'), r47_ds['castName']('formOf'), r47_ds['castName']('scopeOf'), r0_escodegen['generate'](r0_patrisika['generate']([
+                    _r46_t3 = void 0;
+                if (_r46_t1) {
+                    r46_ds = new r0_Scope(r46_env);
+                    r46_ds['declare']('atom', true);
+                    r46_ds['declare']('prim', true);
+                    r46_ds['declare']('formOf', true);
+                    r46_ds['declare']('scopeOf', true);
+                    r46_ds['declare']('definingEnv', true);
+                    r46_macroG = new Function(r46_ds['castName']('atom'), r46_ds['castName']('prim'), r46_ds['castName']('formOf'), r46_ds['castName']('scopeOf'), r46_ds['castName']('definingEnv'), r0_escodegen['generate'](r0_patrisika['generate']([
                         '.return',
-                        r0_ex(r47_body, r47_ds)
-                    ], r47_ds, function _r47_t6(r48_form) {
-                        var r48_form;
+                        r0_ex(r46_body, r46_ds)
+                    ], r46_ds, function _r46_t6(r47_form) {
+                        var r47_form;
                         return [
                             '.return',
-                            r48_form
+                            r47_form
                         ];
                     })));
-                    r47_macroFn = r47_macroG(r0_wrapForSyntacticClosure(r0_atom), r0_wrapForSyntacticClosure(r0_prim), function _r47_t7(r49_x) {
+                    r46_macroFn = r46_macroG(r0_wrapForSyntacticClosure(r0_atom), r0_wrapForSyntacticClosure(r0_prim), function _r46_t7(r48_x) {
+                        var r48_x;
+                        return r48_x[1];
+                    }, function _r46_t8(r49_x) {
                         var r49_x;
-                        return r49_x[1];
-                    }, function _r47_t8(r50_x) {
-                        var r50_x;
-                        return r50_x[2];
-                    });
-                    r47_env['macros']['put'](r47_name, function _r47_t9(r51_c, r51_e) {
-                        var r51_c, r51_e, r51_result, r51_s;
-                        r51_result = r47_macroFn(r51_c, r51_e);
-                        r51_s = new r0_Scope(r47_env);
-                        r51_s['hanging'] = r51_e;
-                        r51_s['semiparent'] = r51_e;
-                        return r0_ex(r51_result, r51_s);
+                        return r49_x[2];
+                    }, r46_env);
+                    r46_env['macros']['put'](r46_name, function _r46_t9(r50_c, r50_e) {
+                        var r50_c, r50_e, r50_result, r50_s;
+                        r50_result = r46_macroFn(r50_c, r50_e);
+                        r50_s = new r0_Scope(r46_env);
+                        r50_s['hanging'] = r50_e;
+                        r50_s['semiparent'] = r50_e;
+                        return r0_ex(r50_result, r50_s);
                     });
                     return ['.unit'];
                 } else {
-                    r47_otherwise = _r47_t0;
+                    r46_otherwise = _r46_t0;
                     return ['.unit'];
                 }
             }
         });
-        r5_externs['macros']['put']('macro-match', function _r5_t21(r52_form, r52_env) {
-            var r52_form, r52_env, r52_otherwise, r52_c, r52_e, r52_patterns, r52_t, r52_tx, r52_tw, _r52_t0, _r52_t1;
-            _r52_t0 = r52_form;
-            if (_r52_t0 instanceof Array && _r52_t0['length'] >= 3 && 'macro-match' === _r52_t0[0]) {
-                r52_c = _r52_t0[1];
-                r52_e = _r52_t0[2];
-                r52_patterns = _r52_t0['slice'](3);
-                r52_t = r52_env['newt']();
-                r52_tx = r52_env['newt']();
-                r52_tw = r52_env['newt']();
+        r5_externs['macros']['put']('macro-match', function _r5_t20(r51_form, r51_env) {
+            var r51_form, r51_env, r51_otherwise, r51_c, r51_e, r51_patterns, r51_t, r51_tx, r51_tw, _r51_t0, _r51_t1;
+            _r51_t0 = r51_form;
+            if (_r51_t0 instanceof Array && _r51_t0['length'] >= 3 && 'macro-match' === _r51_t0[0]) {
+                r51_c = _r51_t0[1];
+                r51_e = _r51_t0[2];
+                r51_patterns = _r51_t0['slice'](3);
+                r51_t = r51_env['newt']();
+                r51_tx = r51_env['newt']();
+                r51_tw = r51_env['newt']();
                 return [
                     '.begin',
                     [
                         '.set',
-                        r52_t,
-                        r52_e
+                        r51_t,
+                        r51_e
                     ],
                     [
                         '.set',
-                        r52_tw,
+                        r51_tw,
                         [
                             '.lambda',
-                            [r52_tx],
+                            [r51_tx],
                             [
                                 '.return',
                                 [
@@ -1287,19 +1158,19 @@
                                         '.quote',
                                         '.syntactic-closure'
                                     ],
-                                    r52_tx,
-                                    r52_t
+                                    r51_tx,
+                                    r51_t
                                 ]
                             ]
                         ]
                     ],
                     r5_externs['macros']['get']('match')([
                         'match',
-                        r52_c
-                    ]['concat'](r52_patterns), r52_env, r52_tw)
+                        r51_c
+                    ]['concat'](r51_patterns), r51_env, r51_tw)
                 ];
             } else {
-                r52_otherwise = _r52_t0;
+                r51_otherwise = _r51_t0;
                 return ['.unit'];
             }
         });

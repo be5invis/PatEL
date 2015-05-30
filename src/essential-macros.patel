@@ -14,3 +14,84 @@ define-macro items-of : syntax-rules {
 		[for [local i 0] [i < n] [i = i + 1] [yield t`i]]
 	]]]]
 }
+define-macro range : syntax-rules {
+	@`[range @low @high] : return @`[let [lo @low] [hi @high] [[lambda [] : begin {
+		for [local j lo] [j < hi] [j = j + 1] : yield j
+	}]]]
+	@`[range @low till @high] : return @`[let [lo @low] [hi @high] [[lambda [] : begin {
+		for [local j lo] [j <= hi] [j = j + 1] : yield j
+	}]]]
+	@`[range @low downto @high] : return @`[let [lo @low] [hi @high] [[lambda [] : begin {
+		for [local j lo] [j > hi] [j = j - 1] : yield j
+	}]]]
+	@`[range @low downtill @high] : return @`[let [lo @low] [hi @high] [[lambda [] : begin {
+		for [local j lo] [j >= hi] [j = j - 1] : yield j
+	}]]]
+}
+define-macro foreach : syntax-rules {
+	@`[foreach @varid [range @low @high] @body] [[env.macros.get "range"] === [definingEnv.macros.get "range"]]: begin {
+		local lo [env.newt]
+		local hi [env.newt]
+		return @`[begin {
+			local @lo @low
+			local @lo @high
+			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@varid < @hi] [@varid = @varid + 1] : begin @body
+		}]
+	}
+	@`[foreach @varid [range @low till @high] @body] [[env.macros.get "range"] === [definingEnv.macros.get "range"]]: begin {
+		local lo [env.newt]
+		local hi [env.newt]
+		return @`[begin {
+			local @lo @low
+			local @lo @high
+			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@varid <= @hi] [@varid = @varid + 1] : begin @body
+		}]
+	}
+	@`[foreach @varid [range @low downto @high] @body] [[env.macros.get "range"] === [definingEnv.macros.get "range"]]: begin {
+		local lo [env.newt]
+		local hi [env.newt]
+		return @`[begin {
+			local @lo @low
+			local @lo @high
+			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@varid > @hi] [@varid = @varid - 1] : begin @body
+		}]
+	}
+	@`[foreach @varid [range @low downtill @high] @body] [[env.macros.get "range"] === [definingEnv.macros.get "range"]]: begin {
+		local lo [env.newt]
+		local hi [env.newt]
+		return @`[begin {
+			local @lo @low
+			local @lo @high
+			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@varid >= @hi] [@varid = @varid - 1] : begin @body
+		}]
+	}
+	@`[foreach @varid [items-of @list] @body] [[env.macros.get "items-of"] === [definingEnv.macros.get "items-of"]]: begin {
+		local tR [env.newt]
+		local tN [env.newt]
+		local t  [env.newt]
+		return @`[begin {
+			local @tR @list
+			local @tN @tR.length
+			local @t 0
+			begin @('.syntactic-closure' @`[local @[formOf varid] nothing] env)
+			while [@t < @tN] : begin {
+				@varid = @tR`@t
+				begin @body
+				@t = @t + 1
+			}
+		}]
+	}
+	@`[foreach @varid @range @body] : begin {
+		local tR [env.newt]
+		local t  [env.newt]
+		return @`[begin {
+			begin @('.syntactic-closure' @`[local @[formOf varid] nothing] env)
+			local @tR @range
+			local @t nothing
+			while [! [set @t [@tR.next]].done] : begin {
+				@varid = @t.value
+				begin @body
+			}
+		}]
+	}
+}

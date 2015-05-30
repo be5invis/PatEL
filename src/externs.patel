@@ -181,35 +181,6 @@ define [Create] : begin {
 			(".while" [ex test env] (".begin" [ex body env] [ex step env])))
 	}
 
-	externs.macros.put "foreach" : lambda [form env] : match form {
-		("foreach" varid ("items-of" list) body) [[env.macros.get "items-of"] == [externs.macros.get "items-of"]] : begin {
-			local tR [env.newt]
-			local tN [env.newt]
-			local tI [env.newt]
-			return (".begin"
-				(".set" tR [ex list env])
-				(".set" tN ("." tR (".quote" "length")))
-				(".set" tI (".quote" 0))
-				(".while"
-					("<" tI tN)
-					(".begin"
-						[Assign varid ("." tR tI) env false]
-						[ex body env]
-						(".set" tI ("+" tI (".quote" 1))))))
-		}
-		("foreach" varid range body) : begin {
-			local tR [env.newt]
-			local t  [env.newt]
-			return (".begin"
-				(".set" tR [ex range env])
-				(".while" 
-					("!" ("." (".set" t (("." tR (".quote" "next")))) (".quote" "done"))) 
-					(".begin"
-						[Assign varid ("." t (".quote" "value")) env false]
-						[ex body env])))
-		}
-	}
-
 	externs.macros.put "this" (".thisp")
 	externs.macros.put "arguments" (".argsp")
 	externs.macros.put "nothing" (".unit")
@@ -342,14 +313,16 @@ define [Create] : begin {
 			ds.declare "prim" true
 			ds.declare "formOf" true
 			ds.declare "scopeOf" true
+			ds.declare "definingEnv" true
 			local macroG : new Function {
 				ds.castName 'atom'
 				ds.castName 'prim'
 				ds.castName 'formOf'
 				ds.castName 'scopeOf'
+				ds.castName "definingEnv"
 				escodegen.generate : patrisika.generate (".return" [ex body ds]) ds [lambda [form] (".return" form)]
 			}
-			local macroFn [macroG [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim] [lambda [x] x`1] [lambda [x] x`2]]
+			local macroFn [macroG [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim] [lambda [x] x`1] [lambda [x] x`2] env]
 			env.macros.put name : lambda [c e] : begin {
 				local result [macroFn c e]
 				local s [new Scope env]
