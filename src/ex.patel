@@ -13,6 +13,10 @@ define [NodeTranslation fn] : lambda [form] : begin {
 
 define [deQuasiquote form level] : match form {
 	(".unquote" c) : if [not level] c (".list" (".quote" ".unquote") [deQuasiquote c [level - 1]])
+	(".unquote" c (".quote" decLevel)) : begin {
+		set devLevel [Math.max 1 [Math.floor devLevel]]
+		if [level - decLevel < 0] c (".list" (".quote" ".unquote") [deQuasiquote c [level - decLevel]])
+	}
 	(".quasiquote" c) (".list" (".quote" ".quasiquote") [deQuasiquote c [level + 1]])
 	(::xs) : match xs`[xs.length - 1] {
 		(".sliceunquote" x) : begin {

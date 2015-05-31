@@ -81,7 +81,7 @@ group = operate / struct
 
 quasiquote = begins:POS '@`' it:primitive ends:POS   	{return BeginsEndsWith(['.quasiquote', it], begins, ends)}
 sliceunquote = begins:POS '@::' it:primitive ends:POS	{return BeginsEndsWith(['.sliceunquote', it], begins, ends)}
-unquote = begins:POS '@' it:primitive ends:POS       	{return BeginsEndsWith(['.unquote', it], begins, ends)}
+unquote = begins:POS '@' level:(numberliteral "*")? it:primitive ends:POS {return BeginsEndsWith(level ? ['.unquote', it, level[0]] : ['.unquote', it], begins, ends)}
 
 operate
 	= begins:POS "[" __ "]" ends:POS              	{ return BeginsEndsWith([], begins, ends) }
@@ -110,13 +110,13 @@ qualifier
 	/ "`" property:primitive { return property }
 
 prefixOp = "+" / "-" / "!"
-factorOp  	= $([?^] [\-_/+*<=>!?%_&~^|]*)
-termOp    	= $([*/%] [\-_/+*<=>!?%_&~^|]*)
-sumOp     	= $([+\-] [\-_/+*<=>!?%_&~^|]*)
-equalityOp	= $([=!] [\-_/+*<=>!?%_&~^|]+)
-compareOp 	= $([<>] [\-_/+*<=>!?%_&~^|]*)
-bothOp    	= $([&] [\-_/+*<=>!?%_&~^|]*)
-eitherOp  	= $([|] [\-_/+*<=>!?%_&~^|]*)
+factorOp  	= $([?^] [\-_/+*<=>!?%_&~^@|]*)
+termOp    	= $([*/%] [\-_/+*<=>!?%_&~^@|]*)
+sumOp     	= $([+\-] [\-_/+*<=>!?%_&~^@|]*)
+equalityOp	= $([=!] [\-_/+*<=>!?%_&~^@|]+)
+compareOp 	= $([<>] [\-_/+*<=>!?%_&~^@|]*)
+bothOp    	= $([&] [\-_/+*<=>!?%_&~^@|]*)
+eitherOp  	= $([|] [\-_/+*<=>!?%_&~^@|]*)
 
 parted
 	= begins:POS left:prefixOp __ right:parting ends:POS { return BeginsEndsWith([left, right], begins, ends) }
