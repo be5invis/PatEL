@@ -34,7 +34,7 @@ define-macro foreach : syntax-rules {
 		local hi [env.newt]
 		return @`[begin {
 			local @lo @low
-			local @lo @high
+			local @hi @high
 			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@varid < @hi] [@varid = @varid + 1] : begin @body
 		}]
 	}
@@ -43,7 +43,7 @@ define-macro foreach : syntax-rules {
 		local hi [env.newt]
 		return @`[begin {
 			local @lo @low
-			local @lo @high
+			local @hi @high
 			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@varid <= @hi] [@varid = @varid + 1] : begin @body
 		}]
 	}
@@ -52,7 +52,7 @@ define-macro foreach : syntax-rules {
 		local hi [env.newt]
 		return @`[begin {
 			local @lo @low
-			local @lo @high
+			local @hi @high
 			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@varid > @hi] [@varid = @varid - 1] : begin @body
 		}]
 	}
@@ -61,7 +61,7 @@ define-macro foreach : syntax-rules {
 		local hi [env.newt]
 		return @`[begin {
 			local @lo @low
-			local @lo @high
+			local @hi @high
 			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@varid >= @hi] [@varid = @varid - 1] : begin @body
 		}]
 	}
