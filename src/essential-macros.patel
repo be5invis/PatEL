@@ -35,7 +35,7 @@ define-macro foreach : syntax-rules {
 		return @`[begin {
 			local @lo @low
 			local @hi @high
-			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@varid < @hi] [@varid = @varid + 1] : begin @body
+			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@[formOf varid] < @hi] [@[formOf varid] = @[formOf varid] + 1] : begin @body
 		}]
 	}
 	@`[foreach @varid [range @low till @high] @body] [[env.macros.get "range"] === [definingEnv.macros.get "range"]]: begin {
@@ -44,7 +44,7 @@ define-macro foreach : syntax-rules {
 		return @`[begin {
 			local @lo @low
 			local @hi @high
-			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@varid <= @hi] [@varid = @varid + 1] : begin @body
+			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@[formOf varid] <= @hi] [@[formOf varid] = @[formOf varid] + 1] : begin @body
 		}]
 	}
 	@`[foreach @varid [range @low downto @high] @body] [[env.macros.get "range"] === [definingEnv.macros.get "range"]]: begin {
@@ -53,7 +53,7 @@ define-macro foreach : syntax-rules {
 		return @`[begin {
 			local @lo @low
 			local @hi @high
-			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@varid > @hi] [@varid = @varid - 1] : begin @body
+			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@[formOf varid] > @hi] [@[formOf varid] = @[formOf varid] - 1] : begin @body
 		}]
 	}
 	@`[foreach @varid [range @low downtill @high] @body] [[env.macros.get "range"] === [definingEnv.macros.get "range"]]: begin {
@@ -62,7 +62,7 @@ define-macro foreach : syntax-rules {
 		return @`[begin {
 			local @lo @low
 			local @hi @high
-			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@varid >= @hi] [@varid = @varid - 1] : begin @body
+			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@[formOf varid] >= @hi] [@[formOf varid] = @[formOf varid] - 1] : begin @body
 		}]
 	}
 	@`[foreach @varid [items-of @list] @body] [[env.macros.get "items-of"] === [definingEnv.macros.get "items-of"]]: begin {
@@ -73,9 +73,8 @@ define-macro foreach : syntax-rules {
 			local @tR @list
 			local @tN @tR.length
 			local @t 0
-			begin @('.syntactic-closure' @`[local @[formOf varid] nothing] env)
 			while [@t < @tN] : begin {
-				@varid = @tR`@t
+				begin @('.syntactic-closure' @`[local @[formOf varid] @tR`@t] env)
 				begin @body
 				@t = @t + 1
 			}
@@ -85,11 +84,10 @@ define-macro foreach : syntax-rules {
 		local tR [env.newt]
 		local t  [env.newt]
 		return @`[begin {
-			begin @('.syntactic-closure' @`[local @[formOf varid] nothing] env)
 			local @tR @range
 			local @t nothing
 			while [! [set @t [@tR.next]].done] : begin {
-				@varid = @t.value
+				begin @('.syntactic-closure' @`[local @[formOf varid] @t.value] env)
 				begin @body
 			}
 		}]
