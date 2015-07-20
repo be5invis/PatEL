@@ -7,7 +7,7 @@ var yargs = require('yargs')
 	.alias('o', 'output-into')
 	.alias('?', 'help')
 	.alias('l', 'line')
-	.boolean(['use-dev', 'dump-ast', 'dump-expanded', 'dump-regularized', 'dump-transformed'])
+	.boolean(['use-dev', 'dump-ast', 'dump-expanded', 'dump-regularized', 'dump-transformed', 'strict'])
 	.describe('?', 'Displays this help.')
 	.describe('l', 'Compile one-line script.')
 	.describe('o', 'Output sfd path. When absent, the result sfd is written to STDOUT.');
@@ -76,6 +76,7 @@ instream.on('end', function(){
 	var lcmap = generateLineAndColumnMap(input);
 	var lines = input.split('\n');
 	var gs = patel.globals();
+	gs.strict = argv.strict
 	try {
 		var ast = patel.parse(input);
 		try {
@@ -96,7 +97,7 @@ instream.on('end', function(){
 			}
 		} catch(ex) {
 			if(ex.begins >= 0 && ex.ends >= 0) {
-				util.error(ex);
+				console.error(ex);
 				var ljBegins = lcmap.line[ex.begins] - 1
 				var ljEnds = lcmap.line[ex.ends] - 1
 				if(ljEnds - ljBegins < 3) {
@@ -107,9 +108,9 @@ instream.on('end', function(){
 					printSourceLines(process.stderr,lines.slice(ljEnds - 1, ljEnds + 1), ljEnds);
 				}
 			} else {
-				util.error(ex.stack || ex);
+				console.error(ex.stack || ex);
 			}
-			return;
+			process.exit(1);
 		}
 	} catch(ex) {
 		process.stderr.write(ex.message + '\n');
@@ -117,6 +118,6 @@ instream.on('end', function(){
 		var line = input.split('\n')[ex.line - 1]
 		process.stderr.write(line + '\n');
 		process.stderr.write(line.replace(/\S/g, ' ').slice(0, ex.column) + '^\n');
-		return;
+		process.exit(1);
 	}
 });
