@@ -68,7 +68,7 @@ function printSourceLines(stream, lines, firstLineNumber){
 
 var input = '';
 instream.on('data', function(buf){
-	input += buf.toString() 
+	input += buf.toString()
 });
 instream.on('end', function(){
 	input += '\n\n\n';
@@ -76,7 +76,13 @@ instream.on('end', function(){
 	var lcmap = generateLineAndColumnMap(input);
 	var lines = input.split('\n');
 	var gs = patel.globals();
-	gs.strict = argv.strict
+	gs.strict = argv.strict;
+	// macros returning information about the file
+	gs.macros.put("input-path", function(){
+		if(argv.l) return ['.quote', '|argv.l']
+		if(argv._[0]) return ['.quote', argv._[0]]
+		return ['.quote', '|-']
+	});
 	try {
 		var ast = patel.parse(input);
 		try {
