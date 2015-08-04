@@ -100,8 +100,9 @@ define [Create] : begin {
 	externs.macros.put "piecewise" : lambda [form env] : match form {
 		("piecewise" :: pairs) : begin {
 			local f (".unit")
-			for [local j [pairs.length - 1]] [j >= 0] [set j [j - 1]] {
-				set f (".if" [ex pairs`j`0 env] [ex pairs`j`1 env] f)
+			for [local j [pairs.length - 1]] [j >= 0] [set j [j - 1]] : match pairs`j {
+				(condition consequent) : set f (".if" [ex condition env] [ex consequent env] f)
+				otherwise : throw [new FormInvalidError otherwise "Invalid Piecewise Segment"]
 			}
 			return f
 		}

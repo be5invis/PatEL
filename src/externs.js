@@ -75,17 +75,21 @@ r0_wrapForSyntacticClosure = function(r4_fn) {
     }), r6_externs.macros.put("object", function(r15_form, r15_env) {
         var r15_form, r15_env, r15_pairs;
         return r15_pairs = r15_form.slice(1).map(function(r16_pair) {
-            var r16_pair, r16_property, r16_value, r16_useless, _r16_t0, _r16_t1, _r16_t6, _r16_t8;
+            var r16_pair, r16_property, r16_value, r16_useless, _r16_t0, _r16_t1, _r16_t6, _r16_t7;
             return _r16_t0 = r16_pair, _r16_t0 instanceof Array && _r16_t0.length >= 2 ? (r16_property = _r16_t0[0], 
             r16_value = _r16_t0[1], r16_useless = _r16_t0.slice(2), [ r16_property, r0_ex(r16_value, r15_env) ]) : _r16_t0 instanceof Array && 2 === _r16_t0.length ? (r16_property = _r16_t0[0], 
             r16_value = _r16_t0[1], [ r16_property, r0_ex(r16_value, r15_env) ]) : (_r16_t1 = !1, 
-            _r16_t0 instanceof Array && 1 === _r16_t0.length ? (r16_property = _r16_t0[0], _r16_t8 = _r16_t1 = r0_atom(r16_property) ? !0 : !1, 
-            _r16_t6 = _r16_t8) : _r16_t6 = void 0, _r16_t1 ? [ r16_property, r15_env.use(r16_property) ] : void 0);
+            _r16_t0 instanceof Array && 1 === _r16_t0.length ? (r16_property = _r16_t0[0], _r16_t7 = _r16_t1 = r0_atom(r16_property) ? !0 : !1, 
+            _r16_t6 = _r16_t7) : _r16_t6 = void 0, _r16_t1 ? [ r16_property, r15_env.use(r16_property) ] : void 0);
         }), [ ".hash" ].concat(r15_pairs);
     }), r6_externs.macros.put("piecewise", function(r17_form, r17_env) {
-        var r17_form, r17_env, r17_pairs, r17_f, r17_j, _r17_t0;
+        var r17_form, r17_env, r17_pairs, r17_f, r17_j, r17_otherwise, r17_condition, r17_consequent, _r17_t0, _r17_t1;
         if (_r17_t0 = r17_form, _r17_t0 instanceof Array && _r17_t0.length >= 1 && "piecewise" === _r17_t0[0]) {
-            for (r17_pairs = _r17_t0.slice(1), r17_f = [ ".unit" ], r17_j = r17_pairs.length - 1; r17_j >= 0; r17_j -= 1) r17_f = [ ".if", r0_ex(r17_pairs[r17_j][0], r17_env), r0_ex(r17_pairs[r17_j][1], r17_env), r17_f ];
+            for (r17_pairs = _r17_t0.slice(1), r17_f = [ ".unit" ], r17_j = r17_pairs.length - 1; r17_j >= 0; r17_j -= 1) {
+                if (_r17_t1 = r17_pairs[r17_j], !(_r17_t1 instanceof Array && 2 === _r17_t1.length)) throw r17_otherwise = _r17_t1, 
+                new r0_FormInvalidError(r17_otherwise, "Invalid Piecewise Segment");
+                r17_condition = _r17_t1[0], r17_consequent = _r17_t1[1], r17_f = [ ".if", r0_ex(r17_condition, r17_env), r0_ex(r17_consequent, r17_env), r17_f ];
+            }
             return r17_f;
         }
         return void 0;
