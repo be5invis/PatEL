@@ -65,6 +65,26 @@ function dump(form){
 function printSourceLines(stream, lines, firstLineNumber){
 	stream.write(lines.map(function(line, k){ return '  ' + (firstLineNumber + k) + '\t| ' + line}).join('\n') + '\n')
 }
+function reportError(ex, lcmap, lines){
+	if(ex.begins >= 0 && ex.ends >= 0) {
+		console.error(ex.message);
+		if(ex.within && ex.within.input){
+			var lcmap = generateLineAndColumnMap(ex.within.input);
+			var lines = ex.within.input.split("\n");
+		}
+		var ljBegins = lcmap.line[ex.begins] - 1
+		var ljEnds = lcmap.line[ex.ends] - 1
+		if(ljEnds - ljBegins < 3) {
+			printSourceLines(process.stderr,lines.slice(ljBegins, ljEnds + 1), ljBegins + 1);
+		} else {
+			printSourceLines(process.stderr,lines.slice(ljBegins, ljBegins + 2), ljBegins + 1);
+			process.stderr.write("......\n");
+			printSourceLines(process.stderr,lines.slice(ljEnds - 1, ljEnds + 1), ljEnds);
+		}
+	} else {
+		console.error(ex.stack || ex);
+	}
+}
 
 var input = '';
 instream.on('data', function(buf){
@@ -73,57 +93,38 @@ instream.on('data', function(buf){
 instream.on('end', function(){
 	input += '\n\n\n';
 	if(argv['dump-input']) { outstream.write(input); return }
-	var lcmap = generateLineAndColumnMap(input);
-	var lines = input.split('\n');
 	var gs = patel.globals();
 	gs.strict = argv.strict;
+	var lcmap = generateLineAndColumnMap(input);
+	var lines = input.split("\n");
 	// macros returning information about the file
 	gs.macros.put("input-path", function(){
 		if(argv.l) return ['.quote', '|argv.l']
 		if(argv._[0]) return ['.quote', argv._[0]]
 		return ['.quote', '|-']
 	});
+	var ast = patel.parse(input, {within: { file: gs.macros.get('input-path')()[1], input: input }});
 	try {
-		var ast = patel.parse(input);
-		try {
-			if(argv['dump-ast']) { dump(ast); return }
-			var xast = patel.ex(ast, gs);
-			patel.checkEvaluated(xast);
-			if(argv['dump-expanded']) { dump(xast); return }
-			var rast = patel.regularize(xast, gs);
-			if(argv['dump-regularized']) { dump(rast); return }
-			var tast = patel.pat2esc(rast, gs, lcmap);
-			if(argv['dump-transformed']) { dump(tast); return }
-			var result = patel.generateCode(tast, {sourceMap: argv._[0] || '(stdin)', sourceMapWithCode: true})
-			if(argv.source_map) {
-				outstream.write(result.map.toString() + '\n');
-			} else {
-				if(os.platform() === 'win32') outstream.write('\uFEFF');
-				outstream.write(result.code + '\n');
-			}
-		} catch(ex) {
-			if(ex.begins >= 0 && ex.ends >= 0) {
-				console.error(ex);
-				var ljBegins = lcmap.line[ex.begins] - 1
-				var ljEnds = lcmap.line[ex.ends] - 1
-				if(ljEnds - ljBegins < 3) {
-					printSourceLines(process.stderr,lines.slice(ljBegins, ljEnds + 1), ljBegins + 1);
-				} else {
-					printSourceLines(process.stderr,lines.slice(ljBegins, ljBegins + 2), ljBegins + 1);
-					process.stderr.write("......\n");
-					printSourceLines(process.stderr,lines.slice(ljEnds - 1, ljEnds + 1), ljEnds);
-				}
-			} else {
-				console.error(ex.stack || ex);
-			}
-			process.exit(1);
+		if(argv['dump-ast']) { dump(ast); return }
+		var xast = patel.ex(ast, gs);
+		patel.checkEvaluated(xast);
+		if(argv['dump-expanded']) { dump(xast); return }
+		var rast = patel.regularize(xast, gs);
+		if(argv['dump-regularized']) { dump(rast); return }
+		var tast = patel.pat2esc(rast, gs, lcmap);
+		if(argv['dump-transformed']) { dump(tast); return }
+		var result = patel.generateCode(tast, {sourceMap: argv._[0] || '(stdin)', sourceMapWithCode: true})
+		if(argv.source_map) {
+			outstream.write(result.map.toString() + '\n');
+		} else {
+			if(os.platform() === 'win32') outstream.write('\uFEFF');
+			outstream.write(result.code + '\n');
 		}
 	} catch(ex) {
-		process.stderr.write(ex.message + '\n');
-		process.stderr.write("At Line " + ex.line + ', Column ' + ex.column + '\n');
-		var line = input.split('\n')[ex.line - 1]
-		process.stderr.write(line + '\n');
-		process.stderr.write(line.replace(/\S/g, ' ').slice(0, ex.column) + '^\n');
+		if(ex && ex.suberrors) {
+			for(var j = 0; j < ex.suberrors.length; j++){ reportError(ex.suberrors[j], lcmap, lines) }
+		}
+		else reportError(ex, lcmap, lines);
 		process.exit(1);
 	}
 });

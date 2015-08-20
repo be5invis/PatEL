@@ -12,17 +12,18 @@ r0_Scope = require("patrisika").Scope, r0_atom = function(r1_x) {
 }, r0_FormInvalidError = require("patrisika").FormInvalidError, r0_NodeTranslation = function(r4_fn) {
     var r4_fn;
     return function(r5_form) {
-        var r5_form, r5_res, _r5_t0, _r5_t1, _r5_t2, _r5_t3;
-        return _r5_t1 = arguments, _r5_t0 = this, r5_res = r4_fn.apply(_r5_t0, _r5_t1), 
+        var r5_form, r5_res, _r5_t0, _r5_t1, _r5_t2, _r5_t3, _r5_t4;
+        return _r5_t0 = this, _r5_t1 = arguments, r5_res = r4_fn.apply(_r5_t0, _r5_t1), 
         _r5_t2 = r5_form && r5_res && r5_form.begins >= 0 ? r5_res.begins = r5_form.begins : void 0, 
         _r5_t3 = r5_form && r5_res && r5_form.ends >= 0 ? r5_res.ends = r5_form.ends : void 0, 
+        _r5_t4 = r5_form && r5_res && r5_form.within ? r5_res.within = r5_form.within : void 0, 
         r5_res;
     };
 }, r0_deQuasiquote = function(r6_form, r6_level) {
-    var r6_form, r6_level, r6_otherwise, r6_xs, r6_x, r6_commonParts, r6_c, r6_decLevel, r6_devLevel, _r6_t0, _r6_t1;
+    var r6_form, r6_level, r6_otherwise, r6_xs, r6_x, r6_commonParts, r6_c, r6_decLevel, _r6_t0, _r6_t1;
     return _r6_t0 = r6_form, _r6_t0 instanceof Array && 2 === _r6_t0.length && ".unquote" === _r6_t0[0] ? (r6_c = _r6_t0[1], 
     r6_level ? [ ".list", [ ".quote", ".unquote" ], r0_deQuasiquote(r6_c, r6_level - 1) ] : r6_c) : _r6_t0 instanceof Array && 3 === _r6_t0.length && ".unquote" === _r6_t0[0] && _r6_t0[2] instanceof Array && 2 === _r6_t0[2].length && ".quote" === _r6_t0[2][0] ? (r6_c = _r6_t0[1], 
-    r6_decLevel = _r6_t0[2][1], r6_devLevel = Math.max(1, Math.floor(r6_devLevel)), 
+    r6_decLevel = _r6_t0[2][1], r6_decLevel = Math.max(1, Math.floor(r6_decLevel)), 
     0 > r6_level - r6_decLevel ? r6_c : [ ".list", [ ".quote", ".unquote" ], r0_deQuasiquote(r6_c, r6_level - r6_decLevel) ]) : _r6_t0 instanceof Array && 2 === _r6_t0.length && ".quasiquote" === _r6_t0[0] ? (r6_c = _r6_t0[1], 
     [ ".list", [ ".quote", ".quasiquote" ], r0_deQuasiquote(r6_c, r6_level + 1) ]) : _r6_t0 instanceof Array && _r6_t0.length >= 0 ? (r6_xs = _r6_t0.slice(0), 
     _r6_t1 = r6_xs[r6_xs.length - 1], _r6_t1 instanceof Array && 2 === _r6_t1.length && ".sliceunquote" === _r6_t1[0] ? (r6_x = _r6_t1[1], 
@@ -35,8 +36,9 @@ r0_Scope = require("patrisika").Scope, r0_atom = function(r1_x) {
         return r0_deQuasiquote(r7_c, r6_level);
     })))) : (r6_otherwise = _r6_t0, [ ".quote", r6_otherwise ]);
 }, r0_ex = r0_NodeTranslation(function(r9_form, r9_env) {
-    var r9_form, r9_env, r9_any, r9_x, r9_callee, r9_args, r9_a, r9_j, r9_arg0, r9_args1, r9_t, r9_allKeysAreQuotes, r9_key, r9_value, r9_otherwise, r9_block, r9_param, r9_handler, r9_body, r9_params, r9_derived, r9_c, r9_e, _r9_t0, _r9_t1, _r9_t14, _r9_t15, _r9_t16, _r9_t21, _r9_t23, _r9_t24;
-    if (_r9_t16 = arguments, _r9_t15 = this, _r9_t0 = r9_form, _r9_t0 instanceof Array && _r9_t0.length >= 1 && ".quote" === _r9_t0[0]) return r9_x = _r9_t0.slice(1), 
+    var r9_form, r9_env, r9_any, r9_x, r9_callee, r9_args, r9_a, r9_j, r9_arg0, r9_args1, r9_t, r9_allKeysAreQuotes, r9_key, r9_value, r9_otherwise, r9_block, r9_param, r9_handler, r9_body, r9_params, r9_derived, r9_c, r9_e, _r9_t0, _r9_t1, _r9_t20, _r9_t22, _r9_t24, _r9_t27;
+    if (_r9_t0 = r9_form, _r9_t0 instanceof Array && 2 === _r9_t0.length && ".preserve" === _r9_t0[0]) return r9_x = _r9_t0[1];
+    if (_r9_t0 instanceof Array && _r9_t0.length >= 1 && ".quote" === _r9_t0[0]) return r9_x = _r9_t0.slice(1), 
     [ ".quote" ].concat(r9_x);
     if (_r9_t0 instanceof Array && 2 === _r9_t0.length && ".quasiquote" === _r9_t0[0]) return r9_x = _r9_t0[1], 
     r0_ex(r0_deQuasiquote(r9_x, 0), r9_env);
@@ -70,22 +72,22 @@ r0_Scope = require("patrisika").Scope, r0_atom = function(r1_x) {
         return r9_allKeysAreQuotes ? [ ".hash" ].concat(r9_a.map(function(r10_pair) {
             var r10_pair;
             return [ r10_pair[0][1], r10_pair[1] ];
-        })) : (_r9_t14 = r9_env.newt(), function(r11_t) {
+        })) : (_r9_t27 = r9_env.newt(), function(r11_t) {
             var r11_t;
             return [ ".begin", [ ".set", r11_t, [ ".hash" ] ] ].concat(r9_a.map(function(r12_pair) {
                 var r12_pair;
                 return [ ".set", [ ".", r11_t, r12_pair[0] ], r12_pair[1] ];
             }).concat([ r11_t ]));
-        }(_r9_t14));
+        }(_r9_t27));
     }
     if (_r9_t0 instanceof Array && 2 === _r9_t0.length && ".local" === _r9_t0[0]) return r9_x = _r9_t0[1], 
     r9_env.declare(r9_x), r9_env.use(r9_x);
     if (_r9_t0 instanceof Array && _r9_t0.length >= 3 && ".revcall" === _r9_t0[0]) return r9_callee = _r9_t0[1], 
-    r9_arg0 = _r9_t0[2], r9_args1 = _r9_t0.slice(3), r0_atom(r9_callee) && r9_env.macros.has(r9_callee) ? r9_env.macros.get(r9_callee)(r9_form.slice(1), r9_env) : (_r9_t21 = void 0, 
+    r9_arg0 = _r9_t0[2], r9_args1 = _r9_t0.slice(3), r0_atom(r9_callee) && r9_env.macros.has(r9_callee) ? r9_env.macros.get(r9_callee)(r9_form.slice(1), r9_env) : (_r9_t24 = void 0, 
     r9_t = r9_env.newt(), [ ".begin", [ ".set", r9_t, r0_ex(r9_arg0, r9_env) ], r0_ex([ r9_callee, r9_t ].concat(r9_args1), r9_env) ]);
     if (_r9_t0 instanceof Array && _r9_t0.length >= 1) {
         if (r9_callee = _r9_t0[0], r9_args = _r9_t0.slice(1), r0_atom(r9_callee) && r9_env.macros.has(r9_callee)) return r9_env.macros.get(r9_callee)(r9_form, r9_env);
-        for (_r9_t23 = void 0, _r9_t24 = r0_prim(r9_callee) ? void 0 : r9_callee = r0_ex(r9_callee, r9_env), 
+        for (_r9_t20 = void 0, _r9_t22 = r0_prim(r9_callee) ? void 0 : r9_callee = r0_ex(r9_callee, r9_env), 
         r9_a = [ r9_callee ], r9_j = 1; r9_j < r9_form.length; r9_j += 1) r9_a[r9_j] = r0_ex(r9_form[r9_j], r9_env);
         return r9_a;
     }
@@ -93,10 +95,10 @@ r0_Scope = require("patrisika").Scope, r0_atom = function(r1_x) {
     !r0_atom(r9_x) || !r9_env.macros.has(r9_x) || r9_env.macros.get(r9_x) instanceof Function ? (r9_x = _r9_t0, 
     r0_prim(r9_x) ? r9_x : (r9_x = _r9_t0, r0_atom(r9_x) ? r9_env.use(r9_x) : r9_any = _r9_t0)) : r9_env.macros.get(r9_x));
 }), r0_checkEvaluated = function(r13_form) {
-    var r13_form, _r13_t1;
+    var r13_form, _r13_t3;
     if (r13_form && r13_form instanceof Array && r13_form.length > 0) {
         if (r13_form.unevaluated) throw new r0_FormInvalidError(r13_form, "Unevaluated subform");
-        return _r13_t1 = void 0, r13_form.forEach(r0_checkEvaluated);
+        return _r13_t3 = void 0, r13_form.forEach(r0_checkEvaluated);
     }
     return void 0;
 }, exports.pass = function(r14_form, r14_globalScope) {

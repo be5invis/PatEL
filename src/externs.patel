@@ -311,6 +311,7 @@ define [Create] : begin {
 		(op (".quote" str) body) : ex (op str body) env
 		(op name body) [atom name] : begin {
 			local ds [new Scope env]
+			ds.declare "ex" true
 			ds.declare "atom" true
 			ds.declare "prim" true
 			ds.declare "formOf" true
@@ -319,6 +320,7 @@ define [Create] : begin {
 			ds.declare "externEnv" true
 			ds.declare "require" true
 			local macroG : new Function {
+				ds.castName 'ex'
 				ds.castName 'atom'
 				ds.castName 'prim'
 				ds.castName 'formOf'
@@ -328,7 +330,7 @@ define [Create] : begin {
 				ds.castName 'require'
 				escodegen.generate : patrisika.generate (".return" [ex body ds]) ds [lambda [form] (".return" form)]
 			}
-			local macroFn [macroG [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim] [lambda [x] x`1] [lambda [x] x`2] env externs require]
+			local macroFn [macroG ex [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim] [lambda [x] x`1] [lambda [x] x`2] env externs require]
 			env.macros.put name : lambda [c e] : begin {
 				local result [macroFn c e]
 				local s [new Scope env]

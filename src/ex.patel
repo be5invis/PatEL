@@ -9,13 +9,14 @@ define [NodeTranslation fn] : lambda [form] : begin {
 	local res : fn.apply this arguments
 	if [form && res && form.begins >= 0] : set res.begins form.begins
 	if [form && res && form.ends >= 0] : set res.ends form.ends
+	if [form && res && form.within] : set res.within form.within
 	return res
 }
 
 define [deQuasiquote form level] : match form {
 	(".unquote" c) : if [not level] c (".list" (".quote" ".unquote") [deQuasiquote c [level - 1]])
 	(".unquote" c (".quote" decLevel)) : begin {
-		set devLevel [Math.max 1 [Math.floor devLevel]]
+		set decLevel [Math.max 1 [Math.floor decLevel]]
 		if [level - decLevel < 0] c (".list" (".quote" ".unquote") [deQuasiquote c [level - decLevel]])
 	}
 	(".quasiquote" c) (".list" (".quote" ".quasiquote") [deQuasiquote c [level + 1]])
@@ -34,6 +35,7 @@ define [deQuasiquote form level] : match form {
 
 # Function [ex form env]: Expand macros and do scoping
 define ex : NodeTranslation : lambda [form env] : match form {
+	(".preserve" x) : return x
 	(".quote" :: x) : return (".quote" :: x)
 	(".quasiquote" x) : ex [deQuasiquote x 0] env
 	(".unquote" x) : return [ex x env]

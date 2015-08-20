@@ -260,12 +260,13 @@ r0_wrapForSyntacticClosure = function(r4_fn) {
         r47_str = _r47_t0[1][1], r47_body = _r47_t0[2], r0_ex([ r47_op, r47_str, r47_body ], r47_env)) : (_r47_t1 = !1, 
         _r47_t0 instanceof Array && 3 === _r47_t0.length ? (r47_op = _r47_t0[0], r47_name = _r47_t0[1], 
         r47_body = _r47_t0[2], _r47_t7 = _r47_t1 = r0_atom(r47_name) ? !0 : !1, _r47_t5 = _r47_t7) : _r47_t5 = void 0, 
-        _r47_t1 ? (r47_ds = new r0_Scope(r47_env), r47_ds.declare("atom", !0), r47_ds.declare("prim", !0), 
-        r47_ds.declare("formOf", !0), r47_ds.declare("scopeOf", !0), r47_ds.declare("definingEnv", !0), 
-        r47_ds.declare("externEnv", !0), r47_ds.declare("require", !0), r47_macroG = new Function(r47_ds.castName("atom"), r47_ds.castName("prim"), r47_ds.castName("formOf"), r47_ds.castName("scopeOf"), r47_ds.castName("definingEnv"), r47_ds.castName("externEnv"), r47_ds.castName("require"), r0_escodegen.generate(r0_patrisika.generate([ ".return", r0_ex(r47_body, r47_ds) ], r47_ds, function(r48_form) {
+        _r47_t1 ? (r47_ds = new r0_Scope(r47_env), r47_ds.declare("ex", !0), r47_ds.declare("atom", !0), 
+        r47_ds.declare("prim", !0), r47_ds.declare("formOf", !0), r47_ds.declare("scopeOf", !0), 
+        r47_ds.declare("definingEnv", !0), r47_ds.declare("externEnv", !0), r47_ds.declare("require", !0), 
+        r47_macroG = new Function(r47_ds.castName("ex"), r47_ds.castName("atom"), r47_ds.castName("prim"), r47_ds.castName("formOf"), r47_ds.castName("scopeOf"), r47_ds.castName("definingEnv"), r47_ds.castName("externEnv"), r47_ds.castName("require"), r0_escodegen.generate(r0_patrisika.generate([ ".return", r0_ex(r47_body, r47_ds) ], r47_ds, function(r48_form) {
             var r48_form;
             return [ ".return", r48_form ];
-        }))), r47_macroFn = r47_macroG(r0_wrapForSyntacticClosure(r0_atom), r0_wrapForSyntacticClosure(r0_prim), function(r49_x) {
+        }))), r47_macroFn = r47_macroG(r0_ex, r0_wrapForSyntacticClosure(r0_atom), r0_wrapForSyntacticClosure(r0_prim), function(r49_x) {
             var r49_x;
             return r49_x[1];
         }, function(r50_x) {

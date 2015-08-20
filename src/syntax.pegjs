@@ -12,7 +12,8 @@
 		return BeginsEndsWith([cdr[0][2], car, buildAssign(cdr[0][4], cdr.slice(1), cdr[0][0], ends)], begins, ends);
 	}
 	function BeginsEndsWith(form, begins, ends) {
-		if(!options.included && form instanceof Array) {
+		if(form instanceof Array) {
+			form.within = options.within
 			form.begins = begins;
 			form.ends = ends;
 		}
