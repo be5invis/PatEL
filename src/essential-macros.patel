@@ -8,6 +8,16 @@ define-macro call-its : syntax-rules {
 	@`[call-its @property] : return @`[let [t @property] [lambda [x] [x`t]]]
 	@`[call-its @property @::args] : return @`[let [t @property] [a (@::args)] [lambda [x] [x`t.apply x a]]]
 }
+define-macro getAllKeys : begin {
+	local exoticAST (.type "FunctionExpression" .id null .params ((.type "Identifier" .name "o")) .defaults () .body (.type "BlockStatement" .body ((.type "VariableDeclaration" .declarations ((.type "VariableDeclarator" .id (.type "Identifier" .name "a") .init (.type "ArrayExpression" .elements ()))) .kind "var") ( .type "ForInStatement" .left (.type "VariableDeclaration" .declarations ((.type "VariableDeclarator" .id (.type "Identifier" .name "k") .init null)) .kind "var") .right (.type "Identifier" .name "o") .body (.type "BlockStatement" .body ((.type "ExpressionStatement" .expression (.type "CallExpression" .callee ( .type "MemberExpression" .computed false .object (.type "Identifier" .name "a") .property (.type "Identifier" .name "push") ) .arguments ((.type "Identifier" .name "k")))))) .each false ) (.type "ReturnStatement" .argument (.type "Identifier" .name "a")))) .rest null .generator false .expression false )
+	local f : syntax-rules {
+		@`[getAllKeys] @`()
+		@`[getAllKeys @obj] @`[@(".preserve" (".exotic" exoticAST)) @obj]
+		@`[getAllKeys @obj @::unused] @`[@(".preserve" (".exotic" exoticAST)) @obj]
+	}
+	set [f.invokeAsAtom] (".preserve" (".exotic" exoticAST))
+	return f
+}
 define-macro items-of : syntax-rules {
 	@`[items-of @obj] : return @`[let [t @obj] [[lambda [] [begin
 		[local n t.length]
