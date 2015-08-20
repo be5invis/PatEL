@@ -127,14 +127,16 @@ function evaluate(ast){
 		var handler = null;
 		var lRecord = 0;
 		var doResize = function(){
-			//var scrollPos = $('master').scrollTop;
+			var doc = document.documentElement;
+			var left = (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0);
+			var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
 			var ln = inputArea.value.length;
 			if(ln < lRecord){
 				inputArea.style.height = '0';
 			};
 			lRecord = ln;
 			resizeInput();
-			//$('master').scrollTop = scrollPos;
+			setTimeout(function(){window.scrollTo(left, top)}, 0)
 			handler = null
 		}
 		var tick = function(){
@@ -149,7 +151,7 @@ function evaluate(ast){
 		if(e.key === 'Enter' || e.keyCode === 13) {
 			if(!e.ctrlKey) {
 				e.preventDefault();
-				insertAtCaret(inputArea, "\n" + getCurrentLineBlanks(inputArea));				
+				insertAtCaret(inputArea, "\n" + getCurrentLineBlanks(inputArea));
 			}
 		} else if(e.key === 'Tab' || e.keyCode === 9){
 			e.preventDefault();
