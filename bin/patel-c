@@ -103,7 +103,12 @@ instream.on('end', function(){
 		if(argv._[0]) return ['.quote', argv._[0]]
 		return ['.quote', '|-']
 	});
-	var ast = patel.parse(input, {within: { file: gs.macros.get('input-path')()[1], input: input }});
+	try {
+		var ast = patel.parse(input, {within: { file: gs.macros.get('input-path')()[1], input: input }});
+	} catch(ex){
+		process.stderr.write(ex.message + '\nAt Line ' + ex.line + ', Column' + ex.column);
+		process.exit(1);
+	}
 	try {
 		if(argv['dump-ast']) { dump(ast); return }
 		var xast = patel.ex(ast, gs);
