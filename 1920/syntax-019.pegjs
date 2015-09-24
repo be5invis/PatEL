@@ -1,75 +1,11 @@
 {
-	var textIndentStack = [];
-	var textIndent = "";
-	function buildleft(car, cdr, begins, ends){
-		if(!cdr.length) return car;
-		var form = car;
-		for(var j = 0; j < cdr.length; j++){
-			form = BeginsEndsWith([cdr[j][1], form, cdr[j][3]], begins, cdr[j][4]);
-		};
-		return BeginsEndsWith(form, begins, ends);
-	}
-	function buildAssign(car, cdr, begins, ends){
-		if(!cdr.length) return car;
-		return BeginsEndsWith([cdr[0][2], car, buildAssign(cdr[0][4], cdr.slice(1), cdr[0][0], ends)], begins, ends);
-	}
-	function BeginsEndsWith(form, begins, ends) {
-		if(form instanceof Array) {
-			form.within = options.within
-			form.begins = begins;
-			form.ends = ends;
-		}
-		return form
-	}
-	function Unevaluated(form){
-		if(form instanceof Array){
-			form.forEach(Unevaluated);
-			form.unevaluated = true
-		};
-		return form
-	}
-	function joinInterpolation(parts){
-		var result = [], pivot = ['.quote', ''];
-		for(var j = 0; j < parts.length; j++){
-			if(parts[j] instanceof Array && parts[j][0] === '.quote') pivot[1] += parts[j][1];
-			else result.push(pivot, parts[j]), pivot = ['.quote', '']
-		};
-		if(pivot[1]) result.push(pivot);
-		if(!result.length) return ['.quote', ''];
-		if(result.length === 1 && result[0] instanceof Array && result[0][0] === '.quote') return result[0]
-		return ['+'].concat(result)
-	}
-	function formGrouped(head, rear, ends){
-		if(!head) return rear;
-		for(var k = head.length - 1; k >= 0; k--){
-			rear = BeginsEndsWith(head[k][1].concat([rear]), head[k][0], ends);
-		}
-		return rear;
-	}
-	function formGroupedPart(begins, head, rear, ends){
-		var res = head
-		for(var j = 0; j < rear.length; j++) {
-			if(rear[j][1].qualifier) 
-				res = BeginsEndsWith([[".", res, rear[j][1].qualifier]].concat(rear[j][1].rear || []), begins, rear[j][2])
-			else 
-				res = BeginsEndsWith([".revcall", rear[j][1].rear[0], res].concat(rear[j][1].rear.slice(1)), begins, rear[j][2])
-		};
-		return BeginsEndsWith(res, begins, ends);
-	}
-	function formInvoke(begins, head, rear, ends){
-		var res = [head]
-		for(var j = 0; j < rear.length; j++){
-			res.push(rear[j][1])
-		};
-		return BeginsEndsWith(res, begins, ends);
+	function enclosed(b){
+		b.enclosed = true;
+		return b
 	}
 }
 
-start = __ it:blockContent __ {
-	var program = ['.begin'].concat(it)
-	Unevaluated(program);
-	return program
-}
+start = __ it:blockContent __
 // Expression
 primitive
 	= group
@@ -82,34 +18,36 @@ primitive
 
 group = operate / struct
 
-quasiquote = begins:POS '`' it:primitive ends:POS   	{return BeginsEndsWith(['.quasiquote', it], begins, ends)}
-sliceunquote = begins:POS '@::' it:primitive ends:POS	{return BeginsEndsWith(['.sliceunquote', it], begins, ends)}
-unquote = begins:POS '@' level:(numberliteral "*")? it:primitive ends:POS {return BeginsEndsWith(level ? ['.unquote', it, level[0]] : ['.unquote', it], begins, ends)}
+quasiquote =  '@`' it:primitive { return ['`', it] }
+sliceunquote =  '@::' it:primitive
+unquote =  '@' level:(numberliteral "*")? it:primitive
 
 operate
-	= begins:POS "[" __ "]" ends:POS              	{ return BeginsEndsWith([], begins, ends) }
-	/ begins:POS "[" __ it:grouped __ "]" ends:POS	{ return BeginsEndsWith(it, begins, ends) }
-	/ begins:POS "(" __ it:assign __ ")" ends:POS	{ return BeginsEndsWith(it, begins, ends) }
+	=  "[" __ "]"
+	/  "[" ls:__ it:grouped rs:__ "]" {
+		if(it.isMidfix) {
+			return enclosed(['(', ls, it, rs, ')'])
+		} else {
+			return enclosed(['[', ls, it, rs, ']'])
+		}
+
+	}
 
 struct
-	= begins:POS "{" __ "}" ends:POS                    	{ return BeginsEndsWith(['.list'], begins, ends) }
-	/ begins:POS "{" __ "." __ "}" ends:POS             	{ return BeginsEndsWith(['.hash'], begins, ends) }
-	/ begins:POS "{" __ it:cons __ "}" ends:POS         	{ return BeginsEndsWith(it, begins, ends) }
-	/ begins:POS "{" __ it:propertyPairs __ "}" ends:POS	{ return BeginsEndsWith(['.hash'].concat(it), begins, ends) }
+	=  "(" __ ")"  { return '{}' }
+	/  "(" __ "." __ ")"  { return '{.}' }
+	/  "(" ls:__ it:cons rs:__ ")" { return enclosed(['{', ls, it, rs, '}']) }
+	/  "(" ls:__ it:propertyPairs rs:__ ")" { return enclosed(['{', ls, it, rs, '}']) }
 	
 parting
-	= begins:POS head:primitive rear:((qualifier POS)*) ends:POS {
-		var res = head;
-		for(var j = 0; j < rear.length; j++){
-			res = BeginsEndsWith(['.', res, rear[j][0]], begins, rear[j][1]);
-		};
-		return BeginsEndsWith(res, begins, ends);
-	}
+	=  head:primitive rear:((qualifier)*)
 qualifier
-	= "." property:identifier { return ['.quote', property] }
-	/ "." property:numberliteral { return property }
-	/ "." property:stringliteral { return property }
-	/ "." property:operate { return property }
+	= "." property:identifier
+	/ "." property:numberliteral
+	/ "." property:stringliteral
+	/ "." "(" __ property:parting __ ")"
+	/ "." property:operate
+	/ "`" property:primitive { return ['.', '(', property, ')'] }
 
 prefixOp = "+" / "-" / "!"
 factorOp  	= $([?^] [\-_/+*<=>!?%_&~^@|]*)
@@ -121,141 +59,120 @@ bothOp    	= $([&] [\-_/+*<=>!?%_&~^@|]*)
 eitherOp  	= $([|] [\-_/+*<=>!?%_&~^@|]*)
 
 parted
-	= begins:POS left:prefixOp __ right:parting ends:POS { return BeginsEndsWith([left, right], begins, ends) }
+	=  left:prefixOp __ right:parting
 	/ parting
 lineParted
-	= begins:POS left:prefixOp _ right:parting ends:POS { return BeginsEndsWith([left, right], begins, ends) }
+	=  left:prefixOp _ right:parting
 	/ parting
 
-factor    	= begins:POS car:parted cdr:((__ factorOp __ parted POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-term    	= begins:POS car:factor cdr:((__ termOp __ factor POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-sum     	= begins:POS car:term cdr:((__ sumOp __ term POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-equality	= begins:POS car:sum cdr:((__ equalityOp __ sum POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-compare 	= begins:POS car:equality cdr:((__ compareOp __ equality POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-both    	= begins:POS car:compare cdr:((__ bothOp __ compare POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-either  	= begins:POS car:both cdr:((__ eitherOp __ both POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-assign  	= begins:POS car:either cdr:((POS __ "=" __ either)*) ends:POS { return buildAssign(car, cdr, begins, ends) }
+factor    	=  car:parted cdr:((__ factorOp __ parted)*)
+term    	=  car:factor cdr:((__ termOp __ factor)*)
+sum     	=  car:term cdr:((__ sumOp __ term)*)
+equality	=  car:sum cdr:((__ equalityOp __ sum)*)
+compare 	=  car:equality cdr:((__ compareOp __ equality)*)
+both    	=  car:compare cdr:((__ bothOp __ compare)*)
+either  	=  car:both cdr:((__ eitherOp __ both)*)
+assign  	=  car:either cdr:(( __ "=" __ either)*)
 
-lineFactor     	= begins:POS car:lineParted cdr:((_ factorOp _ lineParted POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-lineTerm    	= begins:POS car:lineFactor cdr:((_ termOp _ lineFactor POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-lineSum     	= begins:POS car:lineTerm cdr:((_ sumOp _ lineTerm POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-lineEquality	= begins:POS car:lineSum cdr:((_ equalityOp _ lineSum POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-lineCompare 	= begins:POS car:lineEquality cdr:((_ compareOp _ lineEquality POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-lineBoth    	= begins:POS car:lineCompare cdr:((_ bothOp _ lineCompare POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-lineEither  	= begins:POS car:lineBoth cdr:((_ eitherOp _ lineBoth POS)*) ends:POS { return buildleft(car, cdr, begins, ends) }
-lineAssign  	= begins:POS car:lineEither cdr:((POS _ "=" _ lineEither)*) ends:POS { return buildAssign(car, cdr, begins, ends) }
+lineFactor     	=  car:lineParted cdr:((_ factorOp _ lineParted)*)
+lineTerm    	=  car:lineFactor cdr:((_ termOp _ lineFactor)*)
+lineSum     	=  car:lineTerm cdr:((_ sumOp _ lineTerm)*)
+lineEquality	=  car:lineSum cdr:((_ equalityOp _ lineSum)*)
+lineCompare 	=  car:lineEquality cdr:((_ compareOp _ lineEquality)*)
+lineBoth    	=  car:lineCompare cdr:((_ bothOp _ lineCompare)*)
+lineEither  	=  car:lineBoth cdr:((_ eitherOp _ lineBoth)*)
+lineAssign  	=  car:lineEither cdr:(( _ "=" _ lineEither)*)
 
 list
-	= car:parting cdr:((__ ([,;] __)? parting)*) tail:(__ [,;])? {
-		return ['.list', car].concat(cdr.map(function(x){ return x[2] }))
-	}
+	= car:parting cdr:((__ ([,;] __)? parting)*) tail:(__ [,;])?
 
 cons
-	= car:list __ "::" __ cdr:parting { return ['.conslist'].concat(car.slice(1), [cdr]) }
-	/ "::" __ cdr:parting { return ['.conslist', cdr] }
+	= car:list __ "::" __ cdr:parting
+	/ "::" __ cdr:parting
 	/ list
 propertyPairs
-	= head:propertyPair rear:((__ ([,;] __)? propertyPair)*) { 
-		var res = [head]
-		for(var j = 0; j < rear.length; j++){
-			res.push(rear[j][2])
-		};
-		return res;
-	}
+	= head:propertyPair rear:((__ ([,;] __)? propertyPair)*)
 propertyPair
-	= head:qualifier _ rear:either { return [head, rear]}
+	= head:qualifier _ rear:either
 
 block
-	= NEWLINE_INDENT_ADD it:blockContent INDENT_REMOVE { return it }
-blockContent
-	= head:line rear:(STATEMENT_SEPARATOR line)* {
-		var res = [head]
-		for(var j = 0; j < rear.length; j++){
-			res.push(rear[j][1])
-		};
-		return res;
+	= "{" __ it:blockContent __ "}" {
+		var b = enclosed([it]);
+		b.indented = true;
+		return b
 	}
+blockContent
+	= head:line rear:(STATEMENT_SEPARATOR line)*
 
 line
-	= head:(POS linePart _ ":" ![>\.`] _)* rear:simpleLine ends:POS { return formGrouped(head, rear, ends) }
+	= head:(linePart _ ":" ![>\.`] _)* rear:simpleLine
 grouped
-	= head:(POS groupedPart __ ":" ![>\.`] __)* rear:simpleGrouped ends:POS { return formGrouped(head, rear, ends) }
+	= head:(groupedPart __ ":" ![>\.`] __)* rear:simpleGrouped {
+		if(!head || !head.length) return rear; else return [head, rear]
+	}
 
 simpleLine
-	= begins:POS head:linePart rear:(_ block)? ends:POS { 
-		if(rear) return BeginsEndsWith(head.concat(rear[1]), begins, ends) 
-		else return BeginsEndsWith(head, begins, ends);
-	}
+	=  head:linePart rear:(_ block)?
 simpleGrouped
-	= begins:POS head:groupedPart rear:(__ "\\\\" block)? ends:POS { 
-		if(rear) return BeginsEndsWith(head.concat(rear[2]), begins, ends) 
-		else return BeginsEndsWith(head, begins, ends);
+	=  head:groupedPart rear:(__ block)? {
+		if(rear) {
+			rear[1].contained = true
+			return [head, ' \\\\', rear[1]]
+		} else {
+			return head
+		}
 	}
 
 linePart
-	= begins:POS head:lineInvoke rear:(__ linePipeRear POS)* ends:POS { return formGroupedPart(begins, head, rear, ends) }
+	=  head:lineInvoke rear:(__ linePipeRear)*
 groupedPart
-	= begins:POS head:invoke rear:(__ pipeRear POS)* ends:POS { return formGroupedPart(begins, head, rear, ends) }
+	=  head:invoke rear:(__ pipeRear)* {
+		if(!rear || !rear.length) return head; else return [head, rear]
+	}
 
 linePipeRear
-	= ":>" _ it:lineInvoke { return {type: 'pipe', rear: it} }
-	/ ":" q:qualifier _ it:lineInvoke? { return {type:'pipe', rear: it, qualifier:q} }
+	= ":>" _ it:lineInvoke
+	/ ":" q:qualifier _ it:lineInvoke?
 pipeRear
-	= ":>" __ it:invoke { return {type: 'pipe', rear: it} }
-	/ ":" q:qualifier __ it:invoke? { return {type:'pipe', rear: it, qualifier:q} }
+	= ":>" __ it:invoke
+	/ ":" q:qualifier __ it:invoke?
 
 lineInvoke
-	= begins:POS "*" _ it:parting ends:POS { return BeginsEndsWith(it, begins, ends) }
-	/ begins:POS head:parting !(_ [\-/+*<=>!?%&~^|]) rear:(_ parting)* ends:POS { return formInvoke(begins, head, rear, ends) }
-	/ begins:POS it:lineAssign ends:POS { return it }
+	=  "*" _ it:parting
+	/  head:parting !(_ [\-/+*<=>!?%&~^|]) rear:(_ parting)*
+	/  it:lineAssign
 invoke
-	= begins:POS "*" __ it:parting ends:POS { return BeginsEndsWith(it, begins, ends) }
-	/ begins:POS head:parting !(__ [\-/+*<=>!?%&~^|]) rear:(__ parting)* ends:POS { return formInvoke(begins, head, rear, ends) }
-	/ begins:POS it:assign ends:POS { return it }
+	=  "*" __ it:parting {
+		it.isMidfix = true; 
+		return it
+	}
+	/  head:parting !(__ [\-/+*<=>!?%&~^|]) rear:(__ parting)*
+	/  it:assign  { 
+		it.isMidfix = true;
+		return it
+	}
 
 
 // Tokens
 identifier "Name"
 	= $((UnicodeLetter / [_$]) (UnicodeLetter / UnicodeCombiningMark / UnicodeDigit / UnicodeConnectorPunctuation / [\-_@$])*)
 numberliteral "Numeric Literal"
-	= begins:POS ("0x" / "0X") hexdigits:$([0-9a-fA-F]+)  ends:POS {
-		return BeginsEndsWith(['.quote', parseInt(hexdigits, 16)] , begins, ends)
-	}
-	/ begins:POS ("0b" / "0B") bindigits:$([01]+) ends:POS {
-		return BeginsEndsWith(['.quote', parseInt(bindigits, 2)], begins, ends)
-	}
-	/ begins:POS decimal:$([0-9]+ ("." [0-9]+)? ([eE] [+\-]? [0-9]+)?) ends:POS {
-		return BeginsEndsWith(['.quote', decimal - 0], begins, ends)
-	}
+	=  ("0x" / "0X") hexdigits:$([0-9a-fA-F]+)
+	/  ("0b" / "0B") bindigits:$([01]+)
+	/  decimal:$([0-9]+ ("." [0-9]+)? ([eE] [+\-]? [0-9]+)?)
 stringliteral "String Literal"
-	= begins:POS "\"" inner:stringCharacter* "\""  ends:POS {
-		return BeginsEndsWith(joinInterpolation(inner) , begins, ends)
-	}
-	/ begins:POS "'" inner:singleStringCharacter* "'"  ends:POS {
-		return BeginsEndsWith(['.quote', inner.join('')] , begins, ends)
-	}
+	=  "\"" inner:stringCharacter* "\""
+	/  "'" inner:singleStringCharacter* "'"
 stringCharacter
-	= common:$([^"\\\r\n]+) { return ['.quote', common] }
-	/ "\\u" digits:([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9]) { 
-		return ['.quote', String.fromCharCode(parseInt(digits.join(''), 16))]
-	}
-	/ "\\" g:group { return g }
-	/ "\\="g:parting { return g }
-	/ "\\" LINE_TERMINATOR SPACE_CHARACTER_OR_NEWLINE* "\\" { return ['.quote', ''] }
-	/ "\\" which:[^u\r\n] {
-		switch(which) {
-			case('n'): return ['.quote', "\n"];
-			case('r'): return ['.quote', "\r"];
-			case('"'): return ['.quote', "\""];
-			case('t'): return ['.quote', "\t"];
-			case('v'): return ['.quote', "\v"];
-			case('\\'): return ['.quote', "\\"];
-			default: return ['.quote', "\\" + which];
-		}
-	}
+	= common:$([^"\\\r\n]+)
+	/ "\\u" digits:([a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9] [a-fA-F0-9])
+	/ "\\" g:group
+	/ "\\="g:parting
+	/ "\\" LINE_TERMINATOR SPACE_CHARACTER_OR_NEWLINE* "\\"
+	/ "\\" which:[^u\r\n]
 singleStringCharacter
 	= [^']
-	/ "''" { return "'" }
+	/ "''"
 
 // Spaces
 SPACE_CHARACTER "Space Character"
@@ -281,27 +198,12 @@ _   = $(SPACE_CHARACTER*)
 NEWLINE
 	= $(LINE_BREAK IGNORABLE*)
 
-NEWLINE_INDENT_ADD
-	= _ LINE_BREAK (_ LINE_BREAK)* INDENT_ADD
-NEWLINE_INDENT_SAME
-	= _ LINE_BREAK (_ LINE_BREAK)* INDENT_SAME
-NEWLINE_INDENT_SAME_OR_MORE
-	= _ LINE_BREAK (_ LINE_BREAK)* INDENT_SAME_OR_MORE
-
-INDENT_ADD = spaces:_ & { return spaces.length > textIndent.length && spaces.slice(0, textIndent.length) === textIndent }
-                  { textIndentStack.push(textIndent); textIndent = spaces }
-INDENT_REMOVE = { textIndent = textIndentStack.pop() }
-INDENT_SAME = spaces:_ & { return spaces === textIndent }
-INDENT_SAME_OR_MORE = spaces:_ & { return spaces === textIndent || spaces.slice(0, textIndent.length) === textIndent }
-
 STATEMENT_SEPARATOR
-	= NEWLINE_INDENT_SAME
+	= _ NEWLINE
 	/ _ ";" _
 
 LAYER_SEPARATOR
 	= _ "," _
-
-POS = { return offset() }
 
 // Unicode Character Classes
 UnicodeLetter

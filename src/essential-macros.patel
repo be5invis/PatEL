@@ -1,106 +1,90 @@
-define-macro syntax-rules : lambda [form env] : macro-match form env {
-	@`[syntax-rules @::patterns] ('.syntactic-closure' @`[lambda [form env] [macro-match form env @::[patterns.map formOf]]] env)
-}
-define-macro its : syntax-rules {
-	@`[its @property] : return @`[let [t @property] [lambda [x] x`t]]
-}
-define-macro call-its : syntax-rules {
-	@`[call-its @property] : return @`[let [t @property] [lambda [x] [x`t]]]
-	@`[call-its @property @::args] : return @`[let [t @property] [a (@::args)] [lambda [x] [x`t.apply x a]]]
-}
-define-macro getAllKeys : begin {
-	local exoticAST (.type "FunctionExpression" .id null .params ((.type "Identifier" .name "o")) .defaults () .body (.type "BlockStatement" .body ((.type "VariableDeclaration" .declarations ((.type "VariableDeclarator" .id (.type "Identifier" .name "a") .init (.type "ArrayExpression" .elements ()))) .kind "var") ( .type "ForInStatement" .left (.type "VariableDeclaration" .declarations ((.type "VariableDeclarator" .id (.type "Identifier" .name "k") .init null)) .kind "var") .right (.type "Identifier" .name "o") .body (.type "BlockStatement" .body ((.type "ExpressionStatement" .expression (.type "CallExpression" .callee ( .type "MemberExpression" .computed false .object (.type "Identifier" .name "a") .property (.type "Identifier" .name "push") ) .arguments ((.type "Identifier" .name "k")))))) .each false ) (.type "ReturnStatement" .argument (.type "Identifier" .name "a")))) .rest null .generator false .expression false )
-	local f : syntax-rules {
-		@`[getAllKeys] @`()
-		@`[getAllKeys @obj] @`[@(".preserve" (".exotic" exoticAST)) @obj]
-		@`[getAllKeys @obj @::unused] @`[@(".preserve" (".exotic" exoticAST)) @obj]
-	}
-	set [f.invokeAsAtom] (".preserve" (".exotic" exoticAST))
+define-macro syntax-rules : lambda [form env] : macro-match form env 
+	`[syntax-rules @::patterns] {'.syntactic-closure' `[lambda [form env] [macro-match form env @::[patterns.map formOf]]] env}
+define-macro its : syntax-rules 
+	`[its @property] : return `[let [t @property] [lambda [x] x.(t)]]
+define-macro call-its : syntax-rules 
+	`[call-its @property] : return `[let [t @property] [lambda [x] [x.(t)]]]
+	`[call-its @property @::args] : return `[let [t @property] [a {@::args}] [lambda [x] [x.(t).apply x a]]]
+define-macro getAllKeys : begin 
+	local exoticAST {.type "FunctionExpression" .id null .params {{.type "Identifier" .name "o"}} .defaults {} .body {.type "BlockStatement" .body {{.type "VariableDeclaration" .declarations {{.type "VariableDeclarator" .id {.type "Identifier" .name "a"} .init {.type "ArrayExpression" .elements {}}}} .kind "var"} { .type "ForInStatement" .left {.type "VariableDeclaration" .declarations {{.type "VariableDeclarator" .id {.type "Identifier" .name "k"} .init null}} .kind "var"} .right {.type "Identifier" .name "o"} .body {.type "BlockStatement" .body {{.type "ExpressionStatement" .expression {.type "CallExpression" .callee { .type "MemberExpression" .computed false .object {.type "Identifier" .name "a"} .property {.type "Identifier" .name "push"} } .arguments {{.type "Identifier" .name "k"}}}}}} .each false } {.type "ReturnStatement" .argument {.type "Identifier" .name "a"}}}} .rest null .generator false .expression false }
+	local f : syntax-rules 
+		`[getAllKeys] `{}
+		`[getAllKeys @obj] `[@{".preserve" {".exotic" exoticAST}} @obj]
+		`[getAllKeys @obj @::unused] `[@{".preserve" {".exotic" exoticAST}} @obj]
+	set [f.invokeAsAtom] {".preserve" {".exotic" exoticAST}}
 	return f
-}
-define-macro items-of : syntax-rules {
-	@`[items-of @obj] : return @`[let [t @obj] [[lambda [] [begin
+define-macro items-of : syntax-rules 
+	`[items-of @obj] : return `[let [t @obj] [[lambda [] [begin
 		[local n t.length]
-		[for [local i 0] [i < n] [i = i + 1] [yield t`i]]
+		[for [local i 0] (i < n) (i = i + 1) [yield t.(i)]]
 	]]]]
-}
-define-macro range : syntax-rules {
-	@`[range @low @high] : return @`[let [lo @low] [hi @high] [[lambda [] : begin {
-		for [local j lo] [j < hi] [j = j + 1] : yield j
-	}]]]
-	@`[range @low till @high] : return @`[let [lo @low] [hi @high] [[lambda [] : begin {
-		for [local j lo] [j <= hi] [j = j + 1] : yield j
-	}]]]
-	@`[range @low downto @high] : return @`[let [lo @low] [hi @high] [[lambda [] : begin {
-		for [local j lo] [j > hi] [j = j - 1] : yield j
-	}]]]
-	@`[range @low downtill @high] : return @`[let [lo @low] [hi @high] [[lambda [] : begin {
-		for [local j lo] [j >= hi] [j = j - 1] : yield j
-	}]]]
-}
-define-macro foreach : syntax-rules {
-	@`[foreach [@varid @range] @body] ('.syntactic-closure' @`[foreach @[formOf varid] @[formOf range] @[formOf body]] env)
-	@`[foreach @varid [range @low @high] @body] [[env.macros.get "range"] === [definingEnv.macros.get "range"]]: begin {
+define-macro range : syntax-rules 
+	`[range @low @high] : return `[let [lo @low] [hi @high] [[lambda [] : begin \\
+		for [local j lo] (j < hi) (j = j + 1) : yield j
+	]]]
+	`[range @low till @high] : return `[let [lo @low] [hi @high] [[lambda [] : begin \\
+		for [local j lo] (j <= hi) (j = j + 1) : yield j
+	]]]
+	`[range @low downto @high] : return `[let [lo @low] [hi @high] [[lambda [] : begin \\
+		for [local j lo] (j > hi) (j = j - 1) : yield j
+	]]]
+	`[range @low downtill @high] : return `[let [lo @low] [hi @high] [[lambda [] : begin \\
+		for [local j lo] (j >= hi) (j = j - 1) : yield j
+	]]]
+define-macro foreach : syntax-rules 
+	`[foreach [@varid @range] @body] {'.syntactic-closure' `[foreach @[formOf varid] @[formOf range] @[formOf body]] env}
+	`[foreach @varid [range @low @high] @body] ([env.macros.get "range"] === [definingEnv.macros.get "range"]): begin 
 		local lo [env.newt]
 		local hi [env.newt]
-		return @`[begin {
+		return `[begin \\
 			local @lo @low
 			local @hi @high
-			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@[formOf varid] < @hi] [@[formOf varid] = @[formOf varid] + 1] : begin @body
-		}]
-	}
-	@`[foreach @varid [range @low till @high] @body] [[env.macros.get "range"] === [definingEnv.macros.get "range"]]: begin {
+			for @{'.syntactic-closure' `[local @[formOf varid] @lo] env} (@[formOf varid] < @hi) (@[formOf varid] = @[formOf varid] + 1) : begin @body
+		]
+	`[foreach @varid [range @low till @high] @body] ([env.macros.get "range"] === [definingEnv.macros.get "range"]): begin 
 		local lo [env.newt]
 		local hi [env.newt]
-		return @`[begin {
+		return `[begin \\
 			local @lo @low
 			local @hi @high
-			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@[formOf varid] <= @hi] [@[formOf varid] = @[formOf varid] + 1] : begin @body
-		}]
-	}
-	@`[foreach @varid [range @low downto @high] @body] [[env.macros.get "range"] === [definingEnv.macros.get "range"]]: begin {
+			for @{'.syntactic-closure' `[local @[formOf varid] @lo] env} (@[formOf varid] <= @hi) (@[formOf varid] = @[formOf varid] + 1) : begin @body
+		]
+	`[foreach @varid [range @low downto @high] @body] ([env.macros.get "range"] === [definingEnv.macros.get "range"]): begin 
 		local lo [env.newt]
 		local hi [env.newt]
-		return @`[begin {
+		return `[begin \\
 			local @lo @low
 			local @hi @high
-			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@[formOf varid] > @hi] [@[formOf varid] = @[formOf varid] - 1] : begin @body
-		}]
-	}
-	@`[foreach @varid [range @low downtill @high] @body] [[env.macros.get "range"] === [definingEnv.macros.get "range"]]: begin {
+			for @{'.syntactic-closure' `[local @[formOf varid] @lo] env} (@[formOf varid] > @hi) (@[formOf varid] = @[formOf varid] - 1) : begin @body
+		]
+	`[foreach @varid [range @low downtill @high] @body] ([env.macros.get "range"] === [definingEnv.macros.get "range"]): begin 
 		local lo [env.newt]
 		local hi [env.newt]
-		return @`[begin {
+		return `[begin \\
 			local @lo @low
 			local @hi @high
-			for @('.syntactic-closure' @`[local @[formOf varid] @lo] env) [@[formOf varid] >= @hi] [@[formOf varid] = @[formOf varid] - 1] : begin @body
-		}]
-	}
-	@`[foreach @varid [items-of @list] @body] [[env.macros.get "items-of"] === [definingEnv.macros.get "items-of"]]: begin {
+			for @{'.syntactic-closure' `[local @[formOf varid] @lo] env} (@[formOf varid] >= @hi) (@[formOf varid] = @[formOf varid] - 1) : begin @body
+		]
+	`[foreach @varid [items-of @list] @body] ([env.macros.get "items-of"] === [definingEnv.macros.get "items-of"]): begin 
 		local tR [env.newt]
 		local tN [env.newt]
 		local t  [env.newt]
-		return @`[begin {
+		return `[begin \\
 			local @tR @list
 			local @tN @tR.length
 			local @t 0
-			while [@t < @tN] : begin {
-				begin @('.syntactic-closure' @`[local @[formOf varid] @tR`@t] env)
+			while (@t < @tN) : begin 
+				begin @{'.syntactic-closure' `[local @[formOf varid] @tR.(@t)] env}
 				begin @body
 				@t = @t + 1
-			}
-		}]
-	}
-	@`[foreach @varid @range @body] : begin {
+		]
+	`[foreach @varid @range @body] : begin 
 		local tR [env.newt]
 		local t  [env.newt]
-		return @`[begin {
+		return `[begin \\
 			local @tR : @range.(@[externEnv.use 'Symbol'].iterator)
 			local @t nothing
-			while [! [set @t [@tR.next]].done] : begin {
-				begin @('.syntactic-closure' @`[local @[formOf varid] @t.value] env)
+			while (! [set @t [@tR.next]].done) : begin 
+				begin @{'.syntactic-closure' `[local @[formOf varid] @t.value] env}
 				begin @body
-			}
-		}]
-	}
-}
+		]
