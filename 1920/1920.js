@@ -11,7 +11,7 @@ var join = function(a){
 		a.enclosed = false;
 		var s = join(a);
 		level -= 1;
-		return (a.indented ? '\n' + indent(level + 1) : '') + s + (a.contained ? '\n' + indent(level) : '');
+		return (a.indented ? '\n' + indent(level + 1) : '') + s + (a.indented && level === 1 || a.contained ? '\n' + indent(level) : '');
 	} else if(a instanceof Array) {
 		return a.map(join).join('');
 	} else if(a) {

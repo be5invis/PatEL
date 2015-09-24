@@ -26,9 +26,9 @@ operate
 	=  "[" __ "]"
 	/  "[" ls:__ it:grouped rs:__ "]" {
 		if(it.isMidfix) {
-			return enclosed(['(', ls, it, rs, ')'])
+			return ['(', ls, enclosed([it]), rs, ')']
 		} else {
-			return enclosed(['[', ls, it, rs, ']'])
+			return ['[', ls, enclosed([it]), rs, ']']
 		}
 
 	}
@@ -36,8 +36,8 @@ operate
 struct
 	=  "(" __ ")"  { return '{}' }
 	/  "(" __ "." __ ")"  { return '{.}' }
-	/  "(" ls:__ it:cons rs:__ ")" { return enclosed(['{', ls, it, rs, '}']) }
-	/  "(" ls:__ it:propertyPairs rs:__ ")" { return enclosed(['{', ls, it, rs, '}']) }
+	/  "(" ls:__ it:cons rs:__ ")" { return ['{', ls, enclosed([it]), rs, '}'] }
+	/  "(" ls:__ it:propertyPairs rs:__ ")" { return ['{', ls, enclosed([it]), rs, '}'] }
 	
 parting
 	=  head:primitive rear:((qualifier)*)

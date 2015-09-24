@@ -49,9 +49,9 @@ module.exports = (function() {
         peg$c14 = { type: "literal", value: "]", description: "\"]\"" },
         peg$c15 = function(ls, it, rs) {
         		if(it.isMidfix) {
-        			return enclosed(['(', ls, it, rs, ')'])
+        			return ['(', ls, enclosed([it]), rs, ')']
         		} else {
-        			return enclosed(['[', ls, it, rs, ']'])
+        			return ['[', ls, enclosed([it]), rs, ']']
         		}
 
         	},
@@ -63,7 +63,7 @@ module.exports = (function() {
         peg$c21 = ".",
         peg$c22 = { type: "literal", value: ".", description: "\".\"" },
         peg$c23 = function() { return '{.}' },
-        peg$c24 = function(ls, it, rs) { return enclosed(['{', ls, it, rs, '}']) },
+        peg$c24 = function(ls, it, rs) { return ['{', ls, enclosed([it]), rs, '}'] },
         peg$c25 = [],
         peg$c26 = "`",
         peg$c27 = { type: "literal", value: "`", description: "\"`\"" },
