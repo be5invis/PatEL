@@ -168,10 +168,19 @@ propertyPair
 block
 	= NEWLINE_INDENT_ADD it:blockContent INDENT_REMOVE { return it }
 blockContent
-	= head:line rear:(STATEMENT_SEPARATOR line)* {
+	= head:lineComposite rear:(STATEMENT_SEPARATOR lineComposite)* {
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
 			res.push(rear[j][1])
+		};
+		return res;
+	}
+	
+lineComposite
+	= !":" head:line rear:(STATEMENT_SEPARATOR ":" _ line)* {
+		var res = head;
+		if(rear) for(var j = 0; j < rear.length; j++){
+			res.push(rear[j][3])
 		};
 		return res;
 	}

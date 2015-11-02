@@ -1,45 +1,40 @@
-define-macro my-for-each : syntax-rules {
-	@`[my-for-each @varid [items-of @list] @body] [[env.macros.get "items-of"] === [definingEnv.macros.get "items-of"]]: begin {
+define-macro my-for-each : syntax-rules 
+	`[my-for-each @varid [items-of @list] @body] ([env.macros.get "items-of"] === [definingEnv.macros.get "items-of"]): begin 
 		local tR [env.newt]
 		local tN [env.newt]
 		local t  [env.newt]
-		return @`[begin {
+		return `[begin \\
 			local @tR @list
 			local @tN @tR.length
 			local @t 0
-			begin @('.syntactic-closure' @`[local @[formOf varid] nothing] env)
-			while [@t < @tN] : begin {
-			    @varid = @tR`@t
+			begin @{'.syntactic-closure' `[local @[formOf varid] nothing] env}
+			while (@t < @tN) : begin 
+				@varid = @tR.(@t)
 				begin @body
 				@t = @t + 1
-			}
-		}]
-	}
-	@`[my-for-each @varid @range @body] : begin {
+		]
+	`[my-for-each @varid @range @body] : begin 
 		local tR [env.newt]
 		local t  [env.newt]
-		return @`[begin {
-			begin @('.syntactic-closure' @`[local @[formOf varid] nothing] env)
+		return `[begin \\
+			begin @{'.syntactic-closure' `[local @[formOf varid] nothing] env}
 			local @tR @range
 			local @t nothing
-			while [! [set @t [@tR.next]].done] : begin {
+			while (! [set @t [@tR.next]].done) : begin 
 				@varid = @t.value
 				begin @body
-			}
-		}]
-	}
-}
+		]
 
-define [my-generator] : begin {
+
+define [my-generator] : begin 
 	yield 1
 	yield 2
 	yield 3
-}
+
 
 my-for-each x [my-generator] : console.log x
-my-for-each x [items-of (1 2 3 4 5)] : console.log x
+my-for-each x [items-of {1 2 3 4 5}] : console.log x
 
-lambda [] : begin {
+lambda [] : begin 
 	define-macro items-of : syntax-rules
 	my-for-each x [items-of] : console.log x
-}

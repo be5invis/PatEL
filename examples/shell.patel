@@ -1,16 +1,15 @@
 define shell : require 'shelljs'
 define [escapeArgument x] x
 
-define-macro declare-command : syntax-rules {
-	@`[declare-command @_name] [atom _name] : begin {
+define-macro declare-command : syntax-rules 
+	`[declare-command @_name] [atom _name] : begin 
 		local name [formOf _name]
-		local defineStatement @`[define-macro @name [syntax-rules {
-			@`[@2*name @::args]  @`[shell.exec @[args.reduce [lambda [x y] @`[@x + " " + [escapeArgument @y]]] ('.quote' @('.quote' name))]]
-		}]]
-		[env.macros.get 'define-macro'] defineStatement arguments`1
-		return @`nothing
-	}
-}
+		local defineStatement `[define-macro @name [syntax-rules \\
+			`[@2*name @::args]  `[shell.exec @[args.reduce [lambda [x y] `(@x + " " + [escapeArgument @y])] {'.quote' @{'.quote' name}}]]
+		]]
+		[env.macros.get 'define-macro'] defineStatement arguments.(1)
+		return `nothing
+
 
 declare-command ping
 declare-command ls

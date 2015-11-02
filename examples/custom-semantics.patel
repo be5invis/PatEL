@@ -1,7 +1,6 @@
-define-macro pointer : syntax-rules {
-	@`[pointer @x] : return @`(	.get [lambda [] @x] 
-	                           	.set [lambda [t] [set @x t]] )
-}
+define-macro pointer : syntax-rules
+	`[pointer @x] : return `{	.get [lambda [] @x]
+	                           	.set [lambda [t] [set @x t]] }
 
 local a 1
 local at-a [pointer a]
@@ -9,21 +8,19 @@ local at-a [pointer a]
 local b 2
 local at-b [pointer b]
 
-# example for hygiene macros
-
 define [falsy x] [not x]
-define-macro myor : syntax-rules {
-	@`[myor @x @y] @`[begin {
+define-macro myor : syntax-rules
+	`[myor @x @y] `[begin \\
 		local t @x
 		if [falsy t] @y t
-	}]
-}
-define-macro myor-dirty : syntax-rules {
-	@`[myor-dirty @x @y] @`[begin {
+	]
+
+define-macro myor-dirty : syntax-rules
+	`[myor-dirty @x @y] `[begin \\
 		local t @x
-		if [@('.syntactic-closure' @`falsy arguments`1) t] @y t
-	}]
-}
+		if [@{'.syntactic-closure' `(falsy) arguments.(1)} t] @y t
+	]
+
 
 console.log [myor 1 2]                                      	# 1
 console.log [myor-dirty 1 2]                                	# 1
