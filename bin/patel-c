@@ -68,18 +68,21 @@ function printSourceLines(stream, lines, firstLineNumber){
 function reportError(ex, lcmap, lines){
 	if(ex.begins >= 0 && ex.ends >= 0) {
 		console.error(ex.message);
-		if(ex.within && ex.within.input){
+		if(ex.within && ex.within.input) {
 			var lcmap = generateLineAndColumnMap(ex.within.input);
 			var lines = ex.within.input.split("\n");
-		}
-		var ljBegins = lcmap.line[ex.begins] - 1
-		var ljEnds = lcmap.line[ex.ends] - 1
-		if(ljEnds - ljBegins < 3) {
-			printSourceLines(process.stderr,lines.slice(ljBegins, ljEnds + 1), ljBegins + 1);
-		} else {
-			printSourceLines(process.stderr,lines.slice(ljBegins, ljBegins + 2), ljBegins + 1);
-			process.stderr.write("......\n");
-			printSourceLines(process.stderr,lines.slice(ljEnds - 1, ljEnds + 1), ljEnds);
+			var ljBegins = lcmap.line[ex.begins] - 1;
+			var ljEnds = lcmap.line[ex.ends] - 1;
+			if(ex.within.file){
+				process.stderr.write(ex.within.file + "\n")
+			}
+			if(ljEnds - ljBegins < 3) {
+				printSourceLines(process.stderr, lines.slice(ljBegins, ljEnds + 1), ljBegins + 1);
+			} else {
+				printSourceLines(process.stderr, lines.slice(ljBegins, ljBegins + 2), ljBegins + 1);
+				process.stderr.write("......\n");
+				printSourceLines(process.stderr, lines.slice(ljEnds - 1, ljEnds + 1), ljEnds);
+			}
 		}
 	} else {
 		console.error(ex.stack || ex);
