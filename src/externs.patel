@@ -90,7 +90,8 @@ define [Create] : begin
 			# Property initalizer, identifier
 			`(@property = @value) [atom property]        : return {{".quote" property} value}
 			{property value}      [atom property]        : return {{".quote" property} value}
-			{property}            [atom property]        : return {{".quote" property} value}
+			{property}            [atom property]        : return {{".quote" property} property}
+			property              [atom property]        : return {{".quote" property} property}
 			# Property initalizer, string
 			`(@{".quote" property} = @value)             : return {{".quote" property} value} 
 			{{".quote" property} value}                  : return {{".quote" property} value}

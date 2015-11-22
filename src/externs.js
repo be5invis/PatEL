@@ -75,21 +75,22 @@ r0_wrapForSyntacticClosure = function(r4_fn) {
     }), r6_externs.macros.put("object", function(r15_form, r15_env) {
         var r15_form, r15_env, r15_pairs;
         return r15_pairs = r15_form.slice(1).map(function(r16_pair) {
-            var r16_pair, r16_method, r16_param, r16_value, r16_property, _r16_t0, _r16_t1, _r16_t2, _r16_t3, _r16_t4, _r16_t5, _r16_t8, _r16_t10, _r16_t12, _r16_t16, _r16_t18;
+            var r16_pair, r16_method, r16_param, r16_value, r16_property, _r16_t0, _r16_t1, _r16_t2, _r16_t3, _r16_t4, _r16_t5, _r16_t8, _r16_t10, _r16_t12, _r16_t17, _r16_t19;
             return _r16_t0 = r16_pair, _r16_t5 = !1, _r16_t0 instanceof Array && 3 === _r16_t0.length && "=" === _r16_t0[0] ? (r16_property = _r16_t0[1], 
             r16_value = _r16_t0[2], _r16_t8 = _r16_t5 = r0_atom(r16_property) ? !0 : !1) : _r16_t8 = void 0, 
             _r16_t5 ? [ [ ".quote", r16_property ], r16_value ] : (_r16_t4 = !1, _r16_t0 instanceof Array && 2 === _r16_t0.length ? (r16_property = _r16_t0[0], 
             r16_value = _r16_t0[1], _r16_t10 = _r16_t4 = r0_atom(r16_property) ? !0 : !1) : _r16_t10 = void 0, 
             _r16_t4 ? [ [ ".quote", r16_property ], r16_value ] : (_r16_t3 = !1, _r16_t0 instanceof Array && 1 === _r16_t0.length ? (r16_property = _r16_t0[0], 
-            _r16_t12 = _r16_t3 = r0_atom(r16_property) ? !0 : !1) : _r16_t12 = void 0, _r16_t3 ? [ [ ".quote", r16_property ], r16_value ] : _r16_t0 instanceof Array && 3 === _r16_t0.length && "=" === _r16_t0[0] && _r16_t0[1] instanceof Array && 2 === _r16_t0[1].length && ".quote" === _r16_t0[1][0] ? (r16_property = _r16_t0[1][1], 
+            _r16_t12 = _r16_t3 = r0_atom(r16_property) ? !0 : !1) : _r16_t12 = void 0, _r16_t3 ? [ [ ".quote", r16_property ], r16_property ] : (r16_property = _r16_t0, 
+            r0_atom(r16_property) ? [ [ ".quote", r16_property ], r16_property ] : _r16_t0 instanceof Array && 3 === _r16_t0.length && "=" === _r16_t0[0] && _r16_t0[1] instanceof Array && 2 === _r16_t0[1].length && ".quote" === _r16_t0[1][0] ? (r16_property = _r16_t0[1][1], 
             r16_value = _r16_t0[2], [ [ ".quote", r16_property ], r16_value ]) : _r16_t0 instanceof Array && 2 === _r16_t0.length && _r16_t0[0] instanceof Array && 2 === _r16_t0[0].length && ".quote" === _r16_t0[0][0] ? (r16_property = _r16_t0[0][1], 
             r16_value = _r16_t0[1], [ [ ".quote", r16_property ], r16_value ]) : (_r16_t2 = !1, 
             _r16_t0 instanceof Array && 3 === _r16_t0.length && "=" === _r16_t0[0] && _r16_t0[1] instanceof Array && _r16_t0[1].length >= 1 ? (r16_method = _r16_t0[1][0], 
-            r16_param = _r16_t0[1].slice(1), r16_value = _r16_t0[2], _r16_t16 = _r16_t2 = r0_atom(r16_method) ? !0 : !1) : _r16_t16 = void 0, 
+            r16_param = _r16_t0[1].slice(1), r16_value = _r16_t0[2], _r16_t17 = _r16_t2 = r0_atom(r16_method) ? !0 : !1) : _r16_t17 = void 0, 
             _r16_t2 ? [ [ ".quote", r16_method ], [ ".lambda", r16_param, r16_value ] ] : (_r16_t1 = !1, 
             _r16_t0 instanceof Array && 2 === _r16_t0.length && _r16_t0[0] instanceof Array && _r16_t0[0].length >= 1 ? (r16_method = _r16_t0[0][0], 
-            r16_param = _r16_t0[0].slice(1), r16_value = _r16_t0[1], _r16_t18 = _r16_t1 = r0_atom(r16_method) ? !0 : !1) : _r16_t18 = void 0, 
-            _r16_t1 ? [ [ ".quote", r16_method ], [ ".lambda", r16_param, r16_value ] ] : void 0))));
+            r16_param = _r16_t0[0].slice(1), r16_value = _r16_t0[1], _r16_t19 = _r16_t1 = r0_atom(r16_method) ? !0 : !1) : _r16_t19 = void 0, 
+            _r16_t1 ? [ [ ".quote", r16_method ], [ ".lambda", r16_param, r16_value ] ] : void 0)))));
         }), r0_ex([ ".hash" ].concat(r15_pairs.filter(function(r17_x) {
             var r17_x;
             return r17_x;
