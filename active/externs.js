@@ -91,7 +91,7 @@ r0_wrapForSyntacticClosure = function(r4_fn) {
             _r16_t0 instanceof Array && 2 === _r16_t0.length && _r16_t0[0] instanceof Array && _r16_t0[0].length >= 1 ? (r16_method = _r16_t0[0][0], 
             r16_param = _r16_t0[0].slice(1), r16_value = _r16_t0[1], _r16_t19 = _r16_t1 = r0_atom(r16_method) ? !0 : !1) : _r16_t19 = void 0, 
             _r16_t1 ? [ [ ".quote", r16_method ], [ ".lambda", r16_param, r16_value ] ] : void 0)))));
-        }), r0_ex([ ".hash" ].concat(r15_pairs.filter(function(r17_x) {
+        }), r0_ex([ ".xhash" ].concat(r15_pairs.filter(function(r17_x) {
             var r17_x;
             return r17_x;
         })), r15_env);
@@ -116,9 +116,14 @@ r0_wrapForSyntacticClosure = function(r4_fn) {
             r19_j = 0; r19_j < r19_items.length; r19_j += 1) r19_assignments.push(r6_Assign(r19_items[r19_j], [ ".", r19_t, [ ".quote", r19_j ] ], r19_env, r19_locallyQ));
             return r19_assignments.push(r19_t), r19_assignments;
         }
-        if (_r19_t0 instanceof Array && _r19_t0.length >= 1 && ".hash" === _r19_t0[0]) {
+        if (_r19_t0 instanceof Array && _r19_t0.length >= 1 && ".xhash" === _r19_t0[0]) {
             for (r19_items = _r19_t0.slice(1), r19_t = r19_env.newt(), r19_assignments = [ ".begin", [ ".set", r19_t, r0_ex([ r19_mod, r19_right ], r19_env) ] ], 
             r19_j = 0; r19_j < r19_items.length; r19_j += 1) r19_assignments.push(r6_Assign(r19_items[r19_j][1], [ ".", r19_t, r19_items[r19_j][0] ], r19_env, r19_locallyQ));
+            return r19_assignments.push(r19_t), r19_assignments;
+        }
+        if (_r19_t0 instanceof Array && _r19_t0.length >= 1 && ".hash" === _r19_t0[0]) {
+            for (r19_items = _r19_t0.slice(1), r19_t = r19_env.newt(), r19_assignments = [ ".begin", [ ".set", r19_t, r0_ex([ r19_mod, r19_right ], r19_env) ] ], 
+            r19_j = 0; r19_j < r19_items.length; r19_j += 1) r19_assignments.push(r6_Assign(r19_items[r19_j][1], [ ".", r19_t, [ ".quote", r19_items[r19_j][0] ] ], r19_env, r19_locallyQ));
             return r19_assignments.push(r19_t), r19_assignments;
         }
         if (_r19_t0 instanceof Array && _r19_t0.length >= 1 && ".revcall" === _r19_t0[0]) return r19_whatever = _r19_t0.slice(1), 

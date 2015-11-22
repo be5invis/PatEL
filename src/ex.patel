@@ -53,7 +53,7 @@ define ex : NodeTranslation : lambda [form env] : match form
 	{".try" block {param} handler} : begin 
 		env.declare param
 		return {".try" [ex block env] {[env.use param]} [ex handler env]}
-	{".hash" :: args} : begin 
+	{".xhash" :: args} : begin 
 		# NOTE: PatEL's [.hash] differs from Patrisika's pure [.hash]
 		# It supports arbitary initializer
 		local a {}
@@ -68,6 +68,11 @@ define ex : NodeTranslation : lambda [form env] : match form
 		if allKeysAreQuotes 
 			then : return {".hash" :: [a.map [lambda [pair] {pair.(0).(1) pair.(1)}]]}
 			else : return : let [t [env.newt]] {".begin" {".set" t {".hash"}} :: [[a.map [lambda [pair] {".set" {"." t pair.(0)} pair.(1)}]].concat {t}]}
+	{".hash" :: args} : begin 
+		local a {}
+		for [local j 1] (j < form.length) [inc j] : begin 
+			a.push {form.(j).(0) [ex form.(j).(1) env]}
+		return {".hash" :: a}
 	{".local" x} : begin 
 		env.declare x
 		return [env.use x]

@@ -99,7 +99,7 @@ define [Create] : begin
 			`([@method @::param] = @value) [atom method] : return {{".quote" method} {".lambda" param value}}
 			`[[@method @::param] @value]   [atom method] : return {{".quote" method} {".lambda" param value}}
 			# TODO : Accessor initalizer
-		return : ex {".hash" :: [pairs.filter [lambda [x] x]]} env
+		return : ex {".xhash" :: [pairs.filter [lambda [x] x]]} env
 
 	externs.macros.put "piecewise" : lambda [form env] : match form 
 		{"piecewise" :: pairs} : begin 
@@ -121,12 +121,18 @@ define [Create] : begin
 				assignments.push : Assign items.(j) {"." t {".quote" j}} env locallyQ
 			assignments.push t
 			return assignments
-
-		{".hash" :: items} : begin 
+		{".xhash" :: items} : begin 
 			local t [env.newt]
 			local assignments {".begin" {".set" t [ex {mod right} env]}}
 			for [local j 0] (j < items.length) [inc j] 
 				assignments.push : Assign items.(j).(1) {"." t items.(j).(0)}  env locallyQ
+			assignments.push t
+			return assignments
+		{".hash" :: items} : begin 
+			local t [env.newt]
+			local assignments {".begin" {".set" t [ex {mod right} env]}}
+			for [local j 0] (j < items.length) [inc j] 
+				assignments.push : Assign items.(j).(1) {"." t {".quote" items.(j).(0)}}  env locallyQ
 			assignments.push t
 			return assignments
 		{".revcall" :: whatever} : AssignWithMod {:: whatever} right mod env locallyQ

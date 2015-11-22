@@ -93,9 +93,9 @@ operate
 
 struct
 	= begins:POS "{" __ "}" ends:POS                    	{ return BeginsEndsWith(['.list'], begins, ends) }
-	/ begins:POS "{" __ "." __ "}" ends:POS             	{ return BeginsEndsWith(['.hash'], begins, ends) }
+	/ begins:POS "{" __ "." __ "}" ends:POS             	{ return BeginsEndsWith(['.xhash'], begins, ends) }
 	/ begins:POS "{" __ it:cons __ "}" ends:POS         	{ return BeginsEndsWith(it, begins, ends) }
-	/ begins:POS "{" __ it:propertyPairs __ "}" ends:POS	{ return BeginsEndsWith(['.hash'].concat(it), begins, ends) }
+	/ begins:POS "{" __ it:propertyPairs __ "}" ends:POS	{ return BeginsEndsWith(['.xhash'].concat(it), begins, ends) }
 	
 parting
 	= begins:POS head:primitive rear:((qualifier POS)*) ends:POS {
