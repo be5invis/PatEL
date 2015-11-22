@@ -107,8 +107,13 @@ r0_wrapForSyntacticClosure = function(r4_fn) {
         }
         return void 0;
     }), r6_AssignWithMod = function(r19_left, r19_right, r19_mod, r19_env, r19_locallyQ) {
-        var r19_left, r19_right, r19_mod, r19_env, r19_locallyQ, r19_any, r19_callee, r19_paras, r19_whatever, r19_items, r19_t, r19_assignments, r19_j, r19_a, r19_id, _r19_t0;
+        var r19_left, r19_right, r19_mod, r19_env, r19_locallyQ, r19_any, r19_callee, r19_paras, r19_whatever, r19_items, r19_t, r19_assignments, r19_j, r19_a, r19_id, _r19_t0, _r19_t1, _r19_t2, _r19_t6, _r19_t8;
         if (_r19_t0 = r19_left, r19_id = _r19_t0, r0_atom(r19_id)) return r19_locallyQ ? [ ".set", r0_ex([ ".local", r19_id ], r19_env), r0_ex([ r19_mod, r19_right ], r19_env) ] : [ ".set", r0_ex(r19_left, r19_env), r0_ex([ r19_mod, r19_right ], r19_env) ];
+        if (_r19_t2 = !1, _r19_t0 instanceof Array && 2 === _r19_t0.length && ".id" === _r19_t0[0] ? (r19_id = _r19_t0[1], 
+        _r19_t6 = _r19_t2 = r0_atom(r19_id) ? !0 : !1) : _r19_t6 = void 0, _r19_t2) return r19_locallyQ ? [ ".set", r0_ex([ ".local", r19_id ], r19_env), r0_ex([ r19_mod, r19_right ], r19_env) ] : [ ".set", r0_ex(r19_left, r19_env), r0_ex([ r19_mod, r19_right ], r19_env) ];
+        if (_r19_t1 = !1, _r19_t0 instanceof Array && 3 === _r19_t0.length && ".id" === _r19_t0[0] ? (r19_id = _r19_t0[1], 
+        r19_env = _r19_t0[2], _r19_t8 = _r19_t1 = r0_atom(r19_id) ? !0 : !1) : _r19_t8 = void 0, 
+        _r19_t1) return r19_locallyQ ? [ ".set", r0_ex([ ".local", r19_id ], r19_env), r0_ex([ r19_mod, r19_right ], r19_env) ] : [ ".set", r0_ex(r19_left, r19_env), r0_ex([ r19_mod, r19_right ], r19_env) ];
         if (_r19_t0 instanceof Array && 2 === _r19_t0.length && ".local" === _r19_t0[0]) return r19_a = _r19_t0[1], 
         r6_AssignWithMod(r19_a, r19_right, r19_mod, r19_env, !0);
         if (_r19_t0 instanceof Array && _r19_t0.length >= 1 && ".list" === _r19_t0[0]) {

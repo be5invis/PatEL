@@ -113,6 +113,12 @@ define [Create] : begin
 		id [atom id] : piecewise 
 			locallyQ	{".set" [ex {".local" id} env] [ex {mod right} env]}
 			true    	{".set" [ex left env] [ex {mod right} env]}
+		{".id" id} [atom id] : piecewise 
+			locallyQ	{".set" [ex {".local" id} env] [ex {mod right} env]}
+			true    	{".set" [ex left env] [ex {mod right} env]}
+		{".id" id env} [atom id] : piecewise 
+			locallyQ	{".set" [ex {".local" id} env] [ex {mod right} env]}
+			true    	{".set" [ex left env] [ex {mod right} env]}
 		{".local" a} : AssignWithMod a right mod env true
 		{".list" :: items} : begin 
 			local t [env.newt]
