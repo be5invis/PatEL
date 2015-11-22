@@ -85,12 +85,20 @@ define [Create] : begin
 				args.push arg; paras.push [env.use arg]
 		ex {".beta" args form.((form.length - 1)) :: paras} env
 
-	externs.macros.put "object" : lambda [form env] : begin 
-		local pairs : [form.slice 1].map : lambda [pair] : match pair 
-			{property value :: useless}	: return {property [ex value env]}
-			{property value}           	: return {property [ex value env]}
-			{property} [atom property] 	: return {property [env.use property]}
-		return {".hash" :: pairs}
+	externs.macros.put "object" : lambda [form env] : begin
+		local pairs : [form.slice 1].map : lambda [pair] : match pair
+			# Property initalizer, identifier
+			`(@property = @value) [atom property]        : return {{".quote" property} value}
+			{property value}      [atom property]        : return {{".quote" property} value}
+			{property}            [atom property]        : return {{".quote" property} value}
+			# Property initalizer, string
+			`(@{".quote" property} = @value)             : return {{".quote" property} value} 
+			{{".quote" property} value}                  : return {{".quote" property} value}
+			# Method initalizer, identifier
+			`([@method @::param] = @value) [atom method] : return {{".quote" method} {".lambda" param value}}
+			`[[@method @::param] @value]   [atom method] : return {{".quote" method} {".lambda" param value}}
+			# TODO : Accessor initalizer
+		return : ex {".hash" :: [pairs.filter [lambda [x] x]]} env
 
 	externs.macros.put "piecewise" : lambda [form env] : match form 
 		{"piecewise" :: pairs} : begin 

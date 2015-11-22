@@ -54,6 +54,8 @@ define ex : NodeTranslation : lambda [form env] : match form
 		env.declare param
 		return {".try" [ex block env] {[env.use param]} [ex handler env]}
 	{".hash" :: args} : begin 
+		# NOTE: PatEL's [.hash] differs from Patrisika's pure [.hash]
+		# It supports arbitary initializer
 		local a {}
 		local allKeysAreQuotes true
 		for [local j 1] (j < form.length) [inc j] : begin 
