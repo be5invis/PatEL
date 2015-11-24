@@ -7,7 +7,7 @@ var yargs = require('yargs')
 	.alias('o', 'output-into')
 	.alias('?', 'help')
 	.alias('l', 'line')
-	.boolean(['use-dev', 'dump-ast', 'dump-expanded', 'dump-regularized', 'dump-transformed', 'strict', 'mangle'])
+	.boolean(['use-dev', 'dump-ast', 'dump-expanded', 'dump-regularized', 'dump-transformed', 'strict', 'optimize', 'mangle', 'ugly'])
 	.describe('?', 'Displays this help.')
 	.describe('l', 'Compile one-line script.')
 	.describe('o', 'Output sfd path. When absent, the result sfd is written to STDOUT.');
@@ -130,7 +130,21 @@ instream.on('end', function(){
 		}
 		if(argv['dump-transformed']) { dump(tast); return }
 		if(argv.optimize) tast = esmangle.optimize(tast);
-		var result = patel.generateCode(tast, {sourceMap: argv._[0] || '(stdin)', sourceMapWithCode: true})
+		if(argv.mangle) tast = esmangle.mangle(tast);
+		
+		var options = {sourceMap: argv._[0] || '(stdin)', sourceMapWithCode: true};
+		if(argv.ugly) {
+			options.format = {
+				renumber: true,
+				hexadecimal: true,
+				escapeless: false,
+				compact: true,
+				semicolons: false,
+				parentheses: false
+			}
+		}
+		var result = patel.generateCode(tast, options)
+		
 		if(argv.source_map) {
 			outstream.write(result.map.toString() + '\n');
 		} else {
