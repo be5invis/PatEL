@@ -1,6 +1,5 @@
 var patrisika = require('patrisika');
 var escodegen = require('escodegen');
-
 var parserLib = require('./active/syntax.js');
 var exLib = require('./active/ex');
 var externsLib = require('./active/externs');
