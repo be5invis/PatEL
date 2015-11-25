@@ -126,10 +126,13 @@ define [Create] : begin
 		{".id" id} [atom id] : piecewise 
 			locallyQ	{".set" [ex {".local" id} env] [ex {mod right} env]}
 			true    	{".set" [ex left env] [ex {mod right} env]}
-		{".id" id env} [atom id] : piecewise 
-			locallyQ	{".set" [ex {".local" id} env] [ex {mod right} env]}
-			true    	{".set" [ex left env] [ex {mod right} env]}
+		{".id" id e} ([atom id] && (e == env || !locallyQ)) : piecewise 
+			locallyQ	{".set" [ex {".local" id} e] [ex {mod right} e]}
+			true    	{".set" [ex left e] [ex {mod right} e]}
+		{".id" id e} ([atom id] && e != env && locallyQ) : throw [new FormInvalidError left "Attempt to redefine non-local subform"]
 		{".local" a} : AssignWithMod a right mod env true
+		{".syntactic-closure" a e} (e == env || !locallyQ) : AssignWithMod a right mod env locallyQ
+		{".syntactic-closure" a e} (e != env && locallyQ) : throw [new FormInvalidError left "Attempt to redefine non-local subform"]
 		{".revcall" :: whatever} : AssignWithMod {:: whatever} right mod env locallyQ
 		{callee :: paras} : piecewise 
 			([atom callee] && [env.macros.has callee] && [env.macros.get callee].toPattern) : begin
@@ -287,7 +290,20 @@ define [Create] : begin
 	externs.macros.put ".quasiquote" {.}
 	set [[externs.macros.get ".quasiquote"].toPattern pattern env wrapper] : match pattern
 		{".quasiquote" :: subpatterns} : toPattern [deQuasiquote pattern.(1) 0] env wrapper
-		
+	externs.macros.put "&&" {.}
+	set [[externs.macros.get "&&"].toPattern pattern env wrapper] : match pattern
+		{"&&" :: subpatterns} : begin 
+			local ms : subpatterns.map : [x] -> [toPattern x env wrapper]
+			return : object 
+				whether : lambda [x] [{"&&" :: [ms.map : lambda [p j] : p.whether x]}.filter boole]
+				assign : lambda [x locallyQ] {".begin" :: [ms.map [lambda [p j] : p.assign x locallyQ] :.concat {x}] }
+	externs.macros.put "||" {.}
+	set [[externs.macros.get "||"].toPattern pattern env wrapper] : match pattern
+		{"||" :: subpatterns} : begin 
+			local ms : subpatterns.map : [x] -> [toPattern x env wrapper]
+			return : object 
+				whether : lambda [x] [{"||" :: [ms.map : lambda [p j] : p.whether x]}.filter boole]
+				assign : lambda [x locallyQ] {".unit"}
 
 	define [boole x] [not [not x]]
 	externs.macros.put "match" : lambda [form env wrapper] : begin 
