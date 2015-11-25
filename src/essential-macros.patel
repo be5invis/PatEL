@@ -1,5 +1,7 @@
 define-macro syntax-rules : lambda [form env] : macro-match form env 
-	`[syntax-rules @::patterns] {'.syntactic-closure' `[lambda [form env] [macro-match form env @::[patterns.map formOf]]] env}
+	`[syntax-rules @::patterns] {'.syntactic-closure' `[lambda [form env] [begin
+		[local [dirty s] {'.syntactic-closure' s env}] 
+		[macro-match form env @::[patterns.map formOf]]]] env}
 define-macro its : syntax-rules 
 	`[its @property] : return `[let [t @property] [lambda [x] x.(t)]]
 define-macro call-its : syntax-rules 
@@ -88,3 +90,7 @@ define-macro foreach : syntax-rules
 				begin @{'.syntactic-closure' `[local @[formOf varid] @t.value] env}
 				begin @body
 		]
+define-macro extern : syntax-rules
+	`[extern @_id] [atom _id] : let [id : formOf _id] : begin
+		externEnv.declare id
+		return : dirty `[local @id @[externEnv.use id]]

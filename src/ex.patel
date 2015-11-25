@@ -73,16 +73,22 @@ define ex : NodeTranslation : lambda [form env] : match form
 		for [local j 1] (j < form.length) [inc j] : begin 
 			a.push {form.(j).(0) [ex form.(j).(1) env]}
 		return {".hash" :: a}
+	{".conslist" :: items} : begin
+		return {
+			{"." [ex {".list" :: [form.slice 1 (-1)]} env] {".quote" "concat"}}
+			[ex form.((form.length - 1)) env]
+		}
+
 	{".local" x} : begin 
 		env.declare x
 		return [env.use x]
 	{".revcall" callee arg0 :: args1} : begin 
-		if [and [atom callee] [env.macros.has callee]] : begin 
+		if ([atom callee] && [env.macros.has callee] && [env.macros.get callee] <@ Function) : begin 
 			return [[env.macros.get callee] [form.slice 1] env]
 		local t : env.newt
 		return {'.begin' {'.set' t [ex arg0 env]} [ex {callee t :: args1} env]}
 	{callee :: args} : begin 
-		if [and [atom callee] [env.macros.has callee]] : begin 
+		if ([atom callee] && [env.macros.has callee] && [env.macros.get callee] <@ Function) : begin 
 			return [[env.macros.get callee] form env]
 		if [not [prim callee]] : set callee [ex callee env]
 		local a {callee}
