@@ -121,4 +121,6 @@ define-macro export : syntax-rules
 		set @[externEnv.use 'module'].exports @content
 		foreach [s : items-of : Object.keys xs] : set @[externEnv.use 'module'].exports.(s) xs.(s)
 	]
+	`[export @content as @slot] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @content]
+	`[export as @slot @content] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @content]
 	`[export @slot] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @slot]
