@@ -104,23 +104,23 @@ define-macro export : syntax-rules
 	# Declaration exports, variable and function
 	`[export : @(`define||`local) @slot @val] [atom slot] `[set
 		@[externEnv.use 'exports'].(@{".quote" [formOf slot]})
-		@[dirty `[local @slot @val]]]
-	`[export : @(`define||`local) [@slot @::pars] @val] [atom slot] `[set
+		@[dirty `[local @[formOf slot] @[formOf val]]]]
+	`[export : @(`define||`local) [@slot @::pars] @body] [atom slot] `[set
 		@[externEnv.use 'exports'].(@{".quote" [formOf slot]})
-		@[dirty `[local [@[formOf slot] @::[pars.map formOf]] @val]]]
+		@[dirty `[local [@[formOf slot] @::[pars.map formOf]] @[formOf body]]]]
 	`[export : @(`define||`local) @modifer @slot @val] [atom slot] `[set
 		@[externEnv.use 'exports'].(@{".quote" [formOf slot]})
-		@[dirty `[local @slot @val]]]
-	`[export : @(`define||`local) @modifer [@slot @::pars] @val] [atom slot] `[set
+		@[dirty `[local @[formOf slot] @[formOf val]]]]
+	`[export : @(`define||`local) @modifer [@slot @::pars] @body] [atom slot] `[set
 		@[externEnv.use 'exports'].(@{".quote" [formOf slot]})
-		@[dirty `[local @modifer [@[formOf slot] @::[pars.map formOf]] @val]]]
+		@[dirty `[local @modifer [@[formOf slot] @::[pars.map formOf]] @[formOf body]]]]
 	
 	# Direct exports
 	`[export default @content] `[begin \\
 		local xs @[externEnv.use 'module'].exports
-		set @[externEnv.use 'module'].exports @content
+		set @[externEnv.use 'module'].exports @[dirty : formOf content]
 		foreach [s : items-of : Object.keys xs] : set @[externEnv.use 'module'].exports.(s) xs.(s)
 	]
-	`[export @content as @slot] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @content]
-	`[export as @slot @content] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @content]
+	`[export @content as @slot] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @[dirty : formOf content]]
+	`[export as @slot @content] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @[dirty : formOf content]]
 	`[export @slot] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @slot]
