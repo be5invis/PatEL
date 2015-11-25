@@ -204,7 +204,7 @@ r0_wrapForSyntacticClosure = function(r4_fn) {
     }, r6_externs.macros.put("match", function(r30_form, r30_env, r30_wrapper) {
         var r30_form, r30_env, r30_wrapper, r30_pairs, r30_t, r30_matchQ, r30_f, r30_j, r30_any, r30_pattern, r30_guard, r30_body, r30_pat, r30_cond, r30_tc, _r30_t0;
         for (r30_pairs = r30_form.slice(2), r30_t = r30_env.newt(), r30_matchQ = function(r31_pattern) {
-            var r31_pattern, r31_callee, r31_subpatterns, r31_ms, r31_t, r31_final, r31_whatever, r31_x, r31_id, r31_otherwise, r31_left, _r31_t0;
+            var r31_pattern, r31_callee, r31_subpatterns, r31_ms, r31_t, r31_final, r31_whatever, r31_x, r31_id, r31_left, _r31_t0;
             if (_r31_t0 = r31_pattern, r31_id = _r31_t0, r0_atom(r31_id)) return {
                 whether: function() {
                     return null;
@@ -324,8 +324,7 @@ r0_wrapForSyntacticClosure = function(r4_fn) {
             if (_r31_t0 instanceof Array && _r31_t0.length >= 1) {
                 if (r31_callee = _r31_t0[0], r31_subpatterns = _r31_t0.slice(1), r0_atom(r31_callee) && r30_env.macros.has(r31_callee) && r30_env.macros.get(r31_callee).asPattern) return r30_matchQ(r30_env.macros.get(r31_callee).asPattern(r31_pattern, r30_env));
                 if (r0_atom(r31_callee) && r30_env.macros.has(r31_callee)) throw new r0_FormInvalidError(r31_left, "Invalid Pattern");
-                return r31_otherwise ? (r31_ms = r31_subpatterns.map(r30_matchQ), r31_t = r30_env.newt(), 
-                {
+                return r31_ms = r31_subpatterns.map(r30_matchQ), r31_t = r30_env.newt(), {
                     whether: function(r32_x) {
                         var r32_x;
                         return [ "&&", [ ".set", r31_t, [ [ ".", r0_ex(r31_callee, r30_env), [ ".quote", "unapply" ] ], r32_x, [ ".quote", r31_ms.length ] ] ] ].concat(r31_ms.map(function(r33_p, r33_j) {
@@ -340,7 +339,7 @@ r0_wrapForSyntacticClosure = function(r4_fn) {
                             return r35_p.assign([ ".", r31_t, [ ".quote", r35_j ] ], r34_flag);
                         }));
                     }
-                }) : void 0;
+                };
             }
             return void 0;
         }, r30_f = [ ".unit" ], r30_j = r30_pairs.length - 1; r30_j >= 0; r30_j -= 1) _r30_t0 = r30_pairs[r30_j], 
