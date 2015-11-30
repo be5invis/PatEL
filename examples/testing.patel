@@ -5,7 +5,7 @@ define-macro describe : syntax-rules
 		local passes 0
 		define-macro the : syntax-rules
 			`[the @lhs should be @rhs] : begin
-				local testName : list ".quote" : if form.within [form.within.input.slice form.begins form.ends] 'test #?'
+				local testName : if form.within {".quote" [form.within.input.slice form.begins form.ends]} `"(Test \(count))"
 				return `[begin \\
 					inc count
 					try : begin
