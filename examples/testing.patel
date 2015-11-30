@@ -1,0 +1,30 @@
+# Macro for tests.
+define-macro describe : syntax-rules
+	`[describe @name @::rules] : dirty `[[lambda [begin \\
+		local count 0
+		local passes 0
+		define-macro the : syntax-rules
+			`[the @lhs should be @rhs] : begin
+				local testName : list ".quote" : if form.within [form.within.input.slice form.begins form.ends] 'test #?'
+				return `[begin \\
+					inc count
+					try : begin
+						local l @lhs
+						local r @rhs
+						if (l === r) : then
+							console.log "[\(count)] \(@testName) : SUCCESS"
+							inc passes
+						: else : console.log "[\(count)] \(@testName) : FAIL"
+					: ex
+					: begin
+						console.log "[\(count)] \(@testName) : FAIL"
+				]
+		console.log "Testing \(@name)"
+		begin @::[rules.map formOf]
+		console.log "Test \(@name) : \(count) tested, \(passes) passed."
+	]]]
+
+
+describe 'sum'
+	the (1 + 1) should be 2
+	the (0 + 0) should be 0
