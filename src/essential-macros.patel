@@ -97,6 +97,7 @@ define-macro extern : syntax-rules
 		return : dirty `[local @id @[externEnv.use id]]
 define-macro import : syntax-rules
 	`[import @module as @name] : dirty `[local @[formOf name] [@[externEnv.use 'require'] @module]]
+	`[import @slot from @module] [atom slot] : dirty `[local @[formOf slot] [@[externEnv.use 'require'] @module].default]
 	`[import @patterns from @module] : dirty `[local [object @::[formOf patterns]] [@[externEnv.use 'require'] @module]]
 	`[import @module] : dirty `[@[externEnv.use 'require'] @module]
 
@@ -116,7 +117,7 @@ define-macro export : syntax-rules
 		@[dirty `[local @modifer [@[formOf slot] @::[pars.map formOf]] @[formOf body]]]]
 	
 	# Direct exports
-	`[export default @content] `[begin \\
+	`[export all @content] `[begin \\
 		local xs @[externEnv.use 'module'].exports
 		set @[externEnv.use 'module'].exports @[dirty : formOf content]
 		foreach [s : items-of : Object.keys xs] : set @[externEnv.use 'module'].exports.(s) xs.(s)
