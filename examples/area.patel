@@ -1,0 +1,30 @@
+### In this program we will calculate pi using
+### the area the code occupies.
+### Run : patel-c area.patel | node
+local rows 0
+local area 0
+define-macro x : syntax-rules
+	`[x @::xs] `[lambda [] : begin \\
+		set rows : rows + 1
+		set area : area + @{'.quote' (xs.length + 1)}
+	]
+
+
+[             x x x x             ]
+[        x x x x x x x x x        ]
+[     x x x x x x x x x x x x     ]
+[   x x x x x x x x x x x x x x   ]
+[  x x x x x x x x x x x x x x x  ]
+[  x x x x x x x x x x x x x x x  ]
+[ x x x x x x x x x x x x x x x x ]
+[ x x x x x x x x x x x x x x x x ]
+[ x x x x x x x x x x x x x x x x ]
+[ x x x x x x x x x x x x x x x x ]
+[  x x x x x x x x x x x x x x x  ]
+[  x x x x x x x x x x x x x x x  ]
+[   x x x x x x x x x x x x x x   ]
+[     x x x x x x x x x x x x     ]
+[         x x x x x x x x         ]
+[             x x x x             ]
+
+console.log "π = \(area / ((rows / 2) * (rows / 2)))"
