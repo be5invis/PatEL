@@ -229,8 +229,8 @@ define [Create] : begin
 			return : object 
 				whether : lambda [x] [
 					{"&&" 
-						{".is" x [externs.use "Array"]} 
-						{"===" {"." x {".quote" "length"}} {".quote" ms.length}} 
+						{{"." [externs.use "Array"] {".quote" "isArray"}} x}
+						{"===" {"." x {".quote" "length"}} {".quote" ms.length}}
 						:: [ms.map [lambda [p j] 
 								[p.whether {"." x {".quote" j}}]]]
 						}.filter boole]
@@ -244,16 +244,16 @@ define [Create] : begin
 			return : object 
 				whether : lambda [x] [
 					{"&&" 
-						{".is" x [externs.use "Array"]} 
-						{">=" {"." x {".quote" "length"}} {".quote" ms.length}} 
+						{{"." [externs.use "Array"] {".quote" "isArray"}} x}
+						{">=" {"." x {".quote" "length"}} {".quote" ms.length}}
 						:: [
 							[ms.map [lambda [p j] 
 									[p.whether {"." x {".quote" j}}]]].concat
 							[list [final.whether {{"." x {".quote" "slice"}} {".quote" ms.length}}]]]
 						}.filter boole]
 				assign : lambda [x locallyQ] [{".begin"
-						:: [ms.map [lambda [p j] 
-								[p.assign {"." x {".quote" j}} locallyQ]]] 
+						:: [ms.map [lambda [p j]
+								[p.assign {"." x {".quote" j}} locallyQ]]]
 						}.concat [list [final.assign
 							[if (wrapper)
 								{{"." {{"." x {".quote" "slice"}} {".quote" ms.length}} {".quote" "map"}} wrapper}
