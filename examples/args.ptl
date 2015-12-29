@@ -1,0 +1,43 @@
+define [Pair l r] : begin
+	set this.left l
+	set this.right r
+	return this
+
+define-macro "--" : syntax-rules
+	`(@l -- @r) [atom l] `[new Pair @{".quote" [formOf l]} @r]
+
+define-macro autoarg : syntax-rules
+	`[autoarg @::pairs] : begin
+		local ps `[begin]
+		local aps `[begin]
+		local t : env.newt
+		foreach [p pairs] : begin
+			local pf : formOf p
+			local name
+			if [atom pf] : then
+				ps.push `[local @pf nothing]
+				set name pf
+			: else
+				ps.push `[local @(pf.0) @(pf.1)]
+				set name pf.0
+			aps.push `[if (@t && @t <@ Pair && @t.left == @{".quote" name}) [set @name @t.right]]
+		ps.push `[foreach [@t : items-of : {}.slice.call arguments 0] @aps]
+		return : dirty ps
+
+define [fn a b c d] : begin
+	autoarg
+		a 1
+		b 2
+		c 3
+		d 4
+	console.log a b c d
+
+fn
+	a -- 1
+	b -- 2
+	c -- 3
+	d -- 4
+fn 1 2 3 4
+fn 1 2
+	c -- 3
+	d -- 4
