@@ -3,33 +3,34 @@ define [Pair l r] : begin
 	set this.right r
 	return this
 
+define [fallback] : begin
+	for [local j 0] (j < arguments.length) [inc j] : if (arguments.(j) !== nothing) : return arguments.(j)
+	return nothing
+
 define-macro "--" : syntax-rules
 	`(@l -- @r) [atom l] `[new Pair @{".quote" [formOf l]} @r]
 
-define-macro autoarg : syntax-rules
-	`[autoarg @::pairs] : begin
-		local ps `[begin]
-		local aps `[begin]
+define-macro autoargs : syntax-rules
+	`[autoargs @::pairs] : begin
+		local ta : env.newt
 		local t : env.newt
+		local ps `[begin [local @ta : {}.slice.call arguments 0]]
+		local aps `[begin]
 		foreach [p pairs] : begin
 			local pf : formOf p
 			local name
 			if [atom pf] : then
-				ps.push `[local @pf nothing]
+				ps.push `[local @pf : fallback @pf nothing]
 				set name pf
 			: else
-				ps.push `[local @(pf.0) @(pf.1)]
+				ps.push `[local @(pf.0) : fallback @(pf.0) @(pf.1)]
 				set name pf.0
 			aps.push `[if (@t && @t <@ Pair && @t.left == @{".quote" name}) [set @name @t.right]]
-		ps.push `[foreach [@t : items-of : {}.slice.call arguments 0] @aps]
+		ps.push `[foreach [@t : items-of @ta] @aps]
 		return : dirty ps
 
 define [fn a b c d] : begin
-	autoarg
-		a 1
-		b 2
-		c 3
-		d 4
+	autoargs a b c d
 	console.log a b c d
 
 fn
