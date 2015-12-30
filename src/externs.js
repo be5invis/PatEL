@@ -1310,7 +1310,7 @@ r0_Create = function _r0_t4() {
         ].concat(r82_args)) : void 0;
     });
     r6_externs.macros.put('define-macro', function _r6_t30(r83_form, r83_env) {
-        var r83_form, r83_env, r83_otherwise, r83_op, r83_name, r83_body, r83_ds, r83_macroG, r83_macroFn, r83_str, _r83_t0, _r83_t1, _r83_t2, _r83_t3, _r83_t4, _r83_t5, _r83_t6, _r83_t7, _r83_t8, _r83_t9, _r83_t10;
+        var r83_form, r83_env, r83_otherwise, r83_op, r83_name, r83_body, r83_coinit, r83_ds, r83_macroG, r83_macroFn, r83_str, _r83_t0, _r83_t1, _r83_t2, _r83_t3, _r83_t4, _r83_t5, _r83_t6, _r83_t7, _r83_t8, _r83_t9, _r83_t10, _r83_t11;
         _r83_t0 = r83_form;
         if (Array.isArray(_r83_t0) && _r83_t0.length === 3 && (Array.isArray(_r83_t0[1]) && _r83_t0[1].length === 2 && '.quote' === _r83_t0[1][0]))
             return r83_op = _r83_t0[0], r83_str = _r83_t0[1][1], _r83_t0[1], r83_body = _r83_t0[2], r0_ex([
@@ -1325,6 +1325,10 @@ r0_Create = function _r0_t4() {
             else
                 _r83_t5 = void 0;
             if (_r83_t1) {
+                r83_coinit = {
+                    'injectForm': void 0,
+                    'initFn': void 0
+                };
                 r83_ds = new r0_Scope(r83_env);
                 r83_ds.declare('ex', true);
                 r83_ds.declare('atom', true);
@@ -1335,7 +1339,8 @@ r0_Create = function _r0_t4() {
                 r83_ds.declare('externEnv', true);
                 r83_ds.declare('require', true);
                 r83_ds.declare('toPattern', true);
-                r83_macroG = new Function(r83_ds.castName('ex'), r83_ds.castName('atom'), r83_ds.castName('prim'), r83_ds.castName('formOf'), r83_ds.castName('scopeOf'), r83_ds.castName('definingEnv'), r83_ds.castName('externEnv'), r83_ds.castName('require'), r83_ds.castName('toPattern'), r0_escodegen.generate(r0_patrisika.generate([
+                r83_ds.declare('coinit', true);
+                r83_macroG = new Function(r83_ds.castName('ex'), r83_ds.castName('atom'), r83_ds.castName('prim'), r83_ds.castName('formOf'), r83_ds.castName('scopeOf'), r83_ds.castName('definingEnv'), r83_ds.castName('externEnv'), r83_ds.castName('require'), r83_ds.castName('toPattern'), r83_ds.castName('coinit'), r0_escodegen.generate(r0_patrisika.generate([
                     '.return',
                     r0_ex(r83_body, r83_ds)
                 ], r83_ds, function _r83_t7(r84_form) {
@@ -1351,7 +1356,7 @@ r0_Create = function _r0_t4() {
                 }, function _r83_t9(r86_x) {
                     var r86_x, _r86_t0, _r86_t1;
                     return r86_x[2];
-                }, r83_env, r6_externs, require, r6_toPattern);
+                }, r83_env, r6_externs, require, r6_toPattern, r83_coinit);
                 r83_env.macros.put(r83_name, function _r83_t10(r87_c, r87_e) {
                     var r87_c, r87_e, r87_result, r87_s, _r87_t0, _r87_t1;
                     r87_result = r83_macroFn(r87_c, r87_e);
@@ -1360,7 +1365,11 @@ r0_Create = function _r0_t4() {
                     r87_s.semiparent = r87_e;
                     return r0_ex(r87_result, r87_s);
                 });
-                return ['.unit'];
+                if (r83_coinit.initFn)
+                    _r83_t11 = r83_coinit.initFn(r83_env.macros.get(r83_name));
+                else
+                    _r83_t11 = void 0;
+                return r83_coinit.injectForm ? r0_ex(r83_coinit.injectForm, r83_env) : ['.unit'];
             } else
                 return r83_otherwise = _r83_t0, ['.unit'];
         }

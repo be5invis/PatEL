@@ -345,7 +345,11 @@ define [Create] : begin
 
 	externs.macros.put "define-macro" : lambda [form env] : match form 
 		{op {".quote" str} body} : ex {op str body} env
-		{op name body} [atom name] : begin 
+		{op name body} [atom name] : begin
+			local coinit {
+				.injectForm nothing
+				.initFn nothing
+			} 
 			local ds [new Scope env]
 			ds.declare "ex" true
 			ds.declare "atom" true
@@ -356,6 +360,7 @@ define [Create] : begin
 			ds.declare "externEnv" true
 			ds.declare "require" true
 			ds.declare "toPattern" true
+			ds.declare "coinit" true
 			local macroG : new Function 
 				ds.castName 'ex'
 				ds.castName 'atom'
@@ -366,15 +371,17 @@ define [Create] : begin
 				ds.castName 'externEnv'
 				ds.castName 'require'
 				ds.castName 'toPattern'
+				ds.castName 'coinit'
 				escodegen.generate : patrisika.generate {".return" [ex body ds]} ds [lambda [form] {".return" form}]
-			local macroFn [macroG ex [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim] [lambda [x] x.(1)] [lambda [x] x.(2)] env externs require toPattern]
+			local macroFn [macroG ex [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim] [lambda [x] x.(1)] [lambda [x] x.(2)] env externs require toPattern coinit]
 			env.macros.put name : lambda [c e] : begin 
 				local result [macroFn c e]
 				local s [new Scope env]
 				set s.hanging e
 				set s.semiparent e
 				return [ex result s]
-			return {".unit"}
+			if coinit.initFn : coinit.initFn [env.macros.get name]
+			return : if coinit.injectForm [ex coinit.injectForm env] {".unit"}
 		otherwise {".unit"}
 
 	externs.macros.put "macro-match" : lambda [form env] : match form 

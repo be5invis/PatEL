@@ -1,0 +1,22 @@
+define-macro "<>" : begin
+	local tClass [definingEnv.newt 'class']
+	local m : syntax-rules
+		`(@x <> @y) `[new @tClass @x @y]
+		
+	set coinit.initFn : lambda [m] : begin
+		set m.toPattern : syntax-rules
+			`(@x <> @y) : begin
+				local p1 [toPattern [formOf x] env arguments.2]
+				local p2 [toPattern [formOf y] env arguments.2]
+				object
+					whether : lambda [t] `(@t && @[p1.whether `(@t.x)] && @[p2.whether `(@t.y)])
+					assign : lambda [t locallyQ] `[begin @[p1.assign `(@t.x) locallyQ] @[p2.assign `(@t.y) locallyQ]]
+	set coinit.injectForm `[define [@tClass x y] : begin \\
+		set this.x x
+		set this.y y
+		return nothing
+	]
+	return m
+
+console.log : 1 <> 2
+set (x <> y) (1 <> 2)
