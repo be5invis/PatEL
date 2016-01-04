@@ -1,0 +1,17 @@
+# Emulate JSX using unquotes
+define-macro dom : begin
+	define [travel node] : match node
+		{".unquote" e} e
+		{".quote" e} node
+		`[@tagname @::contents] [atom tagname] : begin
+			local tag {".quote" tagname}
+			local properties {".hash"}
+			local subtags {".list"}
+			foreach [e contents] : match e
+				`[@property = @value] [atom property] : properties.push {property [travel value]}
+				otherwise : subtags.push [travel e]
+			return {".new" "element" tag properties subtags}
+	return : syntax-rules
+		`[dom @_cstr] : dirty : travel : formOf _cstr
+
+render : dom : div (class = "button") @[list.foreach : [x] -> [dom : span (class = "button-text") @x]]
