@@ -1,16 +1,19 @@
-define-macro "<>" : begin
+define-operator "<>" 800 'never' : begin
 	local tClass [definingEnv.newt 'class']
 	local m : syntax-rules
 		`(@x <> @y) `[new @tClass @x @y]
 		
 	set coinit.initFn : lambda [m] : begin
-		set m.toPattern : syntax-rules
+		set m.toPattern : lambda [form env wrapper] : match form
 			`(@x <> @y) : begin
-				local p1 [toPattern [formOf x] env arguments.2]
-				local p2 [toPattern [formOf y] env arguments.2]
+				local p1 [toPattern x env wrapper]
+				local p2 [toPattern y env wrapper]
 				object
 					whether : lambda [t] `(@t && @[p1.whether `(@t.x)] && @[p2.whether `(@t.y)])
-					assign : lambda [t locallyQ] `[begin @[p1.assign `(@t.x) locallyQ] @[p2.assign `(@t.y) locallyQ]]
+					assign : lambda [t locallyQ] : ex `[begin 
+						@{".preserve" [p1.assign `(@t.x) locallyQ]}
+						@{".preserve" [p2.assign `(@t.y) locallyQ]}
+					] env
 	set coinit.injectForm `[define [@tClass x y] : begin \\
 		set this.x x
 		set this.y y
@@ -18,5 +21,6 @@ define-macro "<>" : begin
 	]
 	return m
 
+# console.log : 1 <> 2 <> 3 # ERROR!
 console.log : 1 <> 2
 set (x <> y) (1 <> 2)

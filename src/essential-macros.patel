@@ -181,3 +181,27 @@ define-macro export : syntax-rules
 	`[export @content as @slot] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @[dirty : formOf content]]
 	`[export as @slot @content] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @[dirty : formOf content]]
 	`[export @slot] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @slot]
+
+define-macro set-operator-info : syntax-rules
+	`[set-operator-info @{".quote" operator} @{".quote" priority} @{".quote" associvity}] : begin
+		env.operatorInfo.put [formOf operator] {
+			.priority [formOf priority]
+			.associvity [formOf associvity]
+		}
+		return nothing
+	`[set-operator-info @{".quote" operator} @{".quote" priority}] : begin
+		env.operatorInfo.put [formOf operator] {
+			.priority [formOf priority]
+			.associvity "left"
+		}
+		return nothing
+
+define-macro define-operator : syntax-rules
+	`[define-operator @{".quote" operator} @{".quote" priority} @{".quote" associvity} @body] : dirty `[begin \\
+		set-operator-info @{".quote" [formOf operator]} @{".quote" [formOf priority]} @{".quote" [formOf associvity]}
+		define-macro @{".quote" [formOf operator]} @[formOf body]
+	]
+	`[define-operator @{".quote" operator} @{".quote" priority} @body] : dirty `[begin \\
+		set-operator-info @{".quote" [formOf operator]} @{".quote" [formOf priority]}
+		define-macro @{".quote" [formOf operator]} @[formOf body]
+	]

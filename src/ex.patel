@@ -32,7 +32,7 @@ define ASSOC_LEFT  'left'
 define ASSOC_NEVER 'never'
 define ASSOC_RIGHT 'right'
 define [getOperatorInfo operator env] : begin
-	if ([env.macros.has operator] && [env.macros.get operator].opInfo) : return [env.macros.get operator].opInfo
+	if [env.operatorInfo.has operator] : return [env.operatorInfo.get operator]
 	# Automatic decide operator priority
 	while (operator.0 === '<' && operator.(operator.length - 1) === ">") : set operator [operator.slice 1 (-1)]
 	local priority 1000
@@ -79,13 +79,15 @@ define [opSegToRegular items env] : begin
 		: (assoc === ASSOC_LEFT || assoc === ASSOC_NEVER) : begin
 			while (n.2.bp > nbp) : set n n.2
 			if (assoc === ASSOC_NEVER && n.2.bp === nbp) : begin
-				throw : new FormInvalidError form "Attempting to combine uncombinable operator \(operator)"
+				throw : new FormInvalidError operand "Attempting to combine uncombinable operator \(operator)."
 			set node.1 n.2
 			set n.2 node
 		: (assoc === ASSOC_RIGHT) : begin
 			while (n.2.bp >= nbp) : set n n.2
 			set node.1 n.2
 			set n.2 node
+		: true : begin
+			throw : new FormInvalidError operand "Invalid associvity denotion '\(assoc)' for \(operator)."
 	return uber.2
 
 # Function [ex form env]: Expand macros and do scoping

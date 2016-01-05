@@ -47,7 +47,13 @@ r1_patrisika = require('patrisika'), r1_atom = function _r1_t0(r61_x) {
             [],
             ['.unit']
         ], r71_body)) : (r71_otherwise = _r71_t0, r66_reportInvalid(r71_otherwise, 'Invalid Lambda Formation'));
-    }), r66_externs.macros.put('function', r66_externs.macros.get('lambda')), r66_externs.macros.put('->', r66_externs.macros.get('lambda')), r66_externs.macros.put('=>', r66_externs.macros.get('lambda')), r66_externs.macros.put('if', function _r66_t6(r72_form, r72_env) {
+    }), r66_externs.macros.put('function', r66_externs.macros.get('lambda')), r66_externs.macros.put('->', r66_externs.macros.get('lambda')), r66_externs.macros.put('=>', r66_externs.macros.get('lambda')), r66_externs.operatorInfo.put('->', {
+        'priority': 900,
+        'associvity': 'right'
+    }), r66_externs.operatorInfo.put('=>', {
+        'priority': 950,
+        'associvity': 'right'
+    }), r66_externs.macros.put('if', function _r66_t6(r72_form, r72_env) {
         var r72_form, r72_env, r72_otherwise, r72_test, r72_consequents, r72_alternates, r72_consequent, r72_alternate, _r72_t0;
         return _r72_t0 = r72_form, Array.isArray(_r72_t0) && _r72_t0.length === 3 && 'if' === _r72_t0[0] ? (r72_test = _r72_t0[1], r72_consequent = _r72_t0[2], r1_ex([
             '.if',
@@ -81,7 +87,7 @@ r1_patrisika = require('patrisika'), r1_atom = function _r1_t0(r61_x) {
         var r74_form, r74_env, r74_pairs;
         return r74_pairs = r74_form.slice(1).map(function _r74_t2(r75_pair) {
             var r75_pair, r75_method, r75_param, r75_value, r75_property, _r75_t0, _r75_t1, _r75_t2, _r75_t3, _r75_t4, _r75_t5, _r75_t6, _r75_t7;
-            return _r75_t0 = r75_pair, _r75_t7 = !1, Array.isArray(_r75_t0) && _r75_t0.length === 4 && '.operatorPiece' === _r75_t0[0] && '=' === _r75_t0[2] && (r75_property = _r75_t0[1], r75_value = _r75_t0[3], r1_atom(r75_property) ? _r75_t7 = !0 : _r75_t7 = !1), _r75_t7 ? [
+            return _r75_t0 = r75_pair, _r75_t7 = !1, Array.isArray(_r75_t0) && _r75_t0.length === 3 && '=' === _r75_t0[0] && (r75_property = _r75_t0[1], r75_value = _r75_t0[2], r1_atom(r75_property) ? _r75_t7 = !0 : _r75_t7 = !1), _r75_t7 ? [
                 [
                     '.quote',
                     r75_property
@@ -111,7 +117,7 @@ r1_patrisika = require('patrisika'), r1_atom = function _r1_t0(r61_x) {
                     r75_property
                 ],
                 r75_property
-            ] : Array.isArray(_r75_t0) && _r75_t0.length === 4 && '.operatorPiece' === _r75_t0[0] && Array.isArray(_r75_t0[1]) && _r75_t0[1].length === 2 && '.quote' === _r75_t0[1][0] && '=' === _r75_t0[2] ? (r75_property = _r75_t0[1][1], _r75_t0[1], r75_value = _r75_t0[3], [
+            ] : Array.isArray(_r75_t0) && _r75_t0.length === 3 && '=' === _r75_t0[0] && Array.isArray(_r75_t0[1]) && _r75_t0[1].length === 2 && '.quote' === _r75_t0[1][0] ? (r75_property = _r75_t0[1][1], _r75_t0[1], r75_value = _r75_t0[2], [
                 [
                     '.quote',
                     r75_property
@@ -129,7 +135,7 @@ r1_patrisika = require('patrisika'), r1_atom = function _r1_t0(r61_x) {
                     r75_property
                 ],
                 r75_value
-            ]) : (_r75_t3 = !1, Array.isArray(_r75_t0) && _r75_t0.length === 4 && '.operatorPiece' === _r75_t0[0] && Array.isArray(_r75_t0[1]) && _r75_t0[1].length >= 1 && '=' === _r75_t0[2] && (r75_method = _r75_t0[1][0], r75_param = _r75_t0[1].slice(1), _r75_t0[1], r75_value = _r75_t0[3], r1_atom(r75_method) ? _r75_t3 = !0 : _r75_t3 = !1), _r75_t3 ? [
+            ]) : (_r75_t3 = !1, Array.isArray(_r75_t0) && _r75_t0.length === 3 && '=' === _r75_t0[0] && Array.isArray(_r75_t0[1]) && _r75_t0[1].length >= 1 && (r75_method = _r75_t0[1][0], r75_param = _r75_t0[1].slice(1), _r75_t0[1], r75_value = _r75_t0[2], r1_atom(r75_method) ? _r75_t3 = !0 : _r75_t3 = !1), _r75_t3 ? [
                 [
                     '.quote',
                     r75_method
@@ -171,7 +177,7 @@ r1_patrisika = require('patrisika'), r1_atom = function _r1_t0(r61_x) {
         var r78_form, r78_env, r78_wrapper, r78_pairs;
         return r78_pairs = r78_form.slice(1).map(function _r78_t2(r79_pair) {
             var r79_pair, r79_property, r79_value, _r79_t0, _r79_t1, _r79_t2, _r79_t3, _r79_t4;
-            if (_r79_t0 = r79_pair, _r79_t4 = !1, Array.isArray(_r79_t0) && _r79_t0.length === 4 && '.operatorPiece' === _r79_t0[0] && '=' === _r79_t0[2] && (r79_property = _r79_t0[1], r79_value = _r79_t0[3], r1_atom(r79_property) ? _r79_t4 = !0 : _r79_t4 = !1), _r79_t4)
+            if (_r79_t0 = r79_pair, _r79_t4 = !1, Array.isArray(_r79_t0) && _r79_t0.length === 3 && '=' === _r79_t0[0] && (r79_property = _r79_t0[1], r79_value = _r79_t0[2], r1_atom(r79_property) ? _r79_t4 = !0 : _r79_t4 = !1), _r79_t4)
                 return [
                     r79_property,
                     r79_value
@@ -196,8 +202,8 @@ r1_patrisika = require('patrisika'), r1_atom = function _r1_t0(r61_x) {
                     r79_property,
                     r79_property
                 ];
-            else if (Array.isArray(_r79_t0) && _r79_t0.length === 4 && '.operatorPiece' === _r79_t0[0] && Array.isArray(_r79_t0[1]) && _r79_t0[1].length === 2 && '.quote' === _r79_t0[1][0] && '=' === _r79_t0[2])
-                return r79_property = _r79_t0[1][1], _r79_t0[1], r79_value = _r79_t0[3], [
+            else if (Array.isArray(_r79_t0) && _r79_t0.length === 3 && '=' === _r79_t0[0] && Array.isArray(_r79_t0[1]) && _r79_t0[1].length === 2 && '.quote' === _r79_t0[1][0])
+                return r79_property = _r79_t0[1][1], _r79_t0[1], r79_value = _r79_t0[2], [
                     r79_property,
                     r79_value
                 ];

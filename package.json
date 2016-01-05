@@ -4,6 +4,7 @@
 	"description": "A Patrisika-based Example Language",
 	"repository": "https://github.com/be5invis/patel",
 	"dependencies": {
+		"patrisika-scopes": ">=0.10.0",
 		"patrisika": ">=0.19.2",
 		"escodegen": ">=1.1.0",
 		"esmangle": ">=1.0.1",
