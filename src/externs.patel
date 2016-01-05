@@ -373,31 +373,29 @@ define [Create] : begin
 				.initFn nothing
 			} 
 			local ds [new Scope env]
-			ds.declare "ex" true
-			ds.declare "atom" true
-			ds.declare "prim" true
-			ds.declare "formOf" true
-			ds.declare "scopeOf" true
-			ds.declare "definingEnv" true
-			ds.declare "externEnv" true
-			ds.declare "require" true
-			ds.declare "toPattern" true
-			ds.declare "coinit" true
-			ds.declare "FormInvalidError" true
+			local imports {
+				.ex ex
+				.atom [wrapForSyntacticClosure atom]
+				.prim [wrapForSyntacticClosure prim]
+				.formOf [lambda [x] x.(1)]
+				.scopeOf [lambda [x] x.(2)]
+				.definingEnv env
+				.externEnv externs
+				.require require
+				.toPattern toPattern
+				.coinit coinit
+				.formInvalidError FormInvalidError
+				.deQuasiquote deQuasiquote
+				.opSegToRegular opSegToRegular
+			}
+			local names : Object.keys imports
+			
+			ds.declare "$" true
+			local assignments {".begin" :: [names.map : [name] => {"local" name {"." "$" {".quote" name}}}]}
 			local macroG : new Function 
-				ds.castName 'ex'
-				ds.castName 'atom'
-				ds.castName 'prim'
-				ds.castName 'formOf'
-				ds.castName 'scopeOf'
-				ds.castName 'definingEnv'
-				ds.castName 'externEnv'
-				ds.castName 'require'
-				ds.castName 'toPattern'
-				ds.castName 'coinit'
-				ds.castName 'FormInvalidError'
-				escodegen.generate : patrisika.generate {".return" [ex body ds]} ds [lambda [form] {".return" form}]
-			local macroFn [macroG ex [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim] [lambda [x] x.(1)] [lambda [x] x.(2)] env externs require toPattern coinit FormInvalidError]
+				ds.castName '$'
+				escodegen.generate : patrisika.generate {".return" [ex {".begin" assignments body} ds]} ds [lambda [form] {".return" form}]
+			local macroFn [macroG imports]
 			env.macros.put name : lambda [c e] : begin 
 				local result [macroFn c e]
 				local s [new Scope env]

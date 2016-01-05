@@ -70,8 +70,8 @@ r1_Scope = require('patrisika').Scope, r1_atom = function _r1_t0(r71_x) {
             '.OG',
             void 0,
             r80_items[0]
-        ], r80_uber.bp = 65535, r80_j = 1; r80_j < r80_items.length;)
-        if (r80_operator = r80_items[r80_j], r80_operand = r80_items[r80_j + 1], r80_j += 2, _r80_t0 = r1_getOperatorInfo(r80_operator, r80_env), r80_nbp = _r80_t0.priority, r80_assoc = _r80_t0.associvity, r80_node = [
+        ], r80_uber.bp = 65534, r80_j = 1; r80_j < r80_items.length;)
+        if (r80_operator = r80_items[r80_j], r80_operand = r80_items[r80_j + 1], r80_j += 2, _r80_t0 = r1_getOperatorInfo(r80_operator, r80_env), r80_nbp = _r80_t0.priority, r80_assoc = _r80_t0.associvity, r80_nbp > 65534 && (r80_nbp = 65534), r80_node = [
                 r80_operator,
                 void 0,
                 r80_operand

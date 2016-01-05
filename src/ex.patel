@@ -62,17 +62,17 @@ define [getOperatorInfo operator env] : begin
 	return {.priority priority .associvity associvity}
 define [opSegToRegular items env] : begin
 	local uber {".OG" nothing items.0}
-	set uber.bp 0xFFFF
+	set uber.bp 0xFFFE
 	local j 1
 	while (j < items.length) : begin
 		local operator items.(j)
 		local operand items.(j + 1)
 		set j (j + 2)
 		local {.priority nbp .associvity assoc} : getOperatorInfo operator env
+		if (nbp > 0xFFFE) : set nbp 0xFFFE
 		
 		local node {operator nothing operand}
 		set node.bp nbp
-		
 		local n uber
 		
 		piecewise
