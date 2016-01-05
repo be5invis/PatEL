@@ -12,26 +12,87 @@ define [NodeTranslation fn] : lambda [form] : begin
 	if (form && res && form.within) : set res.within form.within
 	return res
 
-define [deQuasiquote form level] : match form 
-	{".unquote" c} : if [not level] c {".list" {".quote" ".unquote"} [deQuasiquote c (level - 1)]}
+define [deQuasiquote form level env] : match form 
+	{".unquote" c} : if [not level] c {".list" {".quote" ".unquote"} [deQuasiquote c (level - 1) env]}
 	{".unquote" c {".quote" decLevel}} : begin 
 		set decLevel [Math.max 1 [Math.floor decLevel]]
-		if (level - decLevel < 0) c {".list" {".quote" ".unquote"} [deQuasiquote c (level - decLevel)]}
-	{".quasiquote" c} {".list" {".quote" ".quasiquote"} [deQuasiquote c (level + 1)]}
+		if (level - decLevel < 0) c {".list" {".quote" ".unquote"} [deQuasiquote c (level - decLevel) env]}
+	{".quasiquote" c} {".list" {".quote" ".quasiquote"} [deQuasiquote c (level + 1) env]}
+	{".operatorPiece" :: items} : deQuasiquote [opSegToRegular items env] level env 
 	{::xs} : match xs.((xs.length - 1)) 
 		{".sliceunquote" x} : begin 
-			local commonParts [[xs.slice 0 (0-1)].map [lambda [c] [deQuasiquote c level]]]
+			local commonParts [[xs.slice 0 (0-1)].map [lambda [c] [deQuasiquote c level env]]]
 			if [not level] 
 				{".conslist"}.concat commonParts {x}
-				{".list"}.concat commonParts {{".list" {".quote" ".sliceunquote"} [deQuasiquote x (level - 1)]}}
-		otherwise	: {".list"}.concat [xs.map [lambda [c] [deQuasiquote c level]]]
+				{".list"}.concat commonParts {{".list" {".quote" ".sliceunquote"} [deQuasiquote x (level - 1) env]}}
+		otherwise	: {".list"}.concat [xs.map [lambda [c] [deQuasiquote c level env]]]
 	otherwise {".quote" otherwise}
+
+define ASSOC_LEFT  'left'
+define ASSOC_NEVER 'never'
+define ASSOC_RIGHT 'right'
+define [getOperatorInfo operator env] : begin
+	if ([env.macros.has operator] && [env.macros.get operator].opInfo) : return [env.macros.get operator].opInfo
+	# Automatic decide operator priority
+	while (operator.0 === '<' && operator.(operator.length - 1) === ">") : set operator [operator.slice 1 (-1)]
+	local priority 1000
+	local associvity ASSOC_RIGHT
+	if (operator && operator !== '=') : begin
+		set priority : match operator.0
+			'?' 100
+			'^' 100
+			'*' 200
+			'/' 200
+			'%' 200
+			'+' 300
+			'-' 300
+			'=' 400
+			'!' 400
+			'<' 500
+			'>' 500
+			'&' 600
+			'|' 700
+			otherwise 1000
+		set associvity : if (operator.length > 1 && operator.(operator.length - 1) === '>') ASSOC_RIGHT : match operator.0
+			'!' ASSOC_NEVER
+			'=' ASSOC_NEVER
+			'<' ASSOC_NEVER
+			'>' ASSOC_NEVER
+			otherwise ASSOC_LEFT
+	return {.priority priority .associvity associvity}
+define [opSegToRegular items env] : begin
+	local uber {".OG" nothing items.0}
+	set uber.bp 0xFFFF
+	local j 1
+	while (j < items.length) : begin
+		local operator items.(j)
+		local operand items.(j + 1)
+		set j (j + 2)
+		local {.priority nbp .associvity assoc} : getOperatorInfo operator env
+		
+		local node {operator nothing operand}
+		set node.bp nbp
+		
+		local n uber
+		
+		piecewise
+		: (assoc === ASSOC_LEFT || assoc === ASSOC_NEVER) : begin
+			while (n.2.bp > nbp) : set n n.2
+			if (assoc === ASSOC_NEVER && n.2.bp === nbp) : begin
+				throw : new FormInvalidError form "Attempting to combine uncombinable operator \(operator)"
+			set node.1 n.2
+			set n.2 node
+		: (assoc === ASSOC_RIGHT) : begin
+			while (n.2.bp >= nbp) : set n n.2
+			set node.1 n.2
+			set n.2 node
+	return uber.2
 
 # Function [ex form env]: Expand macros and do scoping
 define ex : NodeTranslation : lambda [form env] : match form 
 	{".preserve" x} : return x
 	{".quote" :: x} : return {".quote" :: x}
-	{".quasiquote" x} : ex [deQuasiquote x 0] env
+	{".quasiquote" x} : ex [deQuasiquote x 0 env] env
 	{".unquote" x} : return [ex x env]
 	{".id" :: x} : return {".id" :: x}
 	{".t" :: x} : return {".t" :: x}
@@ -78,7 +139,7 @@ define ex : NodeTranslation : lambda [form env] : match form
 			{"." [ex {".list" :: [form.slice 1 (-1)]} env] {".quote" "concat"}}
 			[ex form.((form.length - 1)) env]
 		}
-
+	{".operatorPiece" :: items} : ex [opSegToRegular items env] env
 	{".local" x} : begin 
 		env.declare x
 		return [env.use x]
@@ -109,3 +170,4 @@ define [exports.pass form globalScope] [ex form globalScope]
 define exports.ex ex
 define exports.checkEvaluated checkEvaluated
 define exports.deQuasiquote deQuasiquote
+define exports.opSegToRegular opSegToRegular

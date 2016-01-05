@@ -7,6 +7,7 @@ define escodegen [require "escodegen"]
 define util [require "util"]
 define ex [require "./ex"].ex
 define deQuasiquote [require "./ex"].deQuasiquote
+define opSegToRegular [require "./ex"].opSegToRegular
 
 define FormInvalidError patrisika.FormInvalidError
 
@@ -84,14 +85,17 @@ define [Create] : begin
 		local pairs : [form.slice 1].map : lambda [pair] : match pair
 			# Property initalizer, identifier
 			`(@property = @value) [atom property]        : return {{".quote" property} value}
+			{"=" property value}  [atom property]        : return {{".quote" property} value}
 			{property value}      [atom property]        : return {{".quote" property} value}
 			{property}            [atom property]        : return {{".quote" property} property}
 			property              [atom property]        : return {{".quote" property} property}
 			# Property initalizer, string
-			`(@{".quote" property} = @value)             : return {{".quote" property} value} 
+			`(@{".quote" property} = @value)             : return {{".quote" property} value}
+			{"=" {".quote" property} value}              : return {{".quote" property} value}
 			{{".quote" property} value}                  : return {{".quote" property} value}
 			# Method initalizer, identifier
 			`([@method @::param] = @value) [atom method] : return {{".quote" method} {".lambda" param value}}
+			{"=" {method :: param} value}  [atom method] : return {{".quote" method} {".lambda" param value}}
 			`[[@method @::param] @value]   [atom method] : return {{".quote" method} {".lambda" param value}}
 			# TODO : Accessor initalizer
 		return : ex {".xhash" :: [pairs.filter [lambda [x] x]]} env
@@ -101,11 +105,13 @@ define [Create] : begin
 		local pairs : [form.slice 1].map : lambda [pair] : match pair
 			# Property initalizer, identifier
 			`(@property = @value) [atom property]        : return {property value}
+			{"=" property value}  [atom property]        : return {property value}
 			{property value}      [atom property]        : return {property value}
 			{property}            [atom property]        : return {property property}
 			property              [atom property]        : return {property property}
 			# Property initalizer, string
-			`(@{".quote" property} = @value)             : return {property value} 
+			`(@{".quote" property} = @value)             : return {property value}
+			{"=" {".quote" property} value}              : return {property value}
 			{{".quote" property} value}                  : return {property value}
 			# Method initalizer, identifier
 			otherwise : throw [new FormInvalidError form "Invalid Assignment Left-hand Side"]
@@ -290,13 +296,19 @@ define [Create] : begin
 				] :.concat {x}] }
 	externs.macros.put ".quasiquote" {.}
 	set [[externs.macros.get ".quasiquote"].toPattern pattern env wrapper] : match pattern
-		{".quasiquote" :: subpatterns} : toPattern [deQuasiquote pattern.(1) 0] env wrapper
+		{".quasiquote" :: subpatterns} : toPattern [deQuasiquote pattern.(1) 0 env] env wrapper
+	externs.macros.put ".operatorPiece" {.}
+	set [[externs.macros.get ".operatorPiece"].toPattern pattern env wrapper] : toPattern [opSegToRegular [pattern.slice 1] env] env wrapper
 	externs.macros.put "&&" {.}
 	set [[externs.macros.get "&&"].toPattern pattern env wrapper] : match pattern
 		{"&&" :: subpatterns} : begin 
 			local ms : subpatterns.map : [x] => [toPattern x env wrapper]
 			return : object 
-				whether : lambda [x] [{"&&" :: [ms.map : lambda [p j] : p.whether x]}.filter boole]
+				whether : lambda [x] [begin \\
+					local f : {"&&" :: [ms.map : lambda [p j] : p.whether x]}.filter boole
+					if (f.length === 1) : return {".quote" true}
+					return f
+				]
 				assign : lambda [x locallyQ] {".begin" :: [ms.map [lambda [p j] : p.assign x locallyQ] :.concat {x}] }
 	externs.macros.put "||" {.}
 	set [[externs.macros.get "||"].toPattern pattern env wrapper] : match pattern
