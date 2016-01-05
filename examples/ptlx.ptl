@@ -14,4 +14,4 @@ define-macro dom : begin
 	return : syntax-rules
 		`[dom @_cstr] : dirty : travel : formOf _cstr
 
-render : dom : div (class = "button") @[list.foreach : [x] -> [dom : span (class = "button-text") @x]]
+render : dom : div (class = "button") @[list.foreach : [x] => [dom : span (class = "button-text") @x]]

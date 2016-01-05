@@ -96,25 +96,29 @@ instream.on('data', function(buf){
 instream.on('end', function(){
 	input += '\n\n\n';
 	if(argv['dump-input']) { outstream.write(input); return }
-	var gs = patel.globals();
-	gs.strict = argv.strict;
+	var gs0 = patel.globals();
+	gs0.strict = argv.strict;
 	var lcmap = generateLineAndColumnMap(input);
 	var lines = input.split("\n");
 	// macros returning information about the file
-	gs.macros.put("input-path", function(){
+	gs0.macros.put("input-path", function(){
 		if(argv.l) return ['.quote', '|argv.l']
 		if(argv._[0]) return ['.quote', argv._[0]]
 		return ['.quote', '|-']
 	});
+	var gs = new patel.Scope(gs0);
+	
 	try {
 		var ast = patel.parse(input, {within: { file: gs.macros.get('input-path')()[1], input: input }});
 	} catch(ex){
 		process.stderr.write(ex.message + '\nAt Line ' + ex.line + ', Column' + ex.column);
 		process.exit(1);
-	}
+	};
+	
 	try {
 		if(argv['dump-ast']) { dump(ast); return }
-		var xast = patel.ex(ast, gs);
+		var xastP = patel.ex(patel.prepareAST, gs0);
+		var xast = ['.begin', xastP, patel.ex(ast, gs)];
 		patel.checkEvaluated(xast);
 		if(argv['dump-expanded']) { dump(xast); return }
 		var rast = patel.regularize(xast, gs);

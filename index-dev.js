@@ -3,6 +3,8 @@ var escodegen = require('escodegen');
 var parserLib = require('./src/syntax.js');
 var exLib = require('./src/ex');
 var externsLib = require('./src/externs');
+var prepareAST = require('./src/essential-macros.json');
+
 process.stderr.write("Using in-development PatEL components.\n")
 
 var parse = function(){ return parserLib.parse.apply(this, arguments) };
@@ -25,3 +27,4 @@ exports.pat2esc = patrisika.pat2esc;
 exports.generateCode = escodegen.generate;
 exports.compile = compile;
 exports.checkEvaluated = checkEvaluated;
+exports.prepareAST = prepareAST

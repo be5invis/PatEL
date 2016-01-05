@@ -58,6 +58,7 @@ define [Create] : begin
 		otherwise                              	: reportInvalid otherwise "Invalid Lambda Formation"
 	externs.macros.put "function" : externs.macros.get "lambda"
 	externs.macros.put "->" : externs.macros.get "lambda"
+	externs.macros.put "=>" : externs.macros.get "lambda"
 
 	externs.macros.put "if" : lambda [form env] : match form 
 		{"if" test consequent}                                    	: ex {'.if' test consequent} env
@@ -208,7 +209,7 @@ define [Create] : begin
 				return : [env.macros.get callee].toPattern pattern env wrapper
 			([atom callee] && [env.macros.has callee]) : throw [new FormInvalidError pattern "Invalid Pattern"]
 			true : begin
-				local ms : subpatterns.map : [x] -> [toPattern x env wrapper]
+				local ms : subpatterns.map : [x] => [toPattern x env wrapper]
 				local t : env.newt
 				return : object 
 					whether : lambda [x] [
@@ -225,7 +226,7 @@ define [Create] : begin
 	externs.macros.put ".list" {.}
 	set [[externs.macros.get ".list"].toPattern pattern env wrapper] : match pattern
 		{".list" :: subpatterns} : begin 
-			local ms : subpatterns.map : [x] -> [toPattern x env wrapper]
+			local ms : subpatterns.map : [x] => [toPattern x env wrapper]
 			return : object 
 				whether : lambda [x] [
 					{"&&" 
@@ -239,7 +240,7 @@ define [Create] : begin
 	externs.macros.put ".conslist" {.}
 	set [[externs.macros.get ".conslist"].toPattern pattern env wrapper] : match pattern
 		{".conslist" :: subpatterns} : begin 
-			local ms : [pattern.slice 1 (0 - 1)].map : [x] -> [toPattern x env wrapper]
+			local ms : [pattern.slice 1 (0 - 1)].map : [x] => [toPattern x env wrapper]
 			local final : toPattern pattern.(pattern.length - 1) env
 			return : object 
 				whether : lambda [x] [
@@ -293,14 +294,14 @@ define [Create] : begin
 	externs.macros.put "&&" {.}
 	set [[externs.macros.get "&&"].toPattern pattern env wrapper] : match pattern
 		{"&&" :: subpatterns} : begin 
-			local ms : subpatterns.map : [x] -> [toPattern x env wrapper]
+			local ms : subpatterns.map : [x] => [toPattern x env wrapper]
 			return : object 
 				whether : lambda [x] [{"&&" :: [ms.map : lambda [p j] : p.whether x]}.filter boole]
 				assign : lambda [x locallyQ] {".begin" :: [ms.map [lambda [p j] : p.assign x locallyQ] :.concat {x}] }
 	externs.macros.put "||" {.}
 	set [[externs.macros.get "||"].toPattern pattern env wrapper] : match pattern
 		{"||" :: subpatterns} : begin 
-			local ms : subpatterns.map : [x] -> [toPattern x env wrapper]
+			local ms : subpatterns.map : [x] => [toPattern x env wrapper]
 			return : object 
 				whether : lambda [x] [{"||" :: [ms.map : lambda [p j] : p.whether x]}.filter boole]
 				assign : lambda [x locallyQ] {".unit"}
@@ -361,6 +362,7 @@ define [Create] : begin
 			ds.declare "require" true
 			ds.declare "toPattern" true
 			ds.declare "coinit" true
+			ds.declare "FormInvalidError" true
 			local macroG : new Function 
 				ds.castName 'ex'
 				ds.castName 'atom'
@@ -372,8 +374,9 @@ define [Create] : begin
 				ds.castName 'require'
 				ds.castName 'toPattern'
 				ds.castName 'coinit'
+				ds.castName 'FormInvalidError'
 				escodegen.generate : patrisika.generate {".return" [ex body ds]} ds [lambda [form] {".return" form}]
-			local macroFn [macroG ex [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim] [lambda [x] x.(1)] [lambda [x] x.(2)] env externs require toPattern coinit]
+			local macroFn [macroG ex [wrapForSyntacticClosure atom] [wrapForSyntacticClosure prim] [lambda [x] x.(1)] [lambda [x] x.(2)] env externs require toPattern coinit FormInvalidError]
 			env.macros.put name : lambda [c e] : begin 
 				local result [macroFn c e]
 				local s [new Scope env]
@@ -395,8 +398,7 @@ define [Create] : begin
 				[[externs.macros.get "match"] {"match" c :: patterns} env tw]}
 		otherwise {".unit"}
 
-	ex [require './essential-macros.json'] externs
-
+	#ex [require './essential-macros.json'] externs
 	set externs.pFamily 'r'
 
 	return externs
