@@ -98,6 +98,7 @@ instream.on('end', function(){
 	if(argv['dump-input']) { outstream.write(input); return }
 	var gs0 = patel.globals();
 	gs0.strict = argv.strict;
+	
 	var lcmap = generateLineAndColumnMap(input);
 	var lines = input.split("\n");
 	// macros returning information about the file
@@ -107,6 +108,7 @@ instream.on('end', function(){
 		return ['.quote', '|-']
 	});
 	var gs = new patel.Scope(gs0);
+	gs.strict = argv.strict;
 	
 	try {
 		var ast = patel.parse(input, {within: { file: gs.macros.get('input-path')()[1], input: input }});
