@@ -107,14 +107,11 @@ qualifier
 	/ "." property:stringliteral { return property }
 	/ "." property:operate { return property }
 
-prefixOp = "+" / "-" / "!"
-operator  	= $([\-_/+*<=>!?%_&~^@|]*)
-
 parted
-	= begins:POS left:prefixOp __ right:parting ends:POS { return BeginsEndsWith([left, right], begins, ends) }
+	= begins:POS left:operator __ right:parted ends:POS { return BeginsEndsWith(['.prefix.' + left, right], begins, ends) }
 	/ parting
 lineParted
-	= begins:POS left:prefixOp _ right:parting ends:POS { return BeginsEndsWith([left, right], begins, ends) }
+	= begins:POS left:operator _ right:lineParted ends:POS { return BeginsEndsWith(['.prefix.' + left, right], begins, ends) }
 	/ parting
 
 assign  	= begins:POS car:parted cdr:((POS __ operator __ parted)*) ends:POS { return buildOperatorPiece(car, cdr, begins, ends) }
@@ -189,12 +186,10 @@ pipeRear
 	/ ":" q:qualifier __ it:invoke? { return {type:'pipe', rear: it, qualifier:q} }
 
 lineInvoke
-	= begins:POS "*" _ it:parting ends:POS { return BeginsEndsWith(it, begins, ends) }
-	/ begins:POS head:parting !(_ [\-/+*<=>!?%&~^|]) rear:(_ parting)* ends:POS { return formInvoke(begins, head, rear, ends) }
+	= begins:POS head:parting !(_ operatorStart) rear:(_ parting)* ends:POS { return formInvoke(begins, head, rear, ends) }
 	/ begins:POS it:lineAssign ends:POS { return it }
 invoke
-	= begins:POS "*" __ it:parting ends:POS { return BeginsEndsWith(it, begins, ends) }
-	/ begins:POS head:parting !(__ [\-/+*<=>!?%&~^|]) rear:(__ parting)* ends:POS { return formInvoke(begins, head, rear, ends) }
+	= begins:POS head:parting !(__ operatorStart) rear:(__ parting)* ends:POS { return formInvoke(begins, head, rear, ends) }
 	/ begins:POS it:assign ends:POS { return it }
 
 
@@ -240,6 +235,11 @@ stringCharacter
 singleStringCharacter
 	= [^']
 	/ "''" { return "'" }
+
+// Operators
+operatorStart = [\-/+*<=>!?%&~^|]
+operatorCont =  [\-/+*<=>!?%&~^|_@]
+operator "Operator" = $(operatorStart operatorCont*)
 
 // Spaces
 SPACE_CHARACTER "Space Character"

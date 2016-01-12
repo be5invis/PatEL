@@ -1,13 +1,13 @@
-define-operator "<>" 800 'never' : begin
+define-operator infix "<>" 800 'never' : begin
 	local tClass [definingEnv.newt 'class']
 	local m : syntax-rules
 		`(@x <> @y) `[new @tClass @x @y]
 		
 	set coinit.initFn : lambda [m] : begin
-		set m.toPattern : lambda [form env wrapper] : match form
+		set m.toPattern : lambda [form env w] : match form
 			`(@x <> @y) : begin
-				local p1 [toPattern x env wrapper]
-				local p2 [toPattern y env wrapper]
+				local p1 [toPattern x env w]
+				local p2 [toPattern y env w]
 				object
 					whether : lambda [t] `(@t && @[p1.whether `(@t.x)] && @[p2.whether `(@t.y)])
 					assign : lambda [t locallyQ] : ex `[begin 
@@ -22,5 +22,14 @@ define-operator "<>" 800 'never' : begin
 	return m
 
 # console.log : 1 <> 2 <> 3 # ERROR!
+
+console.log 'SAMPLE : INFIX'
 console.log : 1 <> 2
 set (x <> y) (1 <> 2)
+
+
+console.log 'SAMPLE : PREFIX'
+define-operator prefix '~' : syntax-rules
+	`(~ @x) `(1 / @x)
+
+console.log : ~ 2

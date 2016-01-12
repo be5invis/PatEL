@@ -60,7 +60,6 @@ define [Create] : begin
 	externs.macros.put "function" : externs.macros.get "lambda"
 	externs.macros.put "->" : externs.macros.get "lambda"
 	externs.macros.put "=>" : externs.macros.get "lambda"
-	
 	externs.operatorInfo.put "->" {
 		.priority 900
 		.associvity 'right'
@@ -69,6 +68,13 @@ define [Create] : begin
 		.priority 950
 		.associvity 'right'
 	}
+	
+	externs.macros.put ".prefix.-" : lambda [form env] {"-" [ex form.1 env]}
+	externs.macros.put ".prefix.+" : lambda [form env] {"+" [ex form.1 env]}
+	externs.macros.put ".prefix.!" : lambda [form env] {"!" [ex form.1 env]}
+	
+	externs.macros.put ".prefix.*" : lambda [form env] [ex form.1 env]
+	externs.macros.put ".prefix.=" : lambda [form env] [ex form.1 env]
 
 	externs.macros.put "if" : lambda [form env] : match form 
 		{"if" test consequent}                                    	: ex {'.if' test consequent} env

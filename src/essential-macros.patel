@@ -192,7 +192,7 @@ define-macro set-operator-info : syntax-rules
 	`[set-operator-info @{".quote" operator} @{".quote" priority}] : begin
 		env.operatorInfo.put [formOf operator] {
 			.priority [formOf priority]
-			.associvity "left"
+			.associvity "never"
 		}
 		return nothing
 
@@ -204,4 +204,15 @@ define-macro define-operator : syntax-rules
 	`[define-operator @{".quote" operator} @{".quote" priority} @body] : dirty `[begin \\
 		set-operator-info @{".quote" [formOf operator]} @{".quote" [formOf priority]}
 		define-macro @{".quote" [formOf operator]} @[formOf body]
+	]
+	`[define-operator infix @{".quote" operator} @{".quote" priority} @{".quote" associvity} @body] : dirty `[begin \\
+		set-operator-info @{".quote" [formOf operator]} @{".quote" [formOf priority]} @{".quote" [formOf associvity]}
+		define-macro @{".quote" [formOf operator]} @[formOf body]
+	]
+	`[define-operator infix @{".quote" operator} @{".quote" priority} @body] : dirty `[begin \\
+		set-operator-info @{".quote" [formOf operator]} @{".quote" [formOf priority]}
+		define-macro @{".quote" [formOf operator]} @[formOf body]
+	]
+	`[define-operator prefix @{".quote" operator} @body] : dirty `[begin \\
+		define-macro @{".quote" (".prefix." + [formOf operator])} @[formOf body]
 	]
