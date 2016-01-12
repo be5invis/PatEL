@@ -134,6 +134,13 @@ instream.on('end', function(){
 				body: [tast]
 			}
 		}
+		if(argv.strict) tast.body.unshift({
+			type: 'ExpressionStatement',
+			expression: {
+				type: 'Literal',
+				value: 'use strict'
+			}
+		});
 		if(argv['dump-transformed']) { dump(tast); return }
 		if(argv.optimize) tast = esmangle.optimize(tast);
 		if(argv.mangle) tast = esmangle.mangle(tast);
