@@ -7,9 +7,10 @@ define-macro class : syntax-rules
 		local ctorparams `[]
 		local ctorbody `[begin]
 		
-		local methodDefs {}
+		local publicTerms {}
 		local privateTerms {}
 		local protectedTerms {}
+		local staticTerms {}
 		local accessorAssignments {.}
 		
 		define [wrapPublicMethodBody name body] `[begin \\
@@ -42,24 +43,22 @@ define-macro class : syntax-rules
 			`[inherits @Super] : set Inherits Super
 			
 			# Public term
+			# constructor
 			`[public [new @::params] @body] : begin
 				set ctorparams params
 				set ctorbody `[begin @body [return nothing]]
-			`[public [@name @::params] @body] [atom name] : begin
-				methodDefs.push {`(Type.prototype.(@{".quote" name})) params [wrapPublicMethodBody name body]}
-
+			# property
 			`[public get @name @body] [atom name] : begin
 				if [not accessorAssignments.(name)] : set accessorAssignments.(name) {.get `nothing .set `nothing}
-				local t : env.newt
-				methodDefs.push {t {} [wrapPublicAccrssorBody name body]}
-				set accessorAssignments.(name).get t
+				set accessorAssignments.(name).get `[lambda [] @[wrapPublicAccrssorBody name body]]
 			`[public get @name] [atom name] : handleTerm `[public get @name [private @name]]
 			`[public set @name @value @body] [atom name] : begin
 				if [not accessorAssignments.(name)] : set accessorAssignments.(name) {.get `nothing .set `nothing}
-				local t : env.newt
-				methodDefs.push {t {value} [wrapPublicAccrssorBody name body]}
-				set accessorAssignments.(name).set t
+				set accessorAssignments.(name).set `[lambda [@value] @[wrapPublicAccrssorBody name body]]
 			`[public set @name] [atom name] : handleTerm `[public set @name value : set [private @name] value]
+			# method
+			`[public [@name @::params] @body] [atom name] : begin
+				publicTerms.push {`(Type.prototype.(@{".quote" name})) `[lambda @params @[wrapPublicMethodBody name body]]}
 
 			# Private term, use symbols
 			`[private @name] [atom name] : privateTerms.push {name `nothing}
@@ -70,6 +69,11 @@ define-macro class : syntax-rules
 			`[protected @name] [atom name] : protectedTerms.push {name `nothing}
 			`[protected @name @val] [atom name] : protectedTerms.push {name val}
 			`[protected [@name @::params] @body] [atom name] : protectedTerms.push {name `[function @params @[wrapProtectedMethodBody name body]]}
+			
+			# Static terms
+			`[static @name] [atom name] : staticTerms.push {name `nothing}
+			`[static @name @val] [atom name] : staticTerms.push {name val}
+			`[static [@name @::params] @body] [atom name] : staticTerms.push {name `[function @params @body]}
 
 		foreach [term terms] : handleTerm term
 		
@@ -126,10 +130,7 @@ define-macro class : syntax-rules
 				]
 				
 				# method defs
-				begin @::[methodDefs.map : t -> : begin \\
-					local {name params body} t
-					return `[set @name : function @params @body]
-				]
+				begin @::[publicTerms.map : function [t] : begin [local {name val} t] `[set @name @val]]
 				
 				# accessor defs
 				begin @::[[Object.keys accessorAssignments].map : key -> : begin \\
@@ -138,6 +139,9 @@ define-macro class : syntax-rules
 						.set @(accessorAssignments.(key).set)
 					}]
 				]
+				
+				# static terms
+				begin @::[staticTerms.map : function [t] : begin [local {name val} t] `[set Type.(@{".quote" name}) @val]]
 				
 				return Type
 			] @[if Inherits Inherits [externEnv.use 'Object']]
@@ -168,6 +172,7 @@ define-macro class : syntax-rules
 
 class Shape
 	public get area : return nothing
+	static kind "Shape"
 
 class Rectangle
 	inherits Shape
@@ -182,6 +187,7 @@ class Rectangle
 		set [private height] height
 	
 	public get area : [private width] * [private height]
+	static kind "Rectangle"
 
 class Square
 	inherits Rectangle
@@ -190,6 +196,7 @@ class Square
 	public [new side] : begin
 		super side side
 		set [private side] side
+	static kind "Square"
 
 local cell : new Square 1
 console.log cell.area
