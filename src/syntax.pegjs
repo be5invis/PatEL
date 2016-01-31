@@ -9,6 +9,13 @@
 		};
 		return BeginsEndsWith(form, begins, ends);
 	}
+	function buildOperatorPieceH(cdr, begins, ends){
+		var form = [".operatorPiece"];
+		for(var j = 0; j < cdr.length; j++){
+			form.push (cdr[j][1], cdr[j][3]);
+		};
+		return BeginsEndsWith(form, begins, ends);
+	}
 	function BeginsEndsWith(form, begins, ends) {
 		if(form instanceof Array) {
 			form.within = options.within
@@ -117,6 +124,9 @@ lineParted
 assign  	= begins:POS car:parted cdr:((POS __ operator __ parted)*) ends:POS { return buildOperatorPiece(car, cdr, begins, ends) }
 lineAssign  = begins:POS car:lineParted cdr:((POS _ operator _ lineParted)*) ends:POS { return buildOperatorPiece(car, cdr, begins, ends) }
 
+assignHead  	= begins:POS cdr:((POS parted __ operator __)+) ends:POS { return buildOperatorPieceH(cdr, begins, ends) }
+lineAssignHead  = begins:POS cdr:((POS lineParted _ operator _)+) ends:POS { return buildOperatorPieceH(cdr, begins, ends) }
+
 list
 	= car:parting cdr:((__ ([,;] __)? parting)*) tail:(__ [,;])? {
 		return ['.list', car].concat(cdr.map(function(x){ return x[2] }))
@@ -163,34 +173,54 @@ grouped
 	= head:(POS groupedPart __ ":" ![>\.`] __)* rear:simpleGrouped ends:POS { return formGrouped(head, rear, ends) }
 
 simpleLine
-	= begins:POS head:linePart rear:(_ block)? ends:POS { 
-		if(rear) return BeginsEndsWith(head.concat(rear[1]), begins, ends) 
-		else return BeginsEndsWith(head, begins, ends);
+	= begins:POS head:linePartFinal rear:(_ block)? ends:POS { 
+		if(rear) {
+			if(head[0] === '.operatorPiece') {
+				return BeginsEndsWith(head.slice(0, -1).concat([[head[head.length - 1], rear[1]]]), begins, ends)
+			} else {
+				return BeginsEndsWith(head.concat(rear[1]), begins, ends)
+			}
+		} else {
+			return BeginsEndsWith(head, begins, ends);
+		}
 	}
 simpleGrouped
-	= begins:POS head:groupedPart rear:(__ "\\\\" block)? ends:POS { 
-		if(rear) return BeginsEndsWith(head.concat(rear[2]), begins, ends) 
-		else return BeginsEndsWith(head, begins, ends);
+	= begins:POS head:groupedPartFinal rear:(__ "\\\\" block)? ends:POS { 
+		if(rear) {
+			if(head[0] === '.operatorPiece') {
+				return BeginsEndsWith(head.slice(0, -1).concat([[head[head.length - 1], rear[2]]]), begins, ends)
+			} else {
+				return BeginsEndsWith(head.concat(rear[2]), begins, ends)
+			}
+		} else {
+			return BeginsEndsWith(head, begins, ends);
+		}
 	}
 
 linePart
-	= begins:POS head:lineInvoke rear:(__ linePipeRear POS)* ends:POS { return formGroupedPart(begins, head, rear, ends) }
+	= begins:POS head:(lineInvoke/lineAssignHead) ends:POS { return formGroupedPart(begins, head, [], ends) }
 groupedPart
-	= begins:POS head:invoke rear:(__ pipeRear POS)* ends:POS { return formGroupedPart(begins, head, rear, ends) }
+	= begins:POS head:(invoke/assignHead) ends:POS { return formGroupedPart(begins, head, [], ends) }
+
+linePartFinal
+	= begins:POS head:lineInvokeOrOperat rear:(__ linePipeRear POS)* ends:POS { return formGroupedPart(begins, head, rear, ends) }
+groupedPartFinal
+	= begins:POS head:invokeOrOperat rear:(__ pipeRear POS)* ends:POS { return formGroupedPart(begins, head, rear, ends) }
 
 linePipeRear
-	= ":>" _ it:lineInvoke { return {type: 'pipe', rear: it} }
-	/ ":" q:qualifier _ it:lineInvoke? { return {type:'pipe', rear: it, qualifier:q} }
+	= ":>" _ it:lineInvokeOrOperat { return {type: 'pipe', rear: it} }
+	/ ":" q:qualifier _ it:lineInvokeOrOperat? { return {type:'pipe', rear: it, qualifier:q} }
 pipeRear
-	= ":>" __ it:invoke { return {type: 'pipe', rear: it} }
-	/ ":" q:qualifier __ it:invoke? { return {type:'pipe', rear: it, qualifier:q} }
+	= ":>" __ it:invokeOrOperat { return {type: 'pipe', rear: it} }
+	/ ":" q:qualifier __ it:invokeOrOperat? { return {type:'pipe', rear: it, qualifier:q} }
 
-lineInvoke
-	= begins:POS head:parting !(_ operatorStart) rear:(_ parting)* ends:POS { return formInvoke(begins, head, rear, ends) }
-	/ begins:POS it:lineAssign ends:POS { return it }
-invoke
-	= begins:POS head:parting !(__ operatorStart) rear:(__ parting)* ends:POS { return formInvoke(begins, head, rear, ends) }
-	/ begins:POS it:assign ends:POS { return it }
+lineInvoke = begins:POS head:parting !(_ operatorStart) rear:(_ parting)* ends:POS { return formInvoke(begins, head, rear, ends) }
+lineOperat = begins:POS it:lineAssign ends:POS { return it }
+lineInvokeOrOperat = lineInvoke / lineOperat
+
+invoke = begins:POS head:parting !(__ operatorStart) rear:(__ parting)* ends:POS { return formInvoke(begins, head, rear, ends) }
+operat = begins:POS it:assign ends:POS { return it }
+invokeOrOperat = invoke / operat
 
 
 // Tokens

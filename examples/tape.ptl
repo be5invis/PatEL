@@ -1,0 +1,4 @@
+import 'tape' as test
+
+test 'xxx' : t -> begin
+	t.equal 1 1
