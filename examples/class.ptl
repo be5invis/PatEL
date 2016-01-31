@@ -36,8 +36,8 @@ define-macro class : syntax-rules
 				`[super @::args] `[(Super.prototype.(Super.protectedTerms.(@2*{".quote" name}))).call @[dirty `this] @::args]
 			* @body
 		]
-
-		foreach [term terms] : match term
+		
+		define [handleTerm term] : match term
 			# Inheritance term
 			`[inherits @Super] : set Inherits Super
 			
@@ -47,17 +47,20 @@ define-macro class : syntax-rules
 				set ctorbody `[begin @body [return nothing]]
 			`[public [@name @::params] @body] [atom name] : begin
 				methodDefs.push {`(Type.prototype.(@{".quote" name})) params [wrapPublicMethodBody name body]}
+
 			`[public get @name @body] [atom name] : begin
 				if [not accessorAssignments.(name)] : set accessorAssignments.(name) {.get `nothing .set `nothing}
 				local t : env.newt
 				methodDefs.push {t {} [wrapPublicAccrssorBody name body]}
 				set accessorAssignments.(name).get t
+			`[public get @name] [atom name] : handleTerm `[public get @name [private @name]]
 			`[public set @name @value @body] [atom name] : begin
 				if [not accessorAssignments.(name)] : set accessorAssignments.(name) {.get `nothing .set `nothing}
 				local t : env.newt
 				methodDefs.push {t {value} [wrapPublicAccrssorBody name body]}
 				set accessorAssignments.(name).set t
-			
+			`[public set @name] [atom name] : handleTerm `[public set @name value : set [private @name] value]
+
 			# Private term, use symbols
 			`[private @name] [atom name] : privateTerms.push {name `nothing}
 			`[private @name @val] [atom name] : privateTerms.push {name val}
@@ -67,6 +70,8 @@ define-macro class : syntax-rules
 			`[protected @name] [atom name] : protectedTerms.push {name `nothing}
 			`[protected @name @val] [atom name] : protectedTerms.push {name val}
 			`[protected [@name @::params] @body] [atom name] : protectedTerms.push {name `[function @params @[wrapProtectedMethodBody name body]]}
+
+		foreach [term terms] : handleTerm term
 		
 		return : dirty `[begin \\
 			define @typename : [function [Super] : begin \\
@@ -161,46 +166,34 @@ define-macro class : syntax-rules
 			return GenericType
 		]]]
 
-class Person
-	private firstName 'Unnamed'
-	private lastName 'Whatever'
-	private age 0
-	public [new firstName lastName] : begin
-		set [private firstName] firstName
-		set [private lastName] lastName
-	
-	public get firstName [private firstName]
-	public get lastName [private lastName]
-	
-	public get age [private age]
-	public set age value [set [private age] value]
-	
-	protected [organizeSetence setence] : return "\(this.firstName) \(this.lastName) : \(setence)."
-	public [say setence] : begin
-		console.log : [protected organizeSetence] setence
+class Shape
+	public get area : return nothing
 
-class Child
-	inherits Person
-	public [new firstName lastName] : begin
-		super firstName lastName
-	public get firstName : begin
-		return : 'The Mighty ' + [super]
-	public get age [super]
-	public set age value : begin
-		if (value > 20) : then
-			console.log 'Too old!'
-		: else
-			super value
-	protected [organizeSetence setence] : begin
-		return : [super setence] + " Happily \(this.firstName) \(this.lastName)."
+class Rectangle
+	inherits Shape
+	private width 0
+	private height 0
+	
+	public get width
+	public get height
+	
+	public [new width height] : begin
+		set [private width] width
+		set [private height] height
+	
+	public get area : [private width] * [private height]
 
-define tom : new Child "Tom" "Eri"
-tom.say 'hello'
-console.log tom.age
-set tom.age 100
-console.log tom.age
-set tom.age 10
-console.log tom.age
+class Square
+	inherits Rectangle
+	
+	private side 0
+	public [new side] : begin
+		super side side
+		set [private side] side
+
+local cell : new Square 1
+console.log cell.area
+console.log cell.height
 
 # Generic type
 #class [Either T]
