@@ -1,0 +1,210 @@
+# The mighty [class] macro implements OOP operations
+
+define-macro class : syntax-rules
+	`[class @typename @::_terms] [atom typename] : begin
+		local terms : _terms.map formOf
+		local Inherits null
+		local ctorparams `[]
+		local ctorbody `[begin]
+		
+		local methodDefs {}
+		local privateTerms {}
+		local protectedTerms {}
+		local accessorAssignments {.}
+		
+		define [wrapPublicMethodBody name body] `[begin \\
+			define-macro super : syntax-rules
+				`[super @::args] `[(Super.prototype.(@2*{".quote" name})).call @[dirty `this] @::args]
+			* @body
+		]
+		define [wrapPublicAccrssorBody name body] `[begin \\
+			define-macro super : syntax-rules
+				`[super] : let [t : env.newt] `[begin \\
+					set t Super.prototype
+					while (t && ![@[externEnv.use 'Object'].getOwnPropertyDescriptor t @2*{".quote" name}]) : set t [@[externEnv.use 'Object'].getPrototypeOf t]
+					[@[externEnv.use 'Object'].getOwnPropertyDescriptor t @2*{".quote" name}].get.call @[dirty `this]
+				]
+				`[super @value] : let [t : env.newt] `[begin \\
+					set t Super.prototype
+					while (t && ![@[externEnv.use 'Object'].getOwnPropertyDescriptor t @2*{".quote" name}]) : set t [@[externEnv.use 'Object'].getPrototypeOf t]
+					[@[externEnv.use 'Object'].getOwnPropertyDescriptor t @2*{".quote" name}].set.call @[dirty `this] @value
+				]
+			* @body
+		]
+		define [wrapProtectedMethodBody name body] `[begin \\
+			define-macro super : syntax-rules
+				`[super @::args] `[(Super.prototype.(Super.protectedTerms.(@2*{".quote" name}))).call @[dirty `this] @::args]
+			* @body
+		]
+
+		foreach [term terms] : match term
+			# Inheritance term
+			`[inherits @Super] : set Inherits Super
+			
+			# Public term
+			`[public [new @::params] @body] : begin
+				set ctorparams params
+				set ctorbody `[begin @body [return nothing]]
+			`[public [@name @::params] @body] [atom name] : begin
+				methodDefs.push {`(Type.prototype.(@{".quote" name})) params [wrapPublicMethodBody name body]}
+			`[public get @name @body] [atom name] : begin
+				if [not accessorAssignments.(name)] : set accessorAssignments.(name) {.get `nothing .set `nothing}
+				local t : env.newt
+				methodDefs.push {t {} [wrapPublicAccrssorBody name body]}
+				set accessorAssignments.(name).get t
+			`[public set @name @value @body] [atom name] : begin
+				if [not accessorAssignments.(name)] : set accessorAssignments.(name) {.get `nothing .set `nothing}
+				local t : env.newt
+				methodDefs.push {t {value} [wrapPublicAccrssorBody name body]}
+				set accessorAssignments.(name).set t
+			
+			# Private term, use symbols
+			`[private @name] [atom name] : privateTerms.push {name `nothing}
+			`[private @name @val] [atom name] : privateTerms.push {name val}
+			`[private [@name @::params] @body] [atom name] : privateTerms.push {name `[function @params @body]}
+			
+			# Protected term, use symbols
+			`[protected @name] [atom name] : protectedTerms.push {name `nothing}
+			`[protected @name @val] [atom name] : protectedTerms.push {name val}
+			`[protected [@name @::params] @body] [atom name] : protectedTerms.push {name `[function @params @[wrapProtectedMethodBody name body]]}
+		
+		return : dirty `[begin \\
+			define @typename : [function [Super] : begin \\
+				define-macro private : begin
+					local f : syntax-rules
+						`[private @name] [atom name] : dirty `(this.(@[definingEnv.use ("__private_" + [formOf name])]))
+					set coinit.initFn : lambda [m] : begin
+						set m.toPattern : lambda [form env w] : match form
+							`[private @name] [atom name] : object
+								whether : lambda [t] `true
+								assign : lambda [t locally] : ex `[set this.(@[definingEnv.use ("__private_" + name)]) @t] env
+					*f
+				define-macro protected : begin
+					local f : syntax-rules
+						`[protected @name] [atom name] : dirty `(this.(@[definingEnv.use 'protectedTerms'].(@{".quote" [formOf name]})))
+					set coinit.initFn : lambda [m] : begin
+						set m.toPattern : lambda [form env w] : match form
+							`[protected @name] [atom name] : object
+								whether : lambda [t] `true
+								assign : lambda [t locally] : ex `[set (this.(@[definingEnv.use 'protectedTerms'].(@{".quote" name}))) @t] env
+					*f
+
+				# constructor
+				local Type [function @ctorparams : begin \\
+					define-macro super : syntax-rules
+						`[super @::args] `[Super.call @[dirty `this] @::args]
+					* @ctorbody
+				]
+				
+				# inheritance
+				* @[if Inherits `[set Type.prototype [@[externEnv.use 'Object'].create Super.prototype]] `nothing]
+				
+				extern Symbol
+				
+				# private terms
+				begin @::[privateTerms.map : t -> : begin \\
+					local {name val} t
+					return `[begin \\
+						local @('__private_' + name) [Symbol]
+						set Type.prototype.(@('__private_' + name)) @val
+					]
+				]
+				
+				# protected terms
+				set Type.protectedTerms : local protectedTerms : @[externEnv.use 'Object'].create (Super.protectedTerms || null)
+				begin @::[protectedTerms.map : t -> : begin \\
+					local {name val} t
+					return `[begin \\
+						if [not protectedTerms.(@{".quote" name})] : set protectedTerms.(@{".quote" name}) [Symbol]
+						set Type.prototype.(protectedTerms.(@{".quote" name})) @val
+					]
+				]
+				
+				# method defs
+				begin @::[methodDefs.map : t -> : begin \\
+					local {name params body} t
+					return `[set @name : function @params @body]
+				]
+				
+				# accessor defs
+				begin @::[[Object.keys accessorAssignments].map : key -> : begin \\
+					return `[@[externEnv.use 'Object'].defineProperty Type.prototype @{".quote" key} {
+						.get @(accessorAssignments.(key).get)
+						.set @(accessorAssignments.(key).set)
+					}]
+				]
+				
+				return Type
+			] @[if Inherits Inherits [externEnv.use 'Object']]
+		]
+	`[class [@typename @::_params] @::_terms] : begin
+		local params : _params.map formOf
+		local terms : _terms.map formOf
+		local arity {'.quote' params.length}
+		return : dirty `[define @typename : [function [] [begin \\
+			extern Map
+			local cache : new Map
+			define [GenericType @::params] : begin
+				local pivot cache
+				for [local j 0] (j < @arity) [inc j] : begin
+					if [pivot.has arguments.(j)] : then
+						set pivot [pivot.get arguments.(j)]
+					: else
+						if (j < @arity - 1) : then
+							local m [new Map]
+						: else
+							local m : [lambda [@::params] [class _r @::terms]].apply null arguments
+						
+						pivot.set arguments.(j) m
+						set pivot m
+				return pivot
+			return GenericType
+		]]]
+
+class Person
+	private firstName 'Unnamed'
+	private lastName 'Whatever'
+	private age 0
+	public [new firstName lastName] : begin
+		set [private firstName] firstName
+		set [private lastName] lastName
+	
+	public get firstName [private firstName]
+	public get lastName [private lastName]
+	
+	public get age [private age]
+	public set age value [set [private age] value]
+	
+	protected [organizeSetence setence] : return "\(this.firstName) \(this.lastName) : \(setence)."
+	public [say setence] : begin
+		console.log : [protected organizeSetence] setence
+
+class Child
+	inherits Person
+	public [new firstName lastName] : begin
+		super firstName lastName
+	public get firstName : begin
+		return : 'The Mighty ' + [super]
+	public get age [super]
+	public set age value : begin
+		if (value > 20) : then
+			console.log 'Too old!'
+		: else
+			super value
+	protected [organizeSetence setence] : begin
+		return : [super setence] + " Happily \(this.firstName) \(this.lastName)."
+
+define tom : new Child "Tom" "Eri"
+tom.say 'hello'
+console.log tom.age
+set tom.age 100
+console.log tom.age
+set tom.age 10
+console.log tom.age
+
+# Generic type
+#class [Either T]
+#	public [new x]
+#		nothing
+#
+#console.log : [Either Number] == [Either Number]
