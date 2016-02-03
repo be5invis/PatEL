@@ -390,7 +390,7 @@ define [Create] : begin
 				.require require
 				.toPattern toPattern
 				.coinit coinit
-				.formInvalidError FormInvalidError
+				.FormInvalidError FormInvalidError
 				.deQuasiquote deQuasiquote
 				.opSegToRegular opSegToRegular
 			}

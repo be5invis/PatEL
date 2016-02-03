@@ -1060,7 +1060,7 @@ r1_patrisika = require('patrisika'), r1_atom = function _r1_t0(r71_x) {
             'require': require,
             'toPattern': r76_toPattern,
             'coinit': r159_coinit,
-            'formInvalidError': r1_FormInvalidError,
+            'FormInvalidError': r1_FormInvalidError,
             'deQuasiquote': r1_deQuasiquote,
             'opSegToRegular': r1_opSegToRegular
         }, r159_names = Object.keys(r159_imports), r159_ds.declare('$', !0), r159_assignments = ['.begin'].concat(r159_names.map(function _r159_t8(r162_name) {

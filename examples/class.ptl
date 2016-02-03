@@ -1,5 +1,4 @@
 # The mighty [class] macro implements OOP operations
-
 define-macro class : syntax-rules
 	`[class @typename @::_terms] [atom typename] : begin
 		local terms : _terms.map formOf
@@ -59,6 +58,9 @@ define-macro class : syntax-rules
 			# method
 			`[public [@name @::params] @body] [atom name] : begin
 				publicTerms.push {`(Type.prototype.(@{".quote" name})) `[lambda @params @[wrapPublicMethodBody name body]]}
+			# proto value
+			`[public @name @val] [atom name] : begin
+				publicTerms.push {`(Type.prototype.(@{".quote" name})) val}
 
 			# Private term, use symbols
 			`[private @name] [atom name] : privateTerms.push {name `nothing}
@@ -169,6 +171,8 @@ define-macro class : syntax-rules
 				return pivot
 			return GenericType
 		]]]
+	
+	otherwise : the-form-is-invalid
 
 class Shape
 	public get area : return nothing
