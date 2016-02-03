@@ -18,6 +18,36 @@ function generateLineAndColumnMap(input){
 	}
 }
 exports.generateLineAndColumnMap = generateLineAndColumnMap
+
+function printSourceLines(stream, lines, firstLineNumber){
+	stream.write(lines.map(function(line, k){ return '  ' + (firstLineNumber + k) + '\t| ' + line}).join('\n') + '\n')
+}
+function reportError(ex, _stderr){
+	var stderr = _stderr || process.stderr
+	if(ex.begins >= 0 && ex.ends >= 0) {
+		console.error(ex.message);
+		if(ex.within && ex.within.input) {
+			var lcmap = generateLineAndColumnMap(ex.within.input);
+			var lines = ex.within.input.split("\n");
+			var ljBegins = lcmap.line[ex.begins] - 1;
+			var ljEnds = lcmap.line[ex.ends] - 1;
+			if(ex.within.file){
+				stderr.write(ex.within.file + "\n")
+			}
+			if(ljEnds - ljBegins < 3) {
+				printSourceLines(stderr, lines.slice(ljBegins, ljEnds + 1), ljBegins + 1);
+			} else {
+				printSourceLines(stderr, lines.slice(ljBegins, ljBegins + 2), ljBegins + 1);
+				stderr.write("......\n");
+				printSourceLines(stderr, lines.slice(ljEnds - 1, ljEnds + 1), ljEnds);
+			}
+		}
+	} else {
+		console.error(ex.stack || ex);
+	}
+}
+exports.reportError = reportError
+
 function compile(_input, _options, callback){
 	var input = _input + '\n\n\n';
 	var options = _options || {};

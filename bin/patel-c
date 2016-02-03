@@ -38,6 +38,7 @@ var instream = function(){
 var outstream = argv.o ? fs.createWriteStream(argv.o, { encoding: 'utf-8' }): process.stdout;
 
 var generateLineAndColumnMap = plex.generateLineAndColumnMap
+var reportError = plex.reportError
 
 function deepcopy(form){
 	if(form instanceof Array) return form.map(deepcopy)
@@ -49,32 +50,6 @@ function dumpStruct(form){
 }
 function dumpString(s){
 	outstream.write(s)
-}
-function printSourceLines(stream, lines, firstLineNumber){
-	stream.write(lines.map(function(line, k){ return '  ' + (firstLineNumber + k) + '\t| ' + line}).join('\n') + '\n')
-}
-function reportError(ex){
-	if(ex.begins >= 0 && ex.ends >= 0) {
-		console.error(ex.message);
-		if(ex.within && ex.within.input) {
-			var lcmap = generateLineAndColumnMap(ex.within.input);
-			var lines = ex.within.input.split("\n");
-			var ljBegins = lcmap.line[ex.begins] - 1;
-			var ljEnds = lcmap.line[ex.ends] - 1;
-			if(ex.within.file){
-				process.stderr.write(ex.within.file + "\n")
-			}
-			if(ljEnds - ljBegins < 3) {
-				printSourceLines(process.stderr, lines.slice(ljBegins, ljEnds + 1), ljBegins + 1);
-			} else {
-				printSourceLines(process.stderr, lines.slice(ljBegins, ljBegins + 2), ljBegins + 1);
-				process.stderr.write("......\n");
-				printSourceLines(process.stderr, lines.slice(ljEnds - 1, ljEnds + 1), ljEnds);
-			}
-		}
-	} else {
-		console.error(ex.stack || ex);
-	}
 }
 
 var input = '';
@@ -98,9 +73,9 @@ instream.on('end', function(){
 	}, function(ex, result, dump){
 		if(ex){
 			if(ex.suberrors) {
-				for(var j = 0; j < ex.suberrors.length; j++){ reportError(ex.suberrors[j]) }
+				for(var j = 0; j < ex.suberrors.length; j++){ reportError(ex.suberrors[j], process.stderr) }
 			} else {
-				reportError(ex);
+				reportError(ex, process.stderr);
 			}
 		} else if(result){
 			if(argv['source-map']) {
