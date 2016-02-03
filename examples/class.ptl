@@ -81,6 +81,15 @@ define-macro class : syntax-rules
 		
 		return : dirty `[begin \\
 			define @typename : [function [Super] : begin \\
+				define-macro public : begin
+					local f : syntax-rules
+						`[public @name] [atom name] : dirty `(this.(@{".quote" [formOf name]}))
+					set coinit.initFn : lambda [m] : begin
+						set m.toPattern : lambda [form env w] : match form
+							`[public @name] [atom name] : object
+								whether : lambda [t] `true
+								assign : lambda [t locally] : ex `[set this.(@{".quote" name}) @t] env
+					*f
 				define-macro private : begin
 					local f : syntax-rules
 						`[private @name] [atom name] : dirty `(this.(@[definingEnv.use ("__private_" + [formOf name])]))
@@ -112,39 +121,42 @@ define-macro class : syntax-rules
 				
 				extern Symbol
 				
-				# private terms
-				begin @::[privateTerms.map : t -> : begin \\
-					local {name val} t
-					return `[begin \\
-						local @('__private_' + name) [Symbol]
-						set Type.prototype.(@('__private_' + name)) @val
+				[lambda [] : begin \\
+					# private terms
+					begin @::[privateTerms.map : t -> : begin \\
+						local {name val} t
+						return `[begin \\
+							local @('__private_' + name) [Symbol]
+							set Type.prototype.(@('__private_' + name)) @val
+						]
 					]
-				]
-				
-				# protected terms
-				set Type.protectedTerms : local protectedTerms : @[externEnv.use 'Object'].create (Super.protectedTerms || null)
-				begin @::[protectedTerms.map : t -> : begin \\
-					local {name val} t
-					return `[begin \\
-						if [not protectedTerms.(@{".quote" name})] : set protectedTerms.(@{".quote" name}) [Symbol]
-						set Type.prototype.(protectedTerms.(@{".quote" name})) @val
+					
+					# protected terms
+					set Type.protectedTerms : local protectedTerms : @[externEnv.use 'Object'].create (Super.protectedTerms || null)
+					begin @::[protectedTerms.map : t -> : begin \\
+						local {name val} t
+						return `[begin \\
+							if [not protectedTerms.(@{".quote" name})] : set protectedTerms.(@{".quote" name}) [Symbol]
+							set Type.prototype.(protectedTerms.(@{".quote" name})) @val
+						]
 					]
-				]
-				
-				# method defs
-				begin @::[publicTerms.map : function [t] : begin [local {name val} t] `[set @name @val]]
-				
-				# accessor defs
-				begin @::[[Object.keys accessorAssignments].map : key -> : begin \\
-					return `[@[externEnv.use 'Object'].defineProperty Type.prototype @{".quote" key} {
-						.get @(accessorAssignments.(key).get)
-						.set @(accessorAssignments.(key).set)
-					}]
-				]
-				
-				# static terms
-				begin @::[staticTerms.map : function [t] : begin [local {name val} t] `[set Type.(@{".quote" name}) @val]]
-				
+					
+					# method defs
+					begin @::[publicTerms.map : function [t] : begin [local {name val} t] `[set @name @val]]
+					
+					# accessor defs
+					begin @::[[Object.keys accessorAssignments].map : key -> : begin \\
+						return `[@[externEnv.use 'Object'].defineProperty Type.prototype @{".quote" key} {
+							.get @(accessorAssignments.(key).get)
+							.set @(accessorAssignments.(key).set)
+						}]
+					]
+					
+					# static terms
+					begin @::[staticTerms.map : function [t] : begin [local {name val} t] `[set Type.(@{".quote" name}) @val]]
+					
+					return nothing
+				].call Type.prototype
 				return Type
 			] @[if Inherits Inherits [externEnv.use 'Object']]
 		]
