@@ -12,15 +12,16 @@ var yargs = require('yargs')
 	.describe('l', 'Compile one-line script.')
 	.describe('o', 'Output sfd path. When absent, the result sfd is written to STDOUT.');
 var tty = require('tty');
-var esmangle = require('esmangle');
 
 var argv = yargs.argv;
 if(argv.help){ process.stderr.write(yargs.help()); return };
+
 if(argv['use-dev']) { 
 	var patel = require('../index-dev');
 } else {
 	var patel = require('../index');
 }
+var plex = require('../plex');
 
 var instream = function(){
 	if(argv.l) {
@@ -35,7 +36,6 @@ var instream = function(){
 	}
 }();
 var outstream = argv.o ? fs.createWriteStream(argv.o, { encoding: 'utf-8' }): process.stdout;
-
 
 function generateLineAndColumnMap(input){
 	var lines = [];
@@ -58,14 +58,17 @@ function deepcopy(form){
 	if(form instanceof Array) return form.map(deepcopy)
 	else return form;
 }
-function dump(form){
+function dumpStruct(form){
 	if(!outstream.isTTY) outstream.write(JSON.stringify(form))
 	else outstream.write(util.inspect(deepcopy(form), {depth: null}) + '\n')
+}
+function dumpString(s){
+	outstream.write(s)
 }
 function printSourceLines(stream, lines, firstLineNumber){
 	stream.write(lines.map(function(line, k){ return '  ' + (firstLineNumber + k) + '\t| ' + line}).join('\n') + '\n')
 }
-function reportError(ex, lcmap, lines){
+function reportError(ex){
 	if(ex.begins >= 0 && ex.ends >= 0) {
 		console.error(ex.message);
 		if(ex.within && ex.within.input) {
@@ -94,81 +97,37 @@ instream.on('data', function(buf){
 	input += buf.toString()
 });
 instream.on('end', function(){
-	input += '\n\n\n';
-	if(argv['dump-input']) { outstream.write(input); return }
-	var gs0 = patel.globals();
-	gs0.strict = argv.strict;
-	
-	var lcmap = generateLineAndColumnMap(input);
-	var lines = input.split("\n");
-	// macros returning information about the file
-	gs0.macros.put("input-path", function(){
-		if(argv.l) return ['.quote', '|argv.l']
-		if(argv._[0]) return ['.quote', argv._[0]]
-		return ['.quote', '|-']
+	var compileResult = plex.compile(input, {
+		patel: patel,
+		from: argv.l ? {argv : 'l'} : argv._[0] ? {file : argv._[0]} : {stream : 'stdin'},
+		strict: argv.strict,
+		optimize: argv.optimize,
+		mangle: argv.mangle,
+		ugly: argv.ugly,
+		
+		'dump-input': argv['dump-input'],
+		'dump-ast': argv['dump-ast'],
+		'dump-expanded': argv['dump-expanded'],
+		'dump-regularized': argv['dump-regularized'],
+		'dump-transformed': argv['dump-transformed']
+	}, function(ex, result, dump){
+		if(ex){
+			if(ex.suberrors) {
+				for(var j = 0; j < ex.suberrors.length; j++){ reportError(ex.suberrors[j]) }
+			} else {
+				reportError(ex);
+			}
+		} else if(result){
+			if(argv['source-map']) {
+				outstream.write(result.map.toString() + '\n');
+			} else {
+				if(os.platform() === 'win32') outstream.write('\uFEFF');
+				outstream.write(result.code + '\n');
+			}
+		} else {
+			if(typeof dump === 'string') dumpString(dump)
+			else dumpStruct(dump)
+		}
 	});
-	var gs = new patel.Scope(gs0);
-	gs.strict = argv.strict;
-	
-	try {
-		var ast = patel.parse(input, {within: { file: gs.macros.get('input-path')()[1], input: input }});
-	} catch(ex){
-		process.stderr.write(ex.message + '\nAt Line ' + ex.line + ', Column' + ex.column);
-		process.exit(1);
-	};
-	
-	try {
-		if(argv['dump-ast']) { dump(ast); return }
-		var xastP = patel.ex(patel.prepareAST, gs0);
-		var xast = ['.begin', xastP, patel.ex(ast, gs)];
-		patel.checkEvaluated(xast);
-		if(argv['dump-expanded']) { dump(xast); return }
-		var rast = patel.regularize(xast, gs);
-		if(argv['dump-regularized']) { dump(rast); return }
-		var tast = patel.pat2esc(rast, gs, lcmap);
-		if(tast.type === "BlockStatement") {
-			tast.type = "Program"
-		} else {
-			tast = {
-				type: "Program",
-				body: [tast]
-			}
-		}
-		if(argv.strict) tast.body.unshift({
-			type: 'ExpressionStatement',
-			expression: {
-				type: 'Literal',
-				value: 'use strict'
-			}
-		});
-		if(argv['dump-transformed']) { dump(tast); return }
-		if(argv.optimize) tast = esmangle.optimize(tast);
-		if(argv.mangle) tast = esmangle.mangle(tast);
-		
-		var options = {sourceMap: argv._[0] || '(stdin)', sourceMapWithCode: true};
-		if(argv.ugly) {
-			options.format = {
-				renumber: true,
-				hexadecimal: true,
-				escapeless: false,
-				compact: true,
-				semicolons: false,
-				parentheses: false
-			}
-		}
-		var result = patel.generateCode(tast, options)
-		
-		if(argv.source_map) {
-			outstream.write(result.map.toString() + '\n');
-		} else {
-			if(os.platform() === 'win32') outstream.write('\uFEFF');
-			outstream.write(result.code + '\n');
-		}
-	} catch(ex) {
-		if(ex && ex.suberrors) {
-			for(var j = 0; j < ex.suberrors.length; j++){ reportError(ex.suberrors[j], lcmap, lines) }
-		}
-		else reportError(ex, lcmap, lines);
-		process.exit(1);
-	}
+	if(!compileResult) return;
 });
