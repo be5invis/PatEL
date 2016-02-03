@@ -17,8 +17,8 @@ function generateLineAndColumnMap(input){
 		column: columns
 	}
 }
-
-exports.compile = function(_input, _options, callback){
+exports.generateLineAndColumnMap = generateLineAndColumnMap
+function compile(_input, _options, callback){
 	var input = _input + '\n\n\n';
 	var options = _options || {};
 	var patel = options.patel || patel_default;
@@ -101,3 +101,4 @@ exports.compile = function(_input, _options, callback){
 		return callback(ex);
 	}
 }
+exports.compile = compile;

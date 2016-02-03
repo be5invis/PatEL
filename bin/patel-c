@@ -37,22 +37,7 @@ var instream = function(){
 }();
 var outstream = argv.o ? fs.createWriteStream(argv.o, { encoding: 'utf-8' }): process.stdout;
 
-function generateLineAndColumnMap(input){
-	var lines = [];
-	var columns = [];
-	var line = 1;
-	var col = 0
-	for(var j = 0; j < input.length; j++) {
-		lines[j] = line;
-		columns[j] = col;
-		if(input[j] === '\n') { line += 1; col = 0 }
-		else { col += 1 }
-	};
-	return {
-		line: lines,
-		column: columns
-	}
-}
+var generateLineAndColumnMap = plex.generateLineAndColumnMap
 
 function deepcopy(form){
 	if(form instanceof Array) return form.map(deepcopy)
