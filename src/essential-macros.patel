@@ -243,16 +243,11 @@ define-macro export : syntax-rules
 
 # The mighty [class] macro implements OOP operations
 define-macro class : syntax-rules
-	`[class @typename @::_terms] [atom typename] : begin
-		local terms : _terms.map formOf
+	`[class @typename @::_classBodyLines] [atom typename] : begin
+		local bodylines : _classBodyLines.map formOf
 		local Inherits null
-		local ctorparams `[]
-		local ctorbody `[begin]
-		
-		local publicTerms {}
-		local privateTerms {}
-		local protectedTerms {}
-		local staticTerms {}
+
+		local terms {}
 		local accessorAssignments {.}
 		
 		define [wrapPublicMethodBody name body] `[begin \\
@@ -280,123 +275,141 @@ define-macro class : syntax-rules
 			* @body
 		]
 		
+		define [ConstructorTerm params body] : lambda `[set Constructor : function @params : begin \\
+			define-macro super : syntax-rules
+				`[super @::args] `[Super.call @[dirty `this] @::args]
+			* @body
+			return nothing
+		]
+		define [PublicTerm name val] : lambda [] `[set Type.prototype.(@{".quote" name}) @val]
+		define [PublicAccessorTerm kind name val] : begin
+			local r : lambda [] `nothing
+			if [not accessorAssignments.(name)] : then
+				set f {
+					.get [if externEnv.strict `[lambda [] : throw "The property \(@{'.quote' name}) is write-only."] `nothing]
+					.set [if externEnv.strict `[lambda [] : throw "The property \(@{'.quote' name}) is read-only."] `nothing]
+				}
+				set accessorAssignments.(name) f
+				set r : lambda [] `[@[externEnv.use 'Object'].defineProperty Type.prototype @{".quote" name} {
+					.get @(accessorAssignments.(name).get)
+					.set @(accessorAssignments.(name).set)
+				}]
+			set accessorAssignments.(name).(kind) val
+			return r
+		define [PrivateTerm name val] : lambda [] `[begin \\
+			local @('__private_' + name) [Symbol]
+			set Type.prototype.(@('__private_' + name)) @val
+		]
+		define [ProtectedTerm name val] : lambda [] `[begin \\
+			if [not protectedTerms.(@{".quote" name})] : set protectedTerms.(@{".quote" name}) [Symbol]
+			set Type.prototype.(protectedTerms.(@{".quote" name})) @val
+		]
+		define [StaticTerm name val] : lambda [] `[set Type.(@{".quote" name}) @val]
+		
 		define [handleTerm term] : match term
 			# Inheritance term
-			`[inherits @Super] : set Inherits Super
+			`[inherits @Super @::indentedLines] : begin
+				set Inherits Super
+				indentedLines.forEach handleTerm # for `[class Type : inherits Base<newline><indent>whatever] form
 			
 			# Public term
 			# constructor
-			`[public [new @::params] @body] : begin
-				set ctorparams params
-				set ctorbody `[begin @body [return nothing]]
+			`[define public [new @::params] @body] : terms.push : ConstructorTerm params body
 			# property
-			`[public get @name @body] [atom name] : begin
+			`[define public get @name @body] [atom name] : terms.push : PublicAccessorTerm 'get' name `[lambda [] @[wrapPublicAccrssorBody name body]]
+			`[define public get @name] [atom name] : handleTerm `[define public get @name [private @name]]
+			`[define public set @name @value @body] [atom name] : terms.push : PublicAccessorTerm 'set' name `[lambda [@value] @[wrapPublicAccrssorBody name body]]
+			`[define public set @name] [atom name] : handleTerm `[define public set @name value : set [private @name] value]
+
+			`[define public @modifer get @name @body] [atom name] : begin
 				if [not accessorAssignments.(name)] : set accessorAssignments.(name) {.get `nothing .set `nothing}
-				set accessorAssignments.(name).get `[lambda [] @[wrapPublicAccrssorBody name body]]
-			`[public get @name] [atom name] : handleTerm `[public get @name [private @name]]
-			`[public set @name @value @body] [atom name] : begin
+				set accessorAssignments.(name).get `[@modifer : lambda [] @[wrapPublicAccrssorBody name body]]
+			`[define public @modifer get @name] [atom name] : handleTerm `[define public @modifer get @name [private @name]]
+			`[define public @modifer set @name @value @body] [atom name] : begin
 				if [not accessorAssignments.(name)] : set accessorAssignments.(name) {.get `nothing .set `nothing}
-				set accessorAssignments.(name).set `[lambda [@value] @[wrapPublicAccrssorBody name body]]
-			`[public set @name] [atom name] : handleTerm `[public set @name value : set [private @name] value]
+				set accessorAssignments.(name).set `[@modifer : lambda [@value] @[wrapPublicAccrssorBody name body]]
+			`[define public @modifer set @name] [atom name] : handleTerm `[define public @modifer set @name value : set [private @name] value]
 			# method
-			`[public [@name @::params] @body] [atom name] : begin
-				publicTerms.push {`(Type.prototype.(@{".quote" name})) `[lambda @params @[wrapPublicMethodBody name body]]}
+			`[define public [@name @::params] @body] [atom name] : begin
+				terms.push : PublicTerm name `[lambda @params @[wrapPublicMethodBody name body]]
+			`[define public @modifer [@name @::params] @body] [atom name] : begin
+				terms.push : PublicTerm name `[@modifer : lambda @params @[wrapPublicMethodBody name body]]
 			# proto value
-			`[public @name @val] [atom name] : begin
-				publicTerms.push {`(Type.prototype.(@{".quote" name})) val}
+			`[define public @name @val] [atom name] : begin
+				terms.push : PublicTerm name val
 
 			# Private term, use symbols
-			`[private @name] [atom name] : privateTerms.push {name `nothing}
-			`[private @name @val] [atom name] : privateTerms.push {name val}
-			`[private [@name @::params] @body] [atom name] : privateTerms.push {name `[function @params @body]}
+			`[define private @name] [atom name] : terms.push : PrivateTerm name `nothing
+			`[define private @name @val] [atom name] : terms.push : PrivateTerm name val
+			`[define private [@name @::params] @body] [atom name] : terms.push : PrivateTerm name `[function @params @body]
+			`[define private @modifer [@name @::params] @body] [atom name] : terms.push : PrivateTerm name `[@modifer : function @params @body]
 			
 			# Protected term, use symbols
-			`[protected @name] [atom name] : protectedTerms.push {name `nothing}
-			`[protected @name @val] [atom name] : protectedTerms.push {name val}
-			`[protected [@name @::params] @body] [atom name] : protectedTerms.push {name `[function @params @[wrapProtectedMethodBody name body]]}
+			`[define protected @name] [atom name] : terms.push : ProtectedTerm name `nothing
+			`[define protected @name @val] [atom name] : terms.push : ProtectedTerm name val
+			`[define protected [@name @::params] @body] [atom name] : terms.push : ProtectedTerm name `[function @params @[wrapProtectedMethodBody name body]]
+			`[define protected @modifer [@name @::params] @body] [atom name] : terms.push : ProtectedTerm name `[@modifer : function @params @[wrapProtectedMethodBody name body]]
 			
-			# Static terms
-			`[static @name] [atom name] : staticTerms.push {name `nothing}
-			`[static @name @val] [atom name] : staticTerms.push {name val}
-			`[static [@name @::params] @body] [atom name] : staticTerms.push {name `[function @params @body]}
+			# Static term
+			`[define static @name] [atom name] : terms.push : StaticTerm name `nothing
+			`[define static @name @val] [atom name] : terms.push : StaticTerm name val
+			`[define static [@name @::params] @body] [atom name] : terms.push : StaticTerm name `[function @params @body]
+			`[define static @modifer [@name @::params] @body] [atom name] : terms.push : StaticTerm name `[@modifer : function @params @body]
+			
+			# Shorthands
+			`[public @::whatever] : handleTerm `[define public @::whatever]
+			`[private @::whatever] : handleTerm `[define private @::whatever]
+			`[protected @::whatever] : handleTerm `[define protected @::whatever]
+			`[static @::whatever] : handleTerm `[define static @::whatever]
+			
+			# Modifer applications
+			`[apply @mdf] : terms.push : lambda [] `[@mdf.call Type.prototype Type Super]
+			
+			otherwise : the-form-is-invalid
 
-		foreach [term terms] : handleTerm term
+		foreach [bl bodylines] : handleTerm bl
 		
 		return : dirty `[begin \\
 			define @typename : [function [Super] : begin \\
-				define-macro public : begin
-					local f : syntax-rules
-						`[public @name] [atom name] : dirty `(this.(@{".quote" [formOf name]}))
-					set coinit.initFn : lambda [m] : begin
-						set m.toPattern : lambda [form env w] : match form
-							`[public @name] [atom name] : object
-								whether : lambda [t] `true
-								assign : lambda [t locally] : ex `[set this.(@{".quote" name}) @t] env
-					*f
-				define-macro private : begin
-					local f : syntax-rules
-						`[private @name] [atom name] : dirty `(this.(@[definingEnv.use ("__private_" + [formOf name])]))
-					set coinit.initFn : lambda [m] : begin
-						set m.toPattern : lambda [form env w] : match form
-							`[private @name] [atom name] : object
-								whether : lambda [t] `true
-								assign : lambda [t locally] : ex `[set this.(@[definingEnv.use ("__private_" + name)]) @t] env
-					*f
-				define-macro protected : begin
-					local f : syntax-rules
-						`[protected @name] [atom name] : dirty `(this.(@[definingEnv.use 'protectedTerms'].(@{".quote" [formOf name]})))
-					set coinit.initFn : lambda [m] : begin
-						set m.toPattern : lambda [form env w] : match form
-							`[protected @name] [atom name] : object
-								whether : lambda [t] `true
-								assign : lambda [t locally] : ex `[set (this.(@[definingEnv.use 'protectedTerms'].(@{".quote" name}))) @t] env
-					*f
-
 				# constructor
-				local Type [function @ctorparams : begin \\
-					define-macro super : syntax-rules
-						`[super @::args] `[Super.call @[dirty `this] @::args]
-					* @ctorbody
-				]
+				local Constructor : lambda
+				local Type [function [] : begin [Constructor.apply this arguments] [return nothing]]
 				
 				# inheritance
 				* @[if Inherits `[set Type.prototype [@[externEnv.use 'Object'].create Super.prototype]] `nothing]
 				
 				extern Symbol
-				
 				[lambda [] : begin \\
-					# private terms
-					begin @::[privateTerms.map : t -> : begin \\
-						local {name val} t
-						return `[begin \\
-							local @('__private_' + name) [Symbol]
-							set Type.prototype.(@('__private_' + name)) @val
-						]
-					]
-					
-					# protected terms
+					define-macro public : begin
+						local f : syntax-rules
+							`[public @name] [atom name] : dirty `(this.(@{".quote" [formOf name]}))
+						set coinit.initFn : lambda [m] : begin
+							set m.toPattern : lambda [form env w] : match form
+								`[public @name] [atom name] : object
+									whether : lambda [t] `true
+									assign : lambda [t locally] : ex `[set this.(@{".quote" name}) @t] env
+						*f
+					define-macro private : begin
+						local f : syntax-rules
+							`[private @name] [atom name] : dirty `(this.(@[definingEnv.use ("__private_" + [formOf name])]))
+						set coinit.initFn : lambda [m] : begin
+							set m.toPattern : lambda [form env w] : match form
+								`[private @name] [atom name] : object
+									whether : lambda [t] `true
+									assign : lambda [t locally] : ex `[set this.(@[definingEnv.use ("__private_" + name)]) @t] env
+						*f
+					define-macro protected : begin
+						local f : syntax-rules
+							`[protected @name] [atom name] : dirty `(this.(@[definingEnv.use 'protectedTerms'].(@{".quote" [formOf name]})))
+						set coinit.initFn : lambda [m] : begin
+							set m.toPattern : lambda [form env w] : match form
+								`[protected @name] [atom name] : object
+									whether : lambda [t] `true
+									assign : lambda [t locally] : ex `[set (this.(@[definingEnv.use 'protectedTerms'].(@{".quote" name}))) @t] env
+						*f
 					set Type.protectedTerms : local protectedTerms : @[externEnv.use 'Object'].create (Super.protectedTerms || null)
-					begin @::[protectedTerms.map : t -> : begin \\
-						local {name val} t
-						return `[begin \\
-							if [not protectedTerms.(@{".quote" name})] : set protectedTerms.(@{".quote" name}) [Symbol]
-							set Type.prototype.(protectedTerms.(@{".quote" name})) @val
-						]
-					]
-					
-					# method defs
-					begin @::[publicTerms.map : function [t] : begin [local {name val} t] `[set @name @val]]
-					
-					# accessor defs
-					begin @::[[Object.keys accessorAssignments].map : key -> : begin \\
-						return `[@[externEnv.use 'Object'].defineProperty Type.prototype @{".quote" key} {
-							.get @(accessorAssignments.(key).get)
-							.set @(accessorAssignments.(key).set)
-						}]
-					]
-					
-					# static terms
-					begin @::[staticTerms.map : function [t] : begin [local {name val} t] `[set Type.(@{".quote" name}) @val]]
+
+					begin @::[terms.map : [t] -> [t]]
 					
 					return nothing
 				].call Type.prototype
