@@ -22,8 +22,8 @@ define-operator infix "<>" 800 'never' : begin
 
 console.log 'SAMPLE : INFIX'
 console.log : 1 <> 2
-let (x <> y) (1 <> 2)
-console.log x y
+let [(x <> y) (1 <> 2)] : begin
+	console.log x y
 
 console.log : (1 <> 2) <~> ({p q} <> y)
 console.log : (1 <> 2) <~> (x <> y)

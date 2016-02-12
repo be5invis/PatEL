@@ -1,4 +1,4 @@
-﻿var r1_Scope, r1_atom, r1_identifier, r1_prim, r1_FormInvalidError, r1_trace, r1_NodeTranslation, r1_deQuasiquote, r1_ASSOC_LEFT, r1_ASSOC_NEVER, r1_ASSOC_RIGHT, r1_getOperatorInfo, r1_opSegToRegular, r1_ex, r1_checkEvaluated, _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, _r1_t5, _r1_t6, _r1_t7, _r1_t8, _r1_t9;
+﻿var r1_Scope, r1_atom, r1_identifier, r1_prim, r1_trace, r1_findform, r1_FormInvalidError, r1_NodeTranslation, r1_deQuasiquote, r1_ASSOC_LEFT, r1_ASSOC_NEVER, r1_ASSOC_RIGHT, r1_getOperatorInfo, r1_opSegToRegular, r1_ex, r1_checkEvaluated, _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, _r1_t5, _r1_t6, _r1_t7, _r1_tag8, _r1_t9, _r1_t10, _r1_t11, _r1_t12, _r1_t13, _r1_t14, _r1_t15;
 r1_Scope = require('patrisika').Scope, r1_atom = function _r1_t0(r113_x) {
     var r113_x;
     return typeof r113_x === 'string';
@@ -8,220 +8,233 @@ r1_Scope = require('patrisika').Scope, r1_atom = function _r1_t0(r113_x) {
 }, r1_prim = function _r1_t2(r115_x) {
     var r115_x;
     return r1_atom(r115_x) && !r1_identifier(r115_x);
-}, r1_FormInvalidError = require('patrisika').FormInvalidError, r1_trace = [], r1_NodeTranslation = function _r1_t3(r116_fn) {
-    var r116_fn;
-    return function _r116_t2(r117_form, r117_env) {
-        var r117_form, r117_env, r117_res, r117_found, r117_j, _r117_t0, _r117_t1;
-        if (_r117_t0 = this, _r117_t1 = arguments, r1_trace.push(r117_form), r117_res = r116_fn.apply(_r117_t0, _r117_t1), r117_env.options.trace && typeof r117_form === 'string' && r117_res[0] === '.id')
-            for (r117_found = !1, r117_j = r1_trace.length - 1; r117_j >= 0 && !r117_found; r117_j -= 1)
-                r1_trace[r117_j] && r1_trace[r117_j].within && r1_trace[r117_j].begins >= 0 && r1_trace[r117_j].ends >= 0 && (r117_found = !0, r117_res.begins = r1_trace[r117_j].begins, r117_res.ends = r1_trace[r117_j].ends, r117_res.within = r1_trace[r117_j].within);
-        else
-            r117_form && r117_res && r117_form.begins >= 0 && (r117_res.begins = r117_form.begins), r117_form && r117_res && r117_form.ends >= 0 && (r117_res.ends = r117_form.ends), r117_form && r117_res && r117_form.within && (r117_res.within = r117_form.within);
-        return r1_trace.pop(r117_form), r117_res;
+}, r1_trace = [], r1_findform = function _r1_t3(r116_form) {
+    var r116_form, r116_j, r116_found;
+    if (r116_form && r116_form.within && r116_form.begins >= 0 && r116_form.ends >= 0)
+        return r116_form;
+    for (r116_j = r1_trace.length - 1; r116_j >= 0 && !r116_found; r116_j -= 1)
+        if (r1_trace[r116_j] && r1_trace[r116_j].within && r1_trace[r116_j].begins >= 0 && r1_trace[r116_j].ends >= 0)
+            return r1_trace[r116_j];
+    return r116_form;
+}, _r1_t4 = require('patrisika').FormInvalidError, r1_FormInvalidError = function (r117_raw, _r117_t0) {
+    return function _r117_t0(r118_form, r118_reason) {
+        var r118_form, r118_reason;
+        return new r117_raw(r1_findform(r118_form), r118_reason);
     };
-}, r1_deQuasiquote = function _r1_t4(r118_form, r118_level, r118_env) {
-    var r118_form, r118_level, r118_env, r118_otherwise, r118_xs, r118_x, r118_commonParts, r118_items, r118_c, r118_decLevel, _r118_t0, _r118_t1;
-    return _r118_t0 = r118_form, Array.isArray(_r118_t0) && _r118_t0.length === 2 && '.unquote' === _r118_t0[0] ? (r118_c = _r118_t0[1], r118_level ? [
+}(_r1_t4), r1_NodeTranslation = function _r1_t9(r119_fn) {
+    var r119_fn;
+    return function _r119_t2(r120_form, r120_env) {
+        var r120_form, r120_env, r120_res, r120_found, r120_j, _r120_t0, _r120_t1;
+        if (_r120_t0 = this, _r120_t1 = arguments, r1_trace.push(r120_form), r120_res = r119_fn.apply(_r120_t0, _r120_t1), r120_env.options.trace && typeof r120_form === 'string' && r120_res[0] === '.id')
+            for (r120_found = !1, r120_j = r1_trace.length - 1; r120_j >= 0 && !r120_found; r120_j -= 1)
+                r1_trace[r120_j] && r1_trace[r120_j].within && r1_trace[r120_j].begins >= 0 && r1_trace[r120_j].ends >= 0 && (r120_found = !0, r120_res.begins = r1_trace[r120_j].begins, r120_res.ends = r1_trace[r120_j].ends, r120_res.within = r1_trace[r120_j].within);
+        else
+            r120_form && r120_res && r120_form.begins >= 0 && (r120_res.begins = r120_form.begins), r120_form && r120_res && r120_form.ends >= 0 && (r120_res.ends = r120_form.ends), r120_form && r120_res && r120_form.within && (r120_res.within = r120_form.within);
+        return r1_trace.pop(r120_form), r120_res;
+    };
+}, r1_deQuasiquote = function _r1_t10(r121_form, r121_level, r121_env) {
+    var r121_form, r121_level, r121_env, r121_otherwise, r121_xs, r121_x, r121_commonParts, r121_items, r121_c, r121_decLevel, _r121_t0, _r121_t1;
+    return _r121_t0 = r121_form, Array.isArray(_r121_t0) && _r121_t0.length === 2 && '.unquote' === _r121_t0[0] ? (r121_c = _r121_t0[1], r121_level ? [
         '.list',
         [
             '.quote',
             '.unquote'
         ],
-        r1_deQuasiquote(r118_c, r118_level - 1, r118_env)
-    ] : r118_c) : Array.isArray(_r118_t0) && _r118_t0.length === 3 && '.unquote' === _r118_t0[0] && Array.isArray(_r118_t0[2]) && _r118_t0[2].length === 2 && '.quote' === _r118_t0[2][0] ? (r118_c = _r118_t0[1], r118_decLevel = _r118_t0[2][1], _r118_t0[2], r118_decLevel = Math.max(1, Math.floor(r118_decLevel)), r118_level - r118_decLevel < 0 ? r118_c : [
+        r1_deQuasiquote(r121_c, r121_level - 1, r121_env)
+    ] : r121_c) : Array.isArray(_r121_t0) && _r121_t0.length === 3 && '.unquote' === _r121_t0[0] && Array.isArray(_r121_t0[2]) && _r121_t0[2].length === 2 && '.quote' === _r121_t0[2][0] ? (r121_c = _r121_t0[1], r121_decLevel = _r121_t0[2][1], _r121_t0[2], r121_decLevel = Math.max(1, Math.floor(r121_decLevel)), r121_level - r121_decLevel < 0 ? r121_c : [
         '.list',
         [
             '.quote',
             '.unquote'
         ],
-        r1_deQuasiquote(r118_c, r118_level - r118_decLevel, r118_env)
-    ]) : Array.isArray(_r118_t0) && _r118_t0.length === 2 && '.quasiquote' === _r118_t0[0] ? (r118_c = _r118_t0[1], [
+        r1_deQuasiquote(r121_c, r121_level - r121_decLevel, r121_env)
+    ]) : Array.isArray(_r121_t0) && _r121_t0.length === 2 && '.quasiquote' === _r121_t0[0] ? (r121_c = _r121_t0[1], [
         '.list',
         [
             '.quote',
             '.quasiquote'
         ],
-        r1_deQuasiquote(r118_c, r118_level + 1, r118_env)
-    ]) : Array.isArray(_r118_t0) && _r118_t0.length >= 1 && '.operatorPiece' === _r118_t0[0] ? (r118_items = _r118_t0.slice(1), r1_deQuasiquote(r1_opSegToRegular(r118_items, r118_env), r118_level, r118_env)) : Array.isArray(_r118_t0) && _r118_t0.length >= 0 ? (r118_xs = _r118_t0.slice(0), _r118_t1 = r118_xs[r118_xs.length - 1], Array.isArray(_r118_t1) && _r118_t1.length === 2 && '.sliceunquote' === _r118_t1[0] ? (r118_x = _r118_t1[1], r118_commonParts = r118_xs.slice(0, -1).map(function _r118_t4(r120_c) {
-        var r120_c;
-        return r1_deQuasiquote(r120_c, r118_level, r118_env);
-    }), r118_level ? ['.list'].concat(r118_commonParts, [[
+        r1_deQuasiquote(r121_c, r121_level + 1, r121_env)
+    ]) : Array.isArray(_r121_t0) && _r121_t0.length >= 1 && '.operatorPiece' === _r121_t0[0] ? (r121_items = _r121_t0.slice(1), r1_deQuasiquote(r1_opSegToRegular(r121_items, r121_env), r121_level, r121_env)) : Array.isArray(_r121_t0) && _r121_t0.length >= 0 ? (r121_xs = _r121_t0.slice(0), _r121_t1 = r121_xs[r121_xs.length - 1], Array.isArray(_r121_t1) && _r121_t1.length === 2 && '.sliceunquote' === _r121_t1[0] ? (r121_x = _r121_t1[1], r121_commonParts = r121_xs.slice(0, -1).map(function _r121_t4(r123_c) {
+        var r123_c;
+        return r1_deQuasiquote(r123_c, r121_level, r121_env);
+    }), r121_level ? ['.list'].concat(r121_commonParts, [[
             '.list',
             [
                 '.quote',
                 '.sliceunquote'
             ],
-            r1_deQuasiquote(r118_x, r118_level - 1, r118_env)
-        ]]) : ['.conslist'].concat(r118_commonParts, [r118_x])) : (r118_otherwise = _r118_t1, ['.list'].concat(r118_xs.map(function _r118_t5(r119_c) {
-        var r119_c;
-        return r1_deQuasiquote(r119_c, r118_level, r118_env);
-    })))) : (r118_otherwise = _r118_t0, [
+            r1_deQuasiquote(r121_x, r121_level - 1, r121_env)
+        ]]) : ['.conslist'].concat(r121_commonParts, [r121_x])) : (r121_otherwise = _r121_t1, ['.list'].concat(r121_xs.map(function _r121_t5(r122_c) {
+        var r122_c;
+        return r1_deQuasiquote(r122_c, r121_level, r121_env);
+    })))) : (r121_otherwise = _r121_t0, [
         '.quote',
-        r118_otherwise
+        r121_otherwise
     ]);
-}, r1_ASSOC_LEFT = 'left', r1_ASSOC_NEVER = 'never', r1_ASSOC_RIGHT = 'right', r1_getOperatorInfo = function _r1_t5(r121_operator, r121_env) {
-    var r121_operator, r121_env, r121_priority, r121_associvity, _r121_t0, _r121_t1;
-    if (r121_env.operatorInfo.has(r121_operator))
-        return r121_env.operatorInfo.get(r121_operator);
-    for (; r121_operator[0] === '<' && r121_operator[r121_operator.length - 1] === '>';)
-        r121_operator = r121_operator.slice(1, -1);
-    return r121_priority = 1000, r121_associvity = r1_ASSOC_RIGHT, r121_operator && r121_operator !== '=' && (_r121_t0 = r121_operator[0], r121_priority = '?' === _r121_t0 ? 100 : '^' === _r121_t0 ? 100 : '*' === _r121_t0 ? 200 : '/' === _r121_t0 ? 200 : '%' === _r121_t0 ? 200 : '+' === _r121_t0 ? 300 : '-' === _r121_t0 ? 300 : '=' === _r121_t0 ? 400 : '!' === _r121_t0 ? 400 : '<' === _r121_t0 ? 500 : '>' === _r121_t0 ? 500 : '&' === _r121_t0 ? 600 : '|' === _r121_t0 ? 700 : 1000, r121_associvity = r121_operator.length > 1 && r121_operator[r121_operator.length - 1] === '>' ? r1_ASSOC_RIGHT : (_r121_t1 = r121_operator[0], '!' === _r121_t1 ? r1_ASSOC_NEVER : '=' === _r121_t1 ? r1_ASSOC_NEVER : '<' === _r121_t1 ? r1_ASSOC_NEVER : '>' === _r121_t1 ? r1_ASSOC_NEVER : r1_ASSOC_LEFT)), {
-        'priority': r121_priority,
-        'associvity': r121_associvity
+}, r1_ASSOC_LEFT = 'left', r1_ASSOC_NEVER = 'never', r1_ASSOC_RIGHT = 'right', r1_getOperatorInfo = function _r1_t11(r124_operator, r124_env) {
+    var r124_operator, r124_env, r124_priority, r124_associvity, _r124_t0, _r124_t1;
+    if (r124_env.operatorInfo.has(r124_operator))
+        return r124_env.operatorInfo.get(r124_operator);
+    for (; r124_operator[0] === '<' && r124_operator[r124_operator.length - 1] === '>';)
+        r124_operator = r124_operator.slice(1, -1);
+    return r124_priority = 1000, r124_associvity = r1_ASSOC_RIGHT, r124_operator && r124_operator !== '=' && (_r124_t0 = r124_operator[0], r124_priority = '?' === _r124_t0 ? 100 : '^' === _r124_t0 ? 100 : '*' === _r124_t0 ? 200 : '/' === _r124_t0 ? 200 : '%' === _r124_t0 ? 200 : '+' === _r124_t0 ? 300 : '-' === _r124_t0 ? 300 : '=' === _r124_t0 ? 400 : '!' === _r124_t0 ? 400 : '<' === _r124_t0 ? 500 : '>' === _r124_t0 ? 500 : '&' === _r124_t0 ? 600 : '|' === _r124_t0 ? 700 : 1000, r124_associvity = r124_operator.length > 1 && r124_operator[r124_operator.length - 1] === '>' ? r1_ASSOC_RIGHT : (_r124_t1 = r124_operator[0], '!' === _r124_t1 ? r1_ASSOC_NEVER : '=' === _r124_t1 ? r1_ASSOC_NEVER : '<' === _r124_t1 ? r1_ASSOC_NEVER : '>' === _r124_t1 ? r1_ASSOC_NEVER : r1_ASSOC_LEFT)), {
+        'priority': r124_priority,
+        'associvity': r124_associvity
     };
-}, r1_opSegToRegular = function _r1_t6(r122_items, r122_env) {
-    var r122_items, r122_env, r122_uber, r122_j, r122_operator, r122_operand, r122_nbp, r122_assoc, r122_node, r122_n, _r122_t0;
-    for (r122_uber = [
+}, r1_opSegToRegular = function _r1_t12(r125_items, r125_env) {
+    var r125_items, r125_env, r125_uber, r125_j, r125_operator, r125_operand, r125_nbp, r125_assoc, r125_node, r125_n, _r125_t0;
+    for (r125_uber = [
             '.OG',
             void 0,
-            r122_items[0]
-        ], r122_uber.bp = 65534, r122_j = 1; r122_j < r122_items.length;)
-        if (r122_operator = r122_items[r122_j], r122_operand = r122_items[r122_j + 1], r122_j += 2, _r122_t0 = r1_getOperatorInfo(r122_operator, r122_env), r122_nbp = _r122_t0.priority, r122_assoc = _r122_t0.associvity, r122_nbp > 65534 && (r122_nbp = 65534), r122_node = [
-                r122_operator,
+            r125_items[0]
+        ], r125_uber.bp = 65534, r125_j = 1; r125_j < r125_items.length;)
+        if (r125_operator = r125_items[r125_j], r125_operand = r125_items[r125_j + 1], r125_j += 2, _r125_t0 = r1_getOperatorInfo(r125_operator, r125_env), r125_nbp = _r125_t0.priority, r125_assoc = _r125_t0.associvity, r125_nbp > 65534 && (r125_nbp = 65534), r125_node = [
+                r125_operator,
                 void 0,
-                r122_operand
-            ], r122_node.bp = r122_nbp, r122_n = r122_uber, r122_assoc === r1_ASSOC_LEFT || r122_assoc === r1_ASSOC_NEVER) {
-            for (; r122_n[2].bp > r122_nbp;)
-                r122_n = r122_n[2];
-            if (r122_assoc === r1_ASSOC_NEVER && r122_n[2].bp === r122_nbp)
-                throw new r1_FormInvalidError(r122_operand, 'Attempting to combine uncombinable operator ' + r122_operator + '.');
-            r122_node[1] = r122_n[2], r122_n[2] = r122_node;
-        } else if (r122_assoc === r1_ASSOC_RIGHT) {
-            for (; r122_n[2].bp >= r122_nbp;)
-                r122_n = r122_n[2];
-            r122_node[1] = r122_n[2], r122_n[2] = r122_node;
+                r125_operand
+            ], r125_node.bp = r125_nbp, r125_n = r125_uber, r125_assoc === r1_ASSOC_LEFT || r125_assoc === r1_ASSOC_NEVER) {
+            for (; r125_n[2].bp > r125_nbp;)
+                r125_n = r125_n[2];
+            if (r125_assoc === r1_ASSOC_NEVER && r125_n[2].bp === r125_nbp)
+                throw new r1_FormInvalidError(r125_operand, 'Attempting to combine uncombinable operator ' + r125_operator + '.');
+            r125_node[1] = r125_n[2], r125_n[2] = r125_node;
+        } else if (r125_assoc === r1_ASSOC_RIGHT) {
+            for (; r125_n[2].bp >= r125_nbp;)
+                r125_n = r125_n[2];
+            r125_node[1] = r125_n[2], r125_n[2] = r125_node;
         } else
-            throw new r1_FormInvalidError(r122_operand, 'Invalid associvity denotion \'' + r122_assoc + '\' for ' + r122_operator + '.');
-    return r122_uber[2];
-}, r1_ex = r1_NodeTranslation(function _r1_t7(r123_form, r123_env) {
-    var r123_form, r123_env, r123_any, r123_x, r123_callee, r123_args, r123_a, r123_j, r123_arg0, r123_args1, r123_t, r123_items, r123_allKeysAreQuotes, r123_key, r123_value, r123_block, r123_param, r123_handler, r123_body, r123_params, r123_derived, r123_c, r123_e, _r123_t0, _r123_t1, _r123_t28;
-    if (_r123_t0 = r123_form, Array.isArray(_r123_t0) && _r123_t0.length === 2 && '.preserve' === _r123_t0[0])
-        return r123_x = _r123_t0[1], r123_x;
-    else if (Array.isArray(_r123_t0) && _r123_t0.length >= 1 && '.quote' === _r123_t0[0])
-        return r123_x = _r123_t0.slice(1), ['.quote'].concat(r123_x);
-    else if (Array.isArray(_r123_t0) && _r123_t0.length === 2 && '.quasiquote' === _r123_t0[0])
-        return r123_x = _r123_t0[1], r1_ex(r1_deQuasiquote(r123_x, 0, r123_env), r123_env);
-    else if (Array.isArray(_r123_t0) && _r123_t0.length === 2 && '.unquote' === _r123_t0[0])
-        return r123_x = _r123_t0[1], r1_ex(r123_x, r123_env);
-    else if (Array.isArray(_r123_t0) && _r123_t0.length >= 1 && '.id' === _r123_t0[0])
-        return r123_x = _r123_t0.slice(1), ['.id'].concat(r123_x);
-    else if (Array.isArray(_r123_t0) && _r123_t0.length >= 1 && '.t' === _r123_t0[0])
-        return r123_x = _r123_t0.slice(1), ['.t'].concat(r123_x);
-    else if (Array.isArray(_r123_t0) && _r123_t0.length === 3 && '.lambda' === _r123_t0[0] && Array.isArray(_r123_t0[1]) && _r123_t0[1].length >= 0) {
-        for (r123_args = _r123_t0[1].slice(0), _r123_t0[1], r123_body = _r123_t0[2], r123_derived = new r1_Scope(r123_env), r123_j = 0; r123_j < r123_args.length; r123_j += 1)
-            r123_derived.declare(r123_args[r123_j], !0), r123_args[r123_j] = r123_derived.use(r123_args[r123_j]);
+            throw new r1_FormInvalidError(r125_operand, 'Invalid associvity denotion \'' + r125_assoc + '\' for ' + r125_operator + '.');
+    return r125_uber[2];
+}, r1_ex = r1_NodeTranslation(function _r1_t13(r126_form, r126_env) {
+    var r126_form, r126_env, r126_any, r126_x, r126_callee, r126_args, r126_a, r126_j, r126_arg0, r126_args1, r126_t, r126_items, r126_allKeysAreQuotes, r126_key, r126_value, r126_block, r126_param, r126_handler, r126_body, r126_params, r126_derived, r126_c, r126_e, _r126_t0, _r126_t1, _r126_t28;
+    if (_r126_t0 = r126_form, Array.isArray(_r126_t0) && _r126_t0.length === 2 && '.preserve' === _r126_t0[0])
+        return r126_x = _r126_t0[1], r126_x;
+    else if (Array.isArray(_r126_t0) && _r126_t0.length >= 1 && '.quote' === _r126_t0[0])
+        return r126_x = _r126_t0.slice(1), ['.quote'].concat(r126_x);
+    else if (Array.isArray(_r126_t0) && _r126_t0.length === 2 && '.quasiquote' === _r126_t0[0])
+        return r126_x = _r126_t0[1], r1_ex(r1_deQuasiquote(r126_x, 0, r126_env), r126_env);
+    else if (Array.isArray(_r126_t0) && _r126_t0.length === 2 && '.unquote' === _r126_t0[0])
+        return r126_x = _r126_t0[1], r1_ex(r126_x, r126_env);
+    else if (Array.isArray(_r126_t0) && _r126_t0.length >= 1 && '.id' === _r126_t0[0])
+        return r126_x = _r126_t0.slice(1), ['.id'].concat(r126_x);
+    else if (Array.isArray(_r126_t0) && _r126_t0.length >= 1 && '.t' === _r126_t0[0])
+        return r126_x = _r126_t0.slice(1), ['.t'].concat(r126_x);
+    else if (Array.isArray(_r126_t0) && _r126_t0.length === 3 && '.lambda' === _r126_t0[0] && Array.isArray(_r126_t0[1]) && _r126_t0[1].length >= 0) {
+        for (r126_args = _r126_t0[1].slice(0), _r126_t0[1], r126_body = _r126_t0[2], r126_derived = new r1_Scope(r126_env), r126_j = 0; r126_j < r126_args.length; r126_j += 1)
+            r1_atom(r126_args[r126_j]) && (r126_derived.declare(r126_args[r126_j], !0), r126_args[r126_j] = r126_derived.use(r126_args[r126_j]));
         return [
             '.lambda.scoped',
-            r123_args,
-            r1_ex(r123_body, r123_derived),
-            r123_derived
+            r126_args,
+            r1_ex(r126_body, r126_derived),
+            r126_derived
         ];
-    } else if (Array.isArray(_r123_t0) && _r123_t0.length === 3 && '.syntactic-closure' === _r123_t0[0])
-        return r123_c = _r123_t0[1], r123_e = _r123_t0[2], r1_ex(r123_c, r123_e);
-    else if (Array.isArray(_r123_t0) && _r123_t0.length >= 3 && '.beta' === _r123_t0[0] && Array.isArray(_r123_t0[1]) && _r123_t0[1].length >= 0) {
-        for (r123_args = _r123_t0[1].slice(0), _r123_t0[1], r123_body = _r123_t0[2], r123_params = _r123_t0.slice(3), r123_derived = new r1_Scope(r123_env), r123_j = 0; r123_j < r123_args.length; r123_j += 1)
-            r123_derived.declare(r123_args[r123_j], !0), r123_args[r123_j] = r123_derived.use(r123_args[r123_j]);
-        for (r123_j = 0; r123_j < r123_args.length; r123_j += 1)
-            r123_params[r123_j] = r1_ex(r123_params[r123_j], r123_env);
+    } else if (Array.isArray(_r126_t0) && _r126_t0.length === 3 && '.syntactic-closure' === _r126_t0[0])
+        return r126_c = _r126_t0[1], r126_e = _r126_t0[2], r1_ex(r126_c, r126_e);
+    else if (Array.isArray(_r126_t0) && _r126_t0.length >= 3 && '.beta' === _r126_t0[0] && Array.isArray(_r126_t0[1]) && _r126_t0[1].length >= 0) {
+        for (r126_args = _r126_t0[1].slice(0), _r126_t0[1], r126_body = _r126_t0[2], r126_params = _r126_t0.slice(3), r126_derived = new r1_Scope(r126_env), r126_j = 0; r126_j < r126_args.length; r126_j += 1)
+            r1_atom(r126_args[r126_j]) && (r126_derived.declare(r126_args[r126_j], !0), r126_args[r126_j] = r126_derived.use(r126_args[r126_j]));
+        for (r126_j = 0; r126_j < r126_args.length; r126_j += 1)
+            r126_params[r126_j] = r1_ex(r126_params[r126_j], r126_env);
         return [
             '.beta.scoped',
-            r123_args,
-            r1_ex(r123_body, r123_derived),
-            r123_derived
-        ].concat(r123_params);
-    } else if (Array.isArray(_r123_t0) && _r123_t0.length === 4 && '.try' === _r123_t0[0] && Array.isArray(_r123_t0[2]) && _r123_t0[2].length === 1)
-        return r123_block = _r123_t0[1], r123_param = _r123_t0[2][0], _r123_t0[2], r123_handler = _r123_t0[3], r123_env.declare(r123_param), [
+            r126_args,
+            r1_ex(r126_body, r126_derived),
+            r126_derived
+        ].concat(r126_params);
+    } else if (Array.isArray(_r126_t0) && _r126_t0.length === 4 && '.try' === _r126_t0[0] && Array.isArray(_r126_t0[2]) && _r126_t0[2].length === 1)
+        return r126_block = _r126_t0[1], r126_param = _r126_t0[2][0], _r126_t0[2], r126_handler = _r126_t0[3], r126_env.declare(r126_param), [
             '.try',
-            r1_ex(r123_block, r123_env),
-            [r123_env.use(r123_param)],
-            r1_ex(r123_handler, r123_env)
+            r1_ex(r126_block, r126_env),
+            [r126_env.use(r126_param)],
+            r1_ex(r126_handler, r126_env)
         ];
-    else if (Array.isArray(_r123_t0) && _r123_t0.length >= 1 && '.xhash' === _r123_t0[0]) {
-        for (r123_args = _r123_t0.slice(1), r123_a = [], r123_allKeysAreQuotes = !0, r123_j = 1; r123_j < r123_form.length; r123_j += 1)
-            r123_key = r1_ex(r123_form[r123_j][0], r123_env), r123_value = r1_ex(r123_form[r123_j][1], r123_env), _r123_t1 = r123_key, Array.isArray(_r123_t1) && _r123_t1.length === 2 && '.quote' === _r123_t1[0] ? r123_x = _r123_t1[1] : r123_allKeysAreQuotes = !1, r123_a.push([
-                r123_key,
-                r123_value
+    else if (Array.isArray(_r126_t0) && _r126_t0.length >= 1 && '.xhash' === _r126_t0[0]) {
+        for (r126_args = _r126_t0.slice(1), r126_a = [], r126_allKeysAreQuotes = !0, r126_j = 1; r126_j < r126_form.length; r126_j += 1)
+            r126_key = r1_ex(r126_form[r126_j][0], r126_env), r126_value = r1_ex(r126_form[r126_j][1], r126_env), _r126_t1 = r126_key, Array.isArray(_r126_t1) && _r126_t1.length === 2 && '.quote' === _r126_t1[0] ? r126_x = _r126_t1[1] : r126_allKeysAreQuotes = !1, r126_a.push([
+                r126_key,
+                r126_value
             ]);
-        return r123_allKeysAreQuotes ? ['.hash'].concat(r123_a.map(function _r123_t27(r124_pair) {
-            var r124_pair;
+        return r126_allKeysAreQuotes ? ['.hash'].concat(r126_a.map(function _r126_t27(r127_pair) {
+            var r127_pair;
             return [
-                r124_pair[0][1],
-                r124_pair[1]
+                r127_pair[0][1],
+                r127_pair[1]
             ];
-        })) : (_r123_t28 = r123_env.newt(), function (r125_t, _r125_t0) {
+        })) : (_r126_t28 = r126_env.newt(), function (r128_t, _r128_t0) {
             return [
                 '.begin',
                 [
                     '.set',
-                    r125_t,
+                    r128_t,
                     ['.hash']
                 ]
-            ].concat(r123_a.map(function _r125_t0(r126_pair) {
-                var r126_pair;
+            ].concat(r126_a.map(function _r128_t0(r129_pair) {
+                var r129_pair;
                 return [
                     '.set',
                     [
                         '.',
-                        r125_t,
-                        r126_pair[0]
+                        r128_t,
+                        r129_pair[0]
                     ],
-                    r126_pair[1]
+                    r129_pair[1]
                 ];
-            }).concat([r125_t]));
-        }(_r123_t28));
-    } else if (Array.isArray(_r123_t0) && _r123_t0.length >= 1 && '.hash' === _r123_t0[0]) {
-        for (r123_args = _r123_t0.slice(1), r123_a = [], r123_j = 1; r123_j < r123_form.length; r123_j += 1)
-            r123_a.push([
-                r123_form[r123_j][0],
-                r1_ex(r123_form[r123_j][1], r123_env)
+            }).concat([r128_t]));
+        }(_r126_t28));
+    } else if (Array.isArray(_r126_t0) && _r126_t0.length >= 1 && '.hash' === _r126_t0[0]) {
+        for (r126_args = _r126_t0.slice(1), r126_a = [], r126_j = 1; r126_j < r126_form.length; r126_j += 1)
+            r126_a.push([
+                r126_form[r126_j][0],
+                r1_ex(r126_form[r126_j][1], r126_env)
             ]);
-        return ['.hash'].concat(r123_a);
-    } else if (Array.isArray(_r123_t0) && _r123_t0.length >= 1 && '.conslist' === _r123_t0[0])
-        return r123_items = _r123_t0.slice(1), [
+        return ['.hash'].concat(r126_a);
+    } else if (Array.isArray(_r126_t0) && _r126_t0.length >= 1 && '.conslist' === _r126_t0[0])
+        return r126_items = _r126_t0.slice(1), [
             [
                 '.',
-                r1_ex(['.list'].concat(r123_form.slice(1, -1)), r123_env),
+                r1_ex(['.list'].concat(r126_form.slice(1, -1)), r126_env),
                 [
                     '.quote',
                     'concat'
                 ]
             ],
-            r1_ex(r123_form[r123_form.length - 1], r123_env)
+            r1_ex(r126_form[r126_form.length - 1], r126_env)
         ];
-    else if (Array.isArray(_r123_t0) && _r123_t0.length >= 1 && '.operatorPiece' === _r123_t0[0])
-        return r123_items = _r123_t0.slice(1), r1_ex(r1_opSegToRegular(r123_items, r123_env), r123_env);
-    else if (Array.isArray(_r123_t0) && _r123_t0.length === 2 && '.local' === _r123_t0[0])
-        return r123_x = _r123_t0[1], r123_env.declare(r123_x), r123_env.use(r123_x);
-    else if (Array.isArray(_r123_t0) && _r123_t0.length >= 3 && '.revcall' === _r123_t0[0])
-        return r123_callee = _r123_t0[1], r123_arg0 = _r123_t0[2], r123_args1 = _r123_t0.slice(3), r1_atom(r123_callee) && r123_env.macros.has(r123_callee) && r123_env.macros.get(r123_callee) instanceof Function ? r123_env.macros.get(r123_callee)(r123_form.slice(1), r123_env) : (r123_t = r123_env.newt(), [
+    else if (Array.isArray(_r126_t0) && _r126_t0.length >= 1 && '.operatorPiece' === _r126_t0[0])
+        return r126_items = _r126_t0.slice(1), r1_ex(r1_opSegToRegular(r126_items, r126_env), r126_env);
+    else if (Array.isArray(_r126_t0) && _r126_t0.length === 2 && '.local' === _r126_t0[0])
+        return r126_x = _r126_t0[1], r126_env.declare(r126_x), r126_env.use(r126_x);
+    else if (Array.isArray(_r126_t0) && _r126_t0.length >= 3 && '.revcall' === _r126_t0[0])
+        return r126_callee = _r126_t0[1], r126_arg0 = _r126_t0[2], r126_args1 = _r126_t0.slice(3), r1_atom(r126_callee) && r126_env.macros.has(r126_callee) && r126_env.macros.get(r126_callee) instanceof Function ? r126_env.macros.get(r126_callee)(r126_form.slice(1), r126_env) : (r126_t = r126_env.newt(), [
             '.begin',
             [
                 '.set',
-                r123_t,
-                r1_ex(r123_arg0, r123_env)
+                r126_t,
+                r1_ex(r126_arg0, r126_env)
             ],
             r1_ex([
-                r123_callee,
-                r123_t
-            ].concat(r123_args1), r123_env)
+                r126_callee,
+                r126_t
+            ].concat(r126_args1), r126_env)
         ]);
-    else if (Array.isArray(_r123_t0) && _r123_t0.length >= 1) {
-        if (r123_callee = _r123_t0[0], r123_args = _r123_t0.slice(1), r1_atom(r123_callee) && r123_env.macros.has(r123_callee) && r123_env.macros.get(r123_callee) instanceof Function)
-            return r123_env.macros.get(r123_callee)(r123_form, r123_env);
-        for (r1_prim(r123_callee) || (r123_callee = r1_ex(r123_callee, r123_env)), r123_a = [r123_callee], r123_j = 1; r123_j < r123_form.length; r123_j += 1)
-            r123_a[r123_j] = r1_ex(r123_form[r123_j], r123_env);
-        return r123_a;
+    else if (Array.isArray(_r126_t0) && _r126_t0.length >= 1) {
+        if (r126_callee = _r126_t0[0], r126_args = _r126_t0.slice(1), r1_atom(r126_callee) && r126_env.macros.has(r126_callee) && r126_env.macros.get(r126_callee) instanceof Function)
+            return r126_env.macros.get(r126_callee)(r126_form, r126_env);
+        for (r1_prim(r126_callee) || (r126_callee = r1_ex(r126_callee, r126_env)), r126_a = [r126_callee], r126_j = 1; r126_j < r126_form.length; r126_j += 1)
+            r126_a[r126_j] = r1_ex(r126_form[r126_j], r126_env);
+        return r126_a;
     } else
-        return r123_x = _r123_t0, r1_atom(r123_x) && r123_env.macros.has(r123_x) && r123_env.macros.get(r123_x).invokeAsAtom ? r123_env.macros.get(r123_x).invokeAsAtom(r123_env) : (r123_x = _r123_t0, r1_atom(r123_x) && r123_env.macros.has(r123_x) && !(r123_env.macros.get(r123_x) instanceof Function) ? r123_env.macros.get(r123_x) : (r123_x = _r123_t0, r1_atom(r123_x) && r123_env.macros.has(r123_x) ? (r123_env.options.warn && r123_env.options.warn(new r1_FormInvalidError(r123_form, 'Attempt to use macro ' + r123_x + ' as an atom')), r123_env.use(r123_x)) : (r123_x = _r123_t0, r1_prim(r123_x) ? r123_x : (r123_x = _r123_t0, r1_atom(r123_x) ? r123_env.use(r123_x) : (r123_any = _r123_t0, r123_any)))));
-}), r1_checkEvaluated = function _r1_t8(r127_form) {
-    var r127_form;
-    if (r127_form && r127_form instanceof Array && r127_form.length > 0) {
-        if (r127_form.unevaluated)
-            throw new r1_FormInvalidError(r127_form, 'Unevaluated subform');
-        return r127_form.forEach(r1_checkEvaluated);
+        return r126_x = _r126_t0, r1_atom(r126_x) && r126_env.macros.has(r126_x) && r126_env.macros.get(r126_x).invokeAsAtom ? r126_env.macros.get(r126_x).invokeAsAtom(r126_env) : (r126_x = _r126_t0, r1_atom(r126_x) && r126_env.macros.has(r126_x) && !(r126_env.macros.get(r126_x) instanceof Function) ? r126_env.macros.get(r126_x) : (r126_x = _r126_t0, r1_atom(r126_x) && r126_env.macros.has(r126_x) ? (r126_env.options.warn && r126_env.options.warn(new r1_FormInvalidError(r1_findform(r126_form), 'You are using macro [' + r126_x + '] as an atom.')), r126_env.use(r126_x)) : (r126_x = _r126_t0, r1_prim(r126_x) ? r126_x : (r126_x = _r126_t0, r1_atom(r126_x) ? r126_env.use(r126_x) : (r126_any = _r126_t0, r126_any)))));
+}), r1_checkEvaluated = function _r1_t14(r130_form) {
+    var r130_form;
+    if (r130_form && r130_form instanceof Array && r130_form.length > 0) {
+        if (r130_form.unevaluated)
+            throw new r1_FormInvalidError(r130_form, 'Unevaluated subform');
+        return r130_form.forEach(r1_checkEvaluated);
     } else
         return void 0;
-}, exports.pass = function _r1_t9(r128_form, r128_globalScope) {
-    var r128_form, r128_globalScope;
-    return r1_ex(r128_form, r128_globalScope);
-}, exports.ex = r1_ex, exports.checkEvaluated = r1_checkEvaluated, exports.deQuasiquote = r1_deQuasiquote, exports.opSegToRegular = r1_opSegToRegular;
+}, exports.pass = function _r1_t15(r131_form, r131_globalScope) {
+    var r131_form, r131_globalScope;
+    return r1_ex(r131_form, r131_globalScope);
+}, exports.ex = r1_ex, exports.checkEvaluated = r1_checkEvaluated, exports.deQuasiquote = r1_deQuasiquote, exports.opSegToRegular = r1_opSegToRegular, exports.FormInvalidError = r1_FormInvalidError;

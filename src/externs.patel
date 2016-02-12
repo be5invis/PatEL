@@ -9,7 +9,7 @@ define ex [require "./ex"].ex
 define deQuasiquote [require "./ex"].deQuasiquote
 define opSegToRegular [require "./ex"].opSegToRegular
 
-define FormInvalidError patrisika.FormInvalidError
+define FormInvalidError ex.FormInvalidError
 
 define [wrapForSyntacticClosure fn] : lambda [x] : match x 
 	{".syntactic-closure" c e}	: fn c
@@ -55,7 +55,7 @@ define [Create] : begin
 		{car parameters body} [atom parameters]	: ex {'.lambda' {parameters} body} env
 		{car parameters body}                  	: ex {'.lambda' parameters body} env
 		{car body}                             	: ex {'.lambda' {} body} env
-		{car}                                  	: ex {'.lambda' {} {'.unit'}} body
+		{car}                                  	: ex {'.lambda' {} {'.unit'}} env
 		otherwise                              	: reportInvalid otherwise "Invalid Lambda Formation"
 	externs.macros.put "function" : externs.macros.get "lambda"
 	externs.macros.put "->" : externs.macros.get "lambda"
@@ -87,15 +87,24 @@ define [Create] : begin
 		local pairs [form.slice 1 (0 - 1)]
 		local args {}
 		local paras {}
+		local decls {".begin"}
 		for [local j 0] (j < pairs.length) [inc j] : match pairs.(j) 
-			{arg param :: useless}	: begin 
-				args.push arg; paras.push param
-			{arg param}           	: begin 
-				args.push arg; paras.push param
-			{arg} [atom arg]      	: begin 
-				args.push arg; paras.push [env.use arg]
-		ex {".beta" args form.((form.length - 1)) :: paras} env
-
+			{arg param}           	: begin
+				local t : env.newt 'leti'
+				args.push t; paras.push param; decls.push {"local" arg t}
+			{arg} [atom arg]      	: begin
+				local t : env.newt 'leti'
+				args.push t; paras.push [env.use arg]; decls.push {"local" arg t}
+			otherwise : throw : new FormInvalidError paris.(j) "Invalid [let] subpattern"
+		ex {".beta" args {".begin" decls form.((form.length - 1))} :: paras} env
+	externs.macros.put "letrec" : lambda [form env] : begin 
+		local pairs [form.slice 1 (0 - 1)]
+		local decls {".begin"}
+		for [local j 0] (j < pairs.length) [inc j] : match pairs.(j) 
+			{arg param}           	: begin
+				decls.push {"local" arg param}
+			otherwise : throw : new FormInvalidError paris.(j) "Invalid [letrec] subpattern"
+		ex {".beta" {} {".begin" decls form.((form.length - 1))}} env
 	externs.macros.put "object" : lambda [form env] : begin
 		local pairs : [form.slice 1].map : lambda [pair] : match pair
 			# Property initalizer, identifier
