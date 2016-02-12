@@ -60,7 +60,9 @@ function compile(_input, _options, callback){
 	}
 	
 	var gs0 = options.externScope || patel.globals();
-	gs0.strict = options.strict;
+	gs0.options = options;
+	var isStrict = options.strict;
+	options.strict = false;
 
 	function getComeFrom(){
 		if(options.from && options.from.argv) return '<ARGV>'
@@ -71,7 +73,6 @@ function compile(_input, _options, callback){
 	gs0.macros.put("input-path", function(){ return ['.quote', getComeFrom()] });
 	
 	var gs = new patel.Scope(gs0);
-	gs.strict = gs0.strict;
 	
 	try {
 		var parseOptions = {within: { file: getComeFrom(), input: input }}
@@ -88,13 +89,17 @@ function compile(_input, _options, callback){
 		if(options['dump-ast']) { return callback(null, null, ast)}
 		
 		var xastP = patel.ex(patel.prepareAST, gs0);
+		
+		gs0.options.trace = true;
 		var xast = ['.begin', xastP, patel.ex(ast, gs)];
 		patel.checkEvaluated(xast);
 		if(options['dump-expanded']) { return callback(null, null, xast)}
 		
+		options.strict = options.strict || isStrict;
+		
 		var rast = patel.regularize(xast, gs);
 		if(options['dump-regularized']) { return callback(null, null, rast)}
-		
+
 		var tast = patel.pat2esc(rast, gs, lcmap);
 		if(tast.type === "BlockStatement") {
 			tast.type = "Program"

@@ -228,11 +228,11 @@ define [Create] : begin
 		{callee :: subpatterns} : piecewise
 			([atom callee] && [env.macros.has callee] && [env.macros.get callee].toPattern) : begin
 				return : [env.macros.get callee].toPattern pattern env wrapper
-			([atom callee] && [env.macros.has callee]) : throw [new FormInvalidError pattern "Invalid Pattern"]
+			([atom callee] && [env.macros.has callee] && ![env.macros.get callee].invokeAsAtom) : throw [new FormInvalidError pattern "Invalid Pattern"]
 			true : begin
 				local ms : subpatterns.map : [x] => [toPattern x env wrapper]
 				local t : env.newt
-				return : object 
+				return : object
 					whether : lambda [x] [
 						{"&&" 
 							{".set" t 
@@ -365,6 +365,20 @@ define [Create] : begin
 						{".if" [ex guard env] [ex body env] f }}
 			any f
 		return {".begin" {".set" t [ex form.(1) env]} f}
+	
+	externs.macros.put "matches" : lambda [form env wrapper] : match form
+		{whatever obj pattern} : begin
+			local pat : toPattern pattern env
+			local t [env.newt]
+			local cond [pat.whether t]
+			if cond : then : return {".begin" {".set" t [ex obj env]} [pat.whether t]}
+			: else : return {".quote" true}
+	
+	externs.macros.put "<~>" : externs.macros.get "matches"
+	externs.operatorInfo.put "<~>" {
+		.priority 400
+		.associvity 'never'
+	}
 
 	externs.macros.put "regex" : lambda [form env] : match form 
 		{"regex" {".quote" s}} {".quote" [new RegExp s]}

@@ -60,7 +60,7 @@ define-macro getAllKeys : begin
 	local exoticAST {.type "FunctionExpression" .id null .params {{.type "Identifier" .name "o"}} .defaults {} .body {.type "BlockStatement" .body {{.type "VariableDeclaration" .declarations {{.type "VariableDeclarator" .id {.type "Identifier" .name "a"} .init {.type "ArrayExpression" .elements {}}}} .kind "var"} { .type "ForInStatement" .left {.type "VariableDeclaration" .declarations {{.type "VariableDeclarator" .id {.type "Identifier" .name "k"} .init null}} .kind "var"} .right {.type "Identifier" .name "o"} .body {.type "BlockStatement" .body {{.type "ExpressionStatement" .expression {.type "CallExpression" .callee { .type "MemberExpression" .computed false .object {.type "Identifier" .name "a"} .property {.type "Identifier" .name "push"} } .arguments {{.type "Identifier" .name "k"}}}}}} .each false } {.type "ReturnStatement" .argument {.type "Identifier" .name "a"}}}} .rest null .generator false .expression false }
 	local t : definingEnv.newt
 	#local coinitStatement : ex `[set @t @{".preserve" {".exotic" exoticAST}}] definingEnv
-	set ijp {".begin"}
+	local ijp {".begin"}
 	set coinit.injectForm `[begin @{".preserve" ijp}]
 	define [used] : begin
 		if [not ijp.1] : set ijp.1 : ex `[set @t @{".preserve" {".exotic" exoticAST}}] definingEnv
@@ -74,7 +74,7 @@ define-macro getAllKeys : begin
 	return f
 
 define-macro items-of : begin
-	set ijp {".begin" nothing nothing nothing nothing}
+	local ijp {".begin" nothing nothing nothing nothing}
 	set coinit.injectForm `[begin @{".preserve" ijp}]
 	local t1 : definingEnv.newt
 	define [use id] : match id
@@ -86,7 +86,7 @@ define-macro items-of : begin
 		`[items-of @obj] : begin [use 'items-of'] `[@t1 @obj]
 		otherwise : throw : new FormInvalidError form "Invalid form about [items-of]"
 define-macro pairs-of : begin
-	set ijp {".begin" nothing nothing nothing nothing}
+	local ijp {".begin" nothing nothing nothing nothing}
 	set coinit.injectForm `[begin @{".preserve" ijp}]
 	define [use id] : match id
 		'pairs-of-eigen' : if [not ijp.1] : begin
@@ -114,7 +114,7 @@ define-macro pairs-of : begin
 		`[pairs-of all @obj] : begin `[@[use 'pairs-of-all'] @obj]
 		otherwise : throw : new FormInvalidError form "Invalid form about [pairs-of]"
 define-macro range : begin
-	set ijp {".begin" nothing nothing nothing nothing}
+	local ijp {".begin" nothing nothing nothing nothing}
 	set coinit.injectForm `[begin @{".preserve" ijp}]
 	local t1 : definingEnv.newt
 	local t2 : definingEnv.newt
@@ -140,7 +140,7 @@ define-macro range : begin
 		`[range @low downtill @high] : begin [use 'downtill'] `[@t4 @low @high]
 		otherwise : throw : new FormInvalidError form "Invalid form about [range]"
 define-macro foreach : syntax-rules 
-	`[foreach [@varid @range] @body] {'.syntactic-closure' `[foreach @[formOf varid] @[formOf range] @[formOf body]] env}
+	`[foreach [@varid @enumRange] @body] {'.syntactic-closure' `[foreach @[formOf varid] @[formOf enumRange] @[formOf body]] env}
 	`[foreach @varid [range @low @high] @body] ([env.macros.get "range"] === [definingEnv.macros.get "range"]): begin 
 		local lo [env.newt]
 		local hi [env.newt]
@@ -173,12 +173,12 @@ define-macro foreach : syntax-rules
 			local @hi @high
 			for @{'.syntactic-closure' `[local @[formOf varid] @lo] env} (@[formOf varid] >= @hi) (@[formOf varid] = @[formOf varid] - 1) : begin @body
 		]
-	`[foreach @varid [items-of @list] @body] ([env.macros.get "items-of"] === [definingEnv.macros.get "items-of"]): begin 
+	`[foreach @varid [items-of @enumList] @body] ([env.macros.get "items-of"] === [definingEnv.macros.get "items-of"]): begin 
 		local tR [env.newt]
 		local tN [env.newt]
 		local t  [env.newt]
 		return `[begin \\
-			local @tR @list
+			local @tR @enumList
 			local @tN @tR.length
 			local @t 0
 			while (@t < @tN) : begin 
@@ -186,11 +186,11 @@ define-macro foreach : syntax-rules
 				begin @body
 				@t = @t + 1
 		]
-	`[foreach @varid @range @body] : begin 
+	`[foreach @varid @enumRange @body] : begin 
 		local tR [env.newt]
 		local t  [env.newt]
 		return `[begin \\
-			local @tR : @range.(@[externEnv.use 'Symbol'].iterator)
+			local @tR : @enumRange.(@[externEnv.use 'Symbol'].iterator)
 			local @t nothing
 			while (! [set @t [@tR.next]].done) : begin 
 				begin @{'.syntactic-closure' `[local @[formOf varid] @t.value] env}
@@ -285,7 +285,7 @@ define-macro class : syntax-rules
 		define [PublicAccessorTerm kind name val] : begin
 			local r : lambda [] `nothing
 			if [not accessorAssignments.(name)] : then
-				set f {
+				local f {
 					.get [if externEnv.strict `[lambda [] : throw "The property \(@{'.quote' name}) is write-only."] `nothing]
 					.set [if externEnv.strict `[lambda [] : throw "The property \(@{'.quote' name}) is read-only."] `nothing]
 				}

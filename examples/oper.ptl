@@ -5,15 +5,12 @@ define-operator infix "<>" 800 'never' : begin
 		
 	set coinit.initFn : lambda [m] : begin
 		set m.toPattern : lambda [form env w] : match form
-			`(@x <> @y) : begin
-				local p1 [toPattern x env w]
-				local p2 [toPattern y env w]
-				object
-					whether : lambda [t] `(@t && @[p1.whether `(@t.x)] && @[p2.whether `(@t.y)])
-					assign : lambda [t locallyQ] : ex `[begin 
-						@{".preserve" [p1.assign `(@t.x) locallyQ]}
-						@{".preserve" [p2.assign `(@t.y) locallyQ]}
-					] env
+			`(@x <> @y) : object
+				whether : lambda [t] : ex `(@t && (@t.x <~> @x) && (@t.y <~> @y)) env
+				assign : lambda [t locallyQ] : ex `[begin 
+					[set @x @t.x]
+					[set @y @t.y]
+				] env
 	set coinit.injectForm `[define [@tClass x y] : begin \\
 		set this.x x
 		set this.y y
@@ -25,8 +22,11 @@ define-operator infix "<>" 800 'never' : begin
 
 console.log 'SAMPLE : INFIX'
 console.log : 1 <> 2
-set (x <> y) (1 <> 2)
+let (x <> y) (1 <> 2)
+console.log x y
 
+console.log : (1 <> 2) <~> ({p q} <> y)
+console.log : (1 <> 2) <~> (x <> y)
 
 console.log 'SAMPLE : PREFIX'
 define-operator prefix '~' : syntax-rules

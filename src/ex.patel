@@ -5,11 +5,23 @@ define [prim x] : [atom x] && ![identifier x]
 
 define FormInvalidError [require "patrisika"].FormInvalidError
 
-define [NodeTranslation fn] : lambda [form] : begin 
+define trace {}
+define [NodeTranslation fn] : lambda [form env] : begin 
+	trace.push form
 	local res : fn.apply this arguments
-	if (form && res && form.begins >= 0) : set res.begins form.begins
-	if (form && res && form.ends >= 0) : set res.ends form.ends
-	if (form && res && form.within) : set res.within form.within
+	if (env.options.trace && [typeof form] === 'string' && res.0 === '.id') : then
+		local found false
+		for [local j (trace.length - 1)] (j >= 0 && !found) [dec j] : begin
+			if (trace.(j) && trace.(j).within && trace.(j).begins >= 0 && trace.(j).ends >= 0) : begin
+				set found true
+				set res.begins trace.(j).begins
+				set res.ends trace.(j).ends
+				set res.within trace.(j).within
+	: else
+		if (form && res && form.begins >= 0) : set res.begins form.begins
+		if (form && res && form.ends >= 0) : set res.ends form.ends
+		if (form && res && form.within) : set res.within form.within
+	trace.pop form
 	return res
 
 define [deQuasiquote form level env] : match form 
@@ -158,8 +170,11 @@ define ex : NodeTranslation : lambda [form env] : match form
 		for [local j 1] (j < form.length) [inc j] : begin 
 			set a.(j) [ex form.(j) env]
 		return a
-	x ([atom x] && [env.macros.has x] && [env.macros.get x].invokeAsAtom) : return [[env.macros.get x].invokeAsAtom]
+	x ([atom x] && [env.macros.has x] && [env.macros.get x].invokeAsAtom) : return [[env.macros.get x].invokeAsAtom env]
 	x ([atom x] && [env.macros.has x] && [not ([env.macros.get x] <@ Function)]) : return [env.macros.get x]
+	x ([atom x] && [env.macros.has x]) : begin
+		if(env.options.warn) : env.options.warn : new FormInvalidError form "Attempt to use macro \(x) as an atom"
+		return [env.use x]
 	x [prim x] : return x
 	x [atom x] : return [env.use x]
 	any : return any

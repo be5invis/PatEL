@@ -51,6 +51,13 @@ function dumpStruct(form){
 function dumpString(s){
 	outstream.write(s)
 }
+function handleError(ex){
+	if(ex.suberrors) {
+		for(var j = 0; j < ex.suberrors.length; j++){ reportError(ex.suberrors[j], process.stderr) }
+	} else {
+		reportError(ex, process.stderr);
+	}
+}
 
 var input = '';
 instream.on('data', function(buf){
@@ -65,6 +72,8 @@ instream.on('end', function(){
 		mangle: argv.mangle,
 		ugly: argv.ugly,
 		
+		warn: handleError,
+		
 		'dump-input': argv['dump-input'],
 		'dump-ast': argv['dump-ast'],
 		'dump-expanded': argv['dump-expanded'],
@@ -72,11 +81,7 @@ instream.on('end', function(){
 		'dump-transformed': argv['dump-transformed']
 	}, function(ex, result, dump){
 		if(ex){
-			if(ex.suberrors) {
-				for(var j = 0; j < ex.suberrors.length; j++){ reportError(ex.suberrors[j], process.stderr) }
-			} else {
-				reportError(ex, process.stderr);
-			}
+			return handleError(ex)
 		} else if(result){
 			if(argv['source-map']) {
 				outstream.write(result.map.toString() + '\n');
