@@ -95,7 +95,7 @@ define [Create] : begin
 			{arg} [atom arg]      	: begin
 				local t : env.newt 'leti'
 				args.push t; paras.push [env.use arg]; decls.push {"local" arg t}
-			otherwise : throw : new FormInvalidError paris.(j) "Invalid [let] subpattern"
+			otherwise : throw : new FormInvalidError pairs.(j) "Invalid [let] subpattern"
 		ex {".beta" args {".begin" decls form.((form.length - 1))} :: paras} env
 	externs.macros.put "letrec" : lambda [form env] : begin 
 		local pairs [form.slice 1 (0 - 1)]
@@ -103,7 +103,7 @@ define [Create] : begin
 		for [local j 0] (j < pairs.length) [inc j] : match pairs.(j) 
 			{arg param}           	: begin
 				decls.push {"local" arg param}
-			otherwise : throw : new FormInvalidError paris.(j) "Invalid [letrec] subpattern"
+			otherwise : throw : new FormInvalidError pairs.(j) "Invalid [letrec] subpattern"
 		ex {".beta" {} {".begin" decls form.((form.length - 1))}} env
 	externs.macros.put "object" : lambda [form env] : begin
 		local pairs : [form.slice 1].map : lambda [pair] : match pair

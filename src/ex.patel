@@ -6,7 +6,7 @@ define [prim x] : [atom x] && ![identifier x]
 define trace {}
 define [findform form] : begin
 	if (form && form.within && form.begins >= 0 && form.ends >= 0) : return form
-	for [local j (trace.length - 1)] (j >= 0 && !found) [dec j] : begin
+	for [local j (trace.length - 1)] (j >= 0) [dec j] : begin
 		if (trace.(j) && trace.(j).within && trace.(j).begins >= 0 && trace.(j).ends >= 0) : begin
 			return trace.(j)
 	return form
