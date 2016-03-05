@@ -110,7 +110,7 @@ parting
 	}
 qualifier
 	= "." property:identifier { return ['.quote', property] }
-	/ "." property:numberliteral { return property }
+	/ "." property:$([0-9]+) { return ['.quote', property - 0] }
 	/ "." property:stringliteral { return property }
 	/ "." property:operate { return property }
 
@@ -137,7 +137,7 @@ cons
 	/ "::" __ cdr:parting { return ['.conslist', cdr] }
 	/ list
 propertyPairs
-	= head:propertyPair rear:((__ ([,;] __)? propertyPair)*) { 
+	= head:propertyPair rear:((__ ([,;] __)? propertyPair)*) {
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
 			res.push(rear[j][2])
@@ -146,16 +146,25 @@ propertyPairs
 	}
 propertyPair
 	= head:qualifier _ rear:assign { return [head, rear]}
+linePropertyPair
+	= head:qualifier _ rear:lineAssign { return [head, rear]}
 
 block
 	= NEWLINE_INDENT_ADD it:blockContent INDENT_REMOVE { return it }
 blockContent
-	= head:lineComposite rear:(STATEMENT_SEPARATOR lineComposite)* {
+	= !"." head:lineComposite rear:(STATEMENT_SEPARATOR lineComposite)* {
 		var res = [head]
 		for(var j = 0; j < rear.length; j++){
 			res.push(rear[j][1])
 		};
 		return res;
+	}
+	/ head:linePropertyPair rear:(STATEMENT_SEPARATOR linePropertyPair)* {
+		var res = ['.xhash', head];
+		for(var j = 0; j < rear.length; j++){
+			res.push(rear[j][1])
+		};
+		return [res];
 	}
 	
 lineComposite
@@ -173,7 +182,7 @@ grouped
 	= head:(POS groupedPart __ ":" ![>\.`] __)* rear:simpleGrouped ends:POS { return formGrouped(head, rear, ends) }
 
 simpleLine
-	= begins:POS head:linePartFinal rear:(_ block)? ends:POS { 
+	= begins:POS head:linePartFinal rear:(_ block)? ends:POS {
 		if(rear) {
 			if(head[0] === '.operatorPiece') {
 				return BeginsEndsWith(head.slice(0, -1).concat([[head[head.length - 1], rear[1]]]), begins, ends)
@@ -185,7 +194,7 @@ simpleLine
 		}
 	}
 simpleGrouped
-	= begins:POS head:groupedPartFinal rear:(__ "\\\\" block)? ends:POS { 
+	= begins:POS head:groupedPartFinal rear:(__ "\\\\" block)? ends:POS {
 		if(rear) {
 			if(head[0] === '.operatorPiece') {
 				return BeginsEndsWith(head.slice(0, -1).concat([[head[head.length - 1], rear[2]]]), begins, ends)

@@ -5,11 +5,12 @@ define [prim x] : [atom x] && ![identifier x]
 define Scope [require "patrisika"].Scope
 define escodegen [require "escodegen"]
 define util [require "util"]
-define ex [require "./ex"].ex
-define deQuasiquote [require "./ex"].deQuasiquote
-define opSegToRegular [require "./ex"].opSegToRegular
 
-define FormInvalidError ex.FormInvalidError
+define exlib [require "./ex"]
+define ex exlib.ex
+define deQuasiquote exlib.deQuasiquote
+define opSegToRegular exlib.opSegToRegular
+define FormInvalidError exlib.FormInvalidError
 
 define [wrapForSyntacticClosure fn] : lambda [x] : match x 
 	{".syntactic-closure" c e}	: fn c
@@ -106,6 +107,7 @@ define [Create] : begin
 			otherwise : throw : new FormInvalidError pairs.(j) "Invalid [letrec] subpattern"
 		ex {".beta" {} {".begin" decls form.((form.length - 1))}} env
 	externs.macros.put "object" : lambda [form env] : begin
+		if (form.1 && (form.1).0 === ".xhash") : return : ex form.1 env
 		local pairs : [form.slice 1].map : lambda [pair] : match pair
 			# Property initalizer, identifier
 			`(@property = @value) [atom property]        : return {{".quote" property} value}
