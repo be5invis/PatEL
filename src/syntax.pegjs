@@ -147,7 +147,8 @@ propertyPairs
 propertyPair
 	= head:qualifier _ rear:assign { return [head, rear]}
 linePropertyPair
-	= head:qualifier _ rear:lineAssign { return [head, rear]}
+	= head:qualifier _ ":" _ rear:lineComposite { return [head, rear]}
+	/ head:qualifier _ rear:lineAssign { return [head, rear]}
 
 block
 	= NEWLINE_INDENT_ADD it:blockContent INDENT_REMOVE { return it }

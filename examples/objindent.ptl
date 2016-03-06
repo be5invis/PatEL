@@ -1,0 +1,10 @@
+define [square x] : x * x
+define c true
+define obj
+	.a 1
+	.b 2
+	.c : 1 + 1
+	.d : if c : then 
+		square 4
+	: else
+		square 5
