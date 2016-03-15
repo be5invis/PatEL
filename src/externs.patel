@@ -193,12 +193,11 @@ define [Create] : begin
 	externs.macros.put "define" : lambda [form env] : match form 
 		`[@op @modifer @left @right]	: AssignWithMod left right modifer env 2
 		`[@op @left @right]         	: Assign left right env 2
-		`[@op @left] [atom left]    	: return {".local" left 1}
 		any                          	: throw [new FormInvalidError any "Invalid Assignment"]
 	externs.macros.put "local" : lambda [form env] : match form 
 		`[@op @modifer @left @right]	: AssignWithMod left right modifer env true
 		`[@op @left @right]         	: Assign left right env true
-		`[@op @left] [atom left]    	: return {".local" left 1}
+		`[@op @left] [atom left]    	: return {".local" left}
 		any                          	: throw [new FormInvalidError any "Invalid Assignment"]
 	externs.macros.put "const" : externs.macros.get "define"
 	externs.macros.put "set" : lambda [form env] : match form 

@@ -430,17 +430,11 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                 return r118_AssignWithMod(r140_left, r140_right, '.unquote', r140_env, r140_locallyQ);
             };
         r118_externs.macros.put('define', function _r118_t20(r141_form, r141_env) {
-            var r141_any, r141_op, r141_left, r141_right, r141_modifer, _r141_t1, _r141_t0 = r141_form;
+            var r141_any, r141_op, r141_left, r141_right, r141_modifer, _r141_t0 = r141_form;
             if (Array.isArray(_r141_t0) && _r141_t0.length === 4)
                 return r141_op = _r141_t0[0], r141_modifer = _r141_t0[1], r141_left = _r141_t0[2], r141_right = _r141_t0[3], r118_AssignWithMod(r141_left, r141_right, r141_modifer, r141_env, 2);
             else if (Array.isArray(_r141_t0) && _r141_t0.length === 3)
                 return r141_op = _r141_t0[0], r141_left = _r141_t0[1], r141_right = _r141_t0[2], r118_Assign(r141_left, r141_right, r141_env, 2);
-            else if (_r141_t1 = !1, Array.isArray(_r141_t0) && _r141_t0.length === 2 && (r141_op = _r141_t0[0], r141_left = _r141_t0[1], r1_atom(r141_left) ? _r141_t1 = !0 : _r141_t1 = !1), _r141_t1)
-                return [
-                    '.local',
-                    r141_left,
-                    1
-                ];
             else
                 throw r141_any = _r141_t0, new r1_FormInvalidError(r141_any, 'Invalid Assignment');
         }), r118_externs.macros.put('local', function _r118_t21(r142_form, r142_env) {
@@ -452,8 +446,7 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
             else if (_r142_t1 = !1, Array.isArray(_r142_t0) && _r142_t0.length === 2 && (r142_op = _r142_t0[0], r142_left = _r142_t0[1], r1_atom(r142_left) ? _r142_t1 = !0 : _r142_t1 = !1), _r142_t1)
                 return [
                     '.local',
-                    r142_left,
-                    1
+                    r142_left
                 ];
             else
                 throw r142_any = _r142_t0, new r1_FormInvalidError(r142_any, 'Invalid Assignment');
