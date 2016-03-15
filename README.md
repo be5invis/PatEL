@@ -27,7 +27,7 @@ Invocations and Infixes can be written in line-level like this:
 
 ``` 
 f2 a b c : x y z
-	d e f
+    d e f
     g h i
     j + k
 ```
@@ -36,17 +36,38 @@ This is identical to the form `[f2 a b c [x y z [d e f] [g h i] [j + k]]]`, but 
 
 ## Semantics
 
-- **[if *test* *consequent* *alternate* ]** : Branching.
-- **[if *test* *consequent* ]** : Branching without alternative branch.
-- **[while *test* *body*]** : Loop.
-- **[return *e*]**: Immediate return.
-- **[yield *e*]**: Mark the current function as Generator Function and yield *e*.
-- **[foreach [*e* *range*] *body*]**: Enumerate items in *range*, assign it to *e* and evaluate *body*.
-- **[define *e* *value*]**: Define a local variable *e* and set its value to *value*.
-- **[local *e* *value*]**: Define a local variable *e* and set its value to *value*.
-- **[define [*f* *a* *b* *c*] *body*]**: Define a local function *f*, with parameters *a*, *b* and *c*, to *body*.
-- **[local [*f* *a* *b* *c*] *body*]**: Define a local function *f*, with parameters *a*, *b* and *c*, to *body*.
-- **[local *x*]**: Declare a local variable *x* and set it to *nothing*.
-- **[set *e* *value*]**: Set term *e* (a variable or a property)'s value to *value*.
-- **[begin *a*, *b*, ..., *z*]**: Evaluate *a*, *b*, ..., *z* in order and return *z*'s value.
+- **[if *test* *consequent* *alternate*]**
+  Evaluate *test*, then when it is true, evaluate and return *consequent*, otherwise evaluate and return *alternate*.
+- **[if *test* *consequent*]** 
+  Evaluate *test*, then when it is true, evaluate and return *consequent*, otherwise return `nothing`.
+- **[while *test* *body*]**
+  Assign temporary variable *t* to `nothing`.
+  Evaluate *test*, then when it is true, evaluate *body* and set *t* to the value of *body*, then loop; otherwise return *t*.
+- **[return *e*]**
+  Evaluate *e*, and immediately return the current function valued *e*.
+- **[throw *e*]**
+  Evaluate *e*, and throw an exception valued *e*.
+- **[yield *e*]**
+  Mark the current function as Generator Function.
+  Evaluate and yield *e*.
+- **[foreach [*e* *range*] *body*]**
+  Enumerate items in *range* using standard ES6 semantics, assign the current item to *e* and evaluate *body*.
+- **[define *e* *value*]**
+  Define a local constant *e* and set its value to *value*.
+- **[local *e* *value*]**
+  Define a local variable *e* and set its value to *value*.
+- **[local *x*]**
+  Declare a local variable *x* and set it to *nothing*.
+- **[define [*f* *a* *b* *c*] *body*]**
+  Define a local constant *f*, and set it to a function takes parameters *a*, *b* and *c*, and returns *body*.
+- **[local [*f* *a* *b* *c*] *body*]**
+  Define a local variable *f*, and set it to a function takes parameters *a*, *b* and *c*, and returns *body*.
+- **[define *pattern* *value*]**
+  Assign *value* to *pattern*, and declare all variables occurred in *pattern* as local constant. Function call patterns are not supported here. Function call patterns are not directly supported here, but can be used as sub-pattern.
+- **[local *pattern* *value*]**
+  Assign *value* to *pattern*, and declare all variables occurred in *pattern* as local variable. Function call patterns are not directly supported here, but can be used as sub-pattern.
+- **[lambda [*a* *b* *c*] *body*]**
+  Returns a function which takes parameters *a*, *b* and *c*, and returns *body*.
+- **[set *e* *value*]**: Set term *e* (a variable, a property)'s value to *value*.
+- **[begin *a* *b* ... *z*]**: Evaluate *a*, *b*, ..., *z* in order and return *z*'s value.
 

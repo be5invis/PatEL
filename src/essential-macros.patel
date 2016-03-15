@@ -387,7 +387,7 @@ define-macro class : syntax-rules
 							set m.toPattern : lambda [form env w] : match form
 								`[public @name] [atom name] : object
 									whether : lambda [t] `true
-									assign : lambda [t locally] : ex `[set this.(@{".quote" name}) @t] env
+									assign : lambda [t] : ex `[set this.(@{".quote" name}) @t] env
 						*f
 					define-macro private : begin
 						local f : syntax-rules
@@ -396,7 +396,7 @@ define-macro class : syntax-rules
 							set m.toPattern : lambda [form env w] : match form
 								`[private @name] [atom name] : object
 									whether : lambda [t] `true
-									assign : lambda [t locally] : ex `[set this.(@[definingEnv.use ("__private_" + name)]) @t] env
+									assign : lambda [t] : ex `[set this.(@[definingEnv.use ("__private_" + name)]) @t] env
 						*f
 					define-macro protected : begin
 						local f : syntax-rules
@@ -405,7 +405,7 @@ define-macro class : syntax-rules
 							set m.toPattern : lambda [form env w] : match form
 								`[protected @name] [atom name] : object
 									whether : lambda [t] `true
-									assign : lambda [t locally] : ex `[set (this.(@[definingEnv.use 'protectedTerms'].(@{".quote" name}))) @t] env
+									assign : lambda [t] : ex `[set (this.(@[definingEnv.use 'protectedTerms'].(@{".quote" name}))) @t] env
 						*f
 					set Type.protectedTerms : local protectedTerms : @[externEnv.use 'Object'].create (Super.protectedTerms || null)
 
