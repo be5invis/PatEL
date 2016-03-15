@@ -163,6 +163,7 @@ define [Create] : begin
 			locallyQ	{".set" [ex {".local" id ((locallyQ || 1) - 1)} e] [ex {mod right} e]}
 			true    	{".set" [ex left e] [ex {mod right} e]}
 		{".id" id e} ([atom id] && e != env && locallyQ) : throw [new FormInvalidError left "Attempt to redefine non-local subform"]
+		{".local" a x} : AssignWithMod a right mod env x
 		{".local" a} : AssignWithMod a right mod env (locallyQ || true)
 		{".syntactic-closure" a e} (e == env || !locallyQ) : AssignWithMod a right mod env locallyQ
 		{".syntactic-closure" a e} (e != env && locallyQ) : throw [new FormInvalidError left "Attempt to redefine non-local subform"]
@@ -178,7 +179,7 @@ define [Create] : begin
 			[prim callee] {".set" [ex left env] [ex {mod right} env]}
 			[atom callee] : piecewise 
 				locallyQ {".set" 
-					[ex {".local" callee} env] 
+					[ex {".local" callee ((locallyQ || 1) - 1)} env] 
 					[ex {mod {".lambda" {::paras} right}} env]}
 				true {".set" 
 					[ex callee env]
@@ -192,12 +193,12 @@ define [Create] : begin
 	externs.macros.put "define" : lambda [form env] : match form 
 		`[@op @modifer @left @right]	: AssignWithMod left right modifer env 2
 		`[@op @left @right]         	: Assign left right env 2
-		`[@op @left] [atom left]    	: return {".local" left}
+		`[@op @left] [atom left]    	: return {".local" left 1}
 		any                          	: throw [new FormInvalidError any "Invalid Assignment"]
 	externs.macros.put "local" : lambda [form env] : match form 
 		`[@op @modifer @left @right]	: AssignWithMod left right modifer env true
 		`[@op @left @right]         	: Assign left right env true
-		`[@op @left] [atom left]    	: return {".local" left}
+		`[@op @left] [atom left]    	: return {".local" left 1}
 		any                          	: throw [new FormInvalidError any "Invalid Assignment"]
 	externs.macros.put "const" : externs.macros.get "define"
 	externs.macros.put "set" : lambda [form env] : match form 
@@ -231,10 +232,10 @@ define [Create] : begin
 	define [toPattern pattern env wrapper] : match pattern 
 		id [atom id] : object 
 			whether : lambda [x] null
-			assign : lambda [x locallyQ] {".set" [ex [if locallyQ {".local" id} id] env] [if wrapper {wrapper x} x]}
+			assign : lambda [x locallyQ] {".set" [ex [if locallyQ {".local" id ((locallyQ || 1) - 1)} id] env] [if wrapper {wrapper x} x]}
 		{".id" id} [atom id] : object 
 			whether : lambda [x] null
-			assign : lambda [x locallyQ] {".set" [ex [if locallyQ {".local" id} id] env] [if wrapper {wrapper x} x]}
+			assign : lambda [x locallyQ] {".set" [ex [if locallyQ {".local" id ((locallyQ || 1) - 1)} id] env] [if wrapper {wrapper x} x]}
 		{".quote" x} : object 
 			whether : lambda [x] {"===" [ex pattern env] x}
 			assign  : lambda [x locallyQ] {".unit"}

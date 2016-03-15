@@ -289,7 +289,7 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                 return void 0;
         });
         var r118_AssignWithMod = function _r118_t18(r139_left, r139_right, r139_mod, r139_env, r139_locallyQ) {
-                var r139_callee, r139_paras, r139_pat, r139_t, r139_whatever, r139_a, r139_e, _r139_t1, _r139_t2, _r139_t3, _r139_t4, _r139_t5, _r139_t0 = r139_left, r139_id = _r139_t0;
+                var r139_callee, r139_paras, r139_pat, r139_t, r139_whatever, r139_a, r139_e, r139_x, _r139_t1, _r139_t2, _r139_t3, _r139_t4, _r139_t5, _r139_t0 = r139_left, r139_id = _r139_t0;
                 if (r1_atom(r139_id))
                     return r139_locallyQ ? [
                         '.set',
@@ -352,6 +352,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                     ];
                 else if (_r139_t3 = !1, Array.isArray(_r139_t0) && _r139_t0.length === 3 && '.id' === _r139_t0[0] && (r139_id = _r139_t0[1], r139_e = _r139_t0[2], r1_atom(r139_id) && r139_e !== r139_env && r139_locallyQ ? _r139_t3 = !0 : _r139_t3 = !1), _r139_t3)
                     throw new r1_FormInvalidError(r139_left, 'Attempt to redefine non-local subform');
+                else if (Array.isArray(_r139_t0) && _r139_t0.length === 3 && '.local' === _r139_t0[0])
+                    return r139_a = _r139_t0[1], r139_x = _r139_t0[2], r118_AssignWithMod(r139_a, r139_right, r139_mod, r139_env, r139_x);
                 else if (Array.isArray(_r139_t0) && _r139_t0.length === 2 && '.local' === _r139_t0[0])
                     return r139_a = _r139_t0[1], r118_AssignWithMod(r139_a, r139_right, r139_mod, r139_env, r139_locallyQ || !0);
                 else if (_r139_t2 = !1, Array.isArray(_r139_t0) && _r139_t0.length === 3 && '.syntactic-closure' === _r139_t0[0] && (r139_a = _r139_t0[1], r139_e = _r139_t0[2], r139_e === r139_env || !r139_locallyQ ? _r139_t2 = !0 : _r139_t2 = !1), _r139_t2)
@@ -388,7 +390,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                             '.set',
                             r1_ex([
                                 '.local',
-                                r139_callee
+                                r139_callee,
+                                (r139_locallyQ || 1) - 1
                             ], r139_env),
                             r1_ex([
                                 r139_mod,
@@ -435,7 +438,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
             else if (_r141_t1 = !1, Array.isArray(_r141_t0) && _r141_t0.length === 2 && (r141_op = _r141_t0[0], r141_left = _r141_t0[1], r1_atom(r141_left) ? _r141_t1 = !0 : _r141_t1 = !1), _r141_t1)
                 return [
                     '.local',
-                    r141_left
+                    r141_left,
+                    1
                 ];
             else
                 throw r141_any = _r141_t0, new r1_FormInvalidError(r141_any, 'Invalid Assignment');
@@ -448,7 +452,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
             else if (_r142_t1 = !1, Array.isArray(_r142_t0) && _r142_t0.length === 2 && (r142_op = _r142_t0[0], r142_left = _r142_t0[1], r1_atom(r142_left) ? _r142_t1 = !0 : _r142_t1 = !1), _r142_t1)
                 return [
                     '.local',
-                    r142_left
+                    r142_left,
+                    1
                 ];
             else
                 throw r142_any = _r142_t0, new r1_FormInvalidError(r142_any, 'Invalid Assignment');
@@ -531,7 +536,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                             '.set',
                             r1_ex(r160_locallyQ ? [
                                 '.local',
-                                r147_id
+                                r147_id,
+                                (r160_locallyQ || 1) - 1
                             ] : r147_id, r147_env),
                             r147_wrapper ? [
                                 r147_wrapper,
@@ -550,7 +556,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                             '.set',
                             r1_ex(r158_locallyQ ? [
                                 '.local',
-                                r147_id
+                                r147_id,
+                                (r158_locallyQ || 1) - 1
                             ] : r147_id, r147_env),
                             r147_wrapper ? [
                                 r147_wrapper,
