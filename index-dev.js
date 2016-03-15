@@ -7,15 +7,15 @@ var prepareAST = require('./src/essential-macros.json');
 
 process.stderr.write("Using in-development PatEL components.\n")
 
-var parse = function(){ return parserLib.parse.apply(this, arguments) };
-var ex = function(){ return exLib.ex.apply(this, arguments) };
-var checkEvaluated = function(){ return exLib.checkEvaluated.apply(this, arguments) };
+var parse = function() { return parserLib.parse.apply(this, arguments) };
+var ex = function() { return exLib.ex.apply(this, arguments) };
+var checkEvaluated = function() { return exLib.checkEvaluated.apply(this, arguments) };
 
-var globals = function(){ return new patrisika.Scope(externsLib.Create()) };
-var compile = function(ast, globals){ 
+var globals = function() { return new patrisika.Scope(externsLib.Create()) };
+var compile = function(ast, globals) {
 	var xast = ex(ast, globals);
 	var rast = patrisika.generate(xast, globals)
-	return escodegen.generate(rast) 
+	return escodegen.generate(rast)
 };
 
 exports.Scope = patrisika.Scope;

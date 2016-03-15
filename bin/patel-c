@@ -14,85 +14,85 @@ var yargs = require('yargs')
 var tty = require('tty');
 
 var argv = yargs.argv;
-if(argv.help){ process.stderr.write(yargs.help()); return };
+if (argv.help) { process.stderr.write(yargs.help()); return };
 
-if(argv['use-dev']) { 
+if (argv['use-dev']) {
 	var patel = require('../index-dev');
 } else {
 	var patel = require('../index');
 }
 var plex = require('../plex');
 
-var instream = function(){
-	if(argv.l) {
+var instream = function() {
+	if (argv.l) {
 		var s = resumer();
 		s.queue(argv.l);
-		setTimeout(function(){ s.end() }, 1);
+		setTimeout(function() { s.end() }, 1);
 		return s;
-	} else if(argv._[0]) {
+	} else if (argv._[0]) {
 		return fs.createReadStream(argv._[0])
-	} else { 
+	} else {
 		return process.stdin
 	}
-}();
-var outstream = argv.o ? fs.createWriteStream(argv.o, { encoding: 'utf-8' }): process.stdout;
+} ();
+var outstream = argv.o ? fs.createWriteStream(argv.o, { encoding: 'utf-8' }) : process.stdout;
 
 var generateLineAndColumnMap = plex.generateLineAndColumnMap
 var reportError = plex.reportError
 
-function deepcopy(form){
-	if(form instanceof Array) return form.map(deepcopy)
+function deepcopy(form) {
+	if (form instanceof Array) return form.map(deepcopy)
 	else return form;
 }
-function dumpStruct(form){
-	if(!outstream.isTTY) outstream.write(JSON.stringify(form))
-	else outstream.write(util.inspect(deepcopy(form), {depth: null}) + '\n')
+function dumpStruct(form) {
+	if (!outstream.isTTY) outstream.write(JSON.stringify(form))
+	else outstream.write(util.inspect(deepcopy(form), { depth: null }) + '\n')
 }
-function dumpString(s){
+function dumpString(s) {
 	outstream.write(s)
 }
-function handleError(ex){
-	if(ex.suberrors) {
-		for(var j = 0; j < ex.suberrors.length; j++){ reportError(ex.suberrors[j], process.stderr) }
+function handleError(ex) {
+	if (ex.suberrors) {
+		for (var j = 0; j < ex.suberrors.length; j++) { reportError(ex.suberrors[j], process.stderr) }
 	} else {
 		reportError(ex, process.stderr);
 	}
 }
 
 var input = '';
-instream.on('data', function(buf){
+instream.on('data', function(buf) {
 	input += buf.toString()
 });
-instream.on('end', function(){
+instream.on('end', function() {
 	var compileResult = plex.compile(input, {
 		patel: patel,
-		from: argv.l ? {argv : 'l'} : argv._[0] ? {file : argv._[0]} : {stream : 'stdin'},
+		from: argv.l ? { argv: 'l' } : argv._[0] ? { file: argv._[0] } : { stream: 'stdin' },
 		strict: argv.strict,
 		optimize: argv.optimize,
 		mangle: argv.mangle,
 		ugly: argv.ugly,
-		
+
 		warn: handleError,
-		
+
 		'dump-input': argv['dump-input'],
 		'dump-ast': argv['dump-ast'],
 		'dump-expanded': argv['dump-expanded'],
 		'dump-regularized': argv['dump-regularized'],
 		'dump-transformed': argv['dump-transformed']
-	}, function(ex, result, dump){
-		if(ex){
+	}, function(ex, result, dump) {
+		if (ex) {
 			return handleError(ex)
-		} else if(result){
-			if(argv['source-map']) {
+		} else if (result) {
+			if (argv['source-map']) {
 				outstream.write(result.map.toString() + '\n');
 			} else {
-				if(os.platform() === 'win32') outstream.write('\uFEFF');
+				if (os.platform() === 'win32') outstream.write('\uFEFF');
 				outstream.write(result.code + '\n');
 			}
 		} else {
-			if(typeof dump === 'string') dumpString(dump)
+			if (typeof dump === 'string') dumpString(dump)
 			else dumpStruct(dump)
 		}
 	});
-	if(!compileResult) return;
+	if (!compileResult) return;
 });
