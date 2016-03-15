@@ -49,7 +49,8 @@ define [deQuasiquote form level env] : match form
 define ASSOC_LEFT  'left'
 define ASSOC_NEVER 'never'
 define ASSOC_RIGHT 'right'
-define [getOperatorInfo operator env] : begin
+define [getOperatorInfo _operator env] : begin
+	local operator _operator
 	if [env.operatorInfo.has operator] : return [env.operatorInfo.get operator]
 	# Automatic decide operator priority
 	while (operator.0 === '<' && operator.(operator.length - 1) === ">") : set operator [operator.slice 1 (-1)]
@@ -116,14 +117,14 @@ define ex : NodeTranslation : lambda [form env] : match form
 	{".unquote" x} : return [ex x env]
 	{".id" :: x} : return {".id" :: x}
 	{".t" :: x} : return {".t" :: x}
-	{".lambda" {::args} body} : begin 
+	{".lambda" {::args} body} : let : begin 
 		define derived [new Scope env]
 		for [local j 0] (j < args.length) [inc j] : if [atom args.(j)] : begin 
 			derived.declare args.(j) true
 			set args.(j) : derived.use args.(j)
 		return {".lambda.scoped" args [ex body derived] derived}
 	{".syntactic-closure" c e} : ex c e
-	{".beta" {::args} body :: params} : begin 
+	{".beta" {::args} body :: params} : let : begin 
 		define derived [new Scope env]
 		for [local j 0] (j < args.length) [inc j] : if [atom args.(j)] : begin 
 			derived.declare args.(j) true
@@ -160,6 +161,9 @@ define ex : NodeTranslation : lambda [form env] : match form
 			[ex form.((form.length - 1)) env]
 		}
 	{".operatorPiece" :: items} : ex [opSegToRegular items env] env
+	{".local" x constQ} : begin 
+		env.declare x [if constQ 2 0]
+		return [env.use x]
 	{".local" x} : begin 
 		env.declare x
 		return [env.use x]

@@ -92,7 +92,7 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
             for (; r130_j < r130_pairs.length; r130_j += 1)
                 if (_r130_t0 = r130_pairs[r130_j], Array.isArray(_r130_t0) && _r130_t0.length === 2)
                     r130_arg = _r130_t0[0], r130_param = _r130_t0[1], r130_t = r130_env.newt('leti'), r130_args.push(r130_t), r130_paras.push(r130_param), r130_decls.push([
-                        'local',
+                        'define',
                         r130_arg,
                         r130_t
                     ]);
@@ -100,7 +100,7 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                     if (_r130_t1 = !1, Array.isArray(_r130_t0) && _r130_t0.length === 1 && (r130_arg = _r130_t0[0], r1_atom(r130_arg) ? _r130_t1 = !0 : _r130_t1 = !1), !_r130_t1)
                         throw new r1_FormInvalidError(r130_pairs[r130_j], 'Invalid [let] subpattern');
                     r130_t = r130_env.newt('leti'), r130_args.push(r130_t), r130_paras.push(r130_env.use(r130_arg)), r130_decls.push([
-                        'local',
+                        'define',
                         r130_arg,
                         r130_t
                     ]);
@@ -295,7 +295,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                         '.set',
                         r1_ex([
                             '.local',
-                            r139_id
+                            r139_id,
+                            (r139_locallyQ || 1) - 1
                         ], r139_env),
                         r1_ex([
                             r139_mod,
@@ -314,7 +315,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                         '.set',
                         r1_ex([
                             '.local',
-                            r139_id
+                            r139_id,
+                            (r139_locallyQ || 1) - 1
                         ], r139_env),
                         r1_ex([
                             r139_mod,
@@ -333,7 +335,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                         '.set',
                         r1_ex([
                             '.local',
-                            r139_id
+                            r139_id,
+                            (r139_locallyQ || 1) - 1
                         ], r139_e),
                         r1_ex([
                             r139_mod,
@@ -350,7 +353,7 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                 else if (_r139_t3 = !1, Array.isArray(_r139_t0) && _r139_t0.length === 3 && '.id' === _r139_t0[0] && (r139_id = _r139_t0[1], r139_e = _r139_t0[2], r1_atom(r139_id) && r139_e !== r139_env && r139_locallyQ ? _r139_t3 = !0 : _r139_t3 = !1), _r139_t3)
                     throw new r1_FormInvalidError(r139_left, 'Attempt to redefine non-local subform');
                 else if (Array.isArray(_r139_t0) && _r139_t0.length === 2 && '.local' === _r139_t0[0])
-                    return r139_a = _r139_t0[1], r118_AssignWithMod(r139_a, r139_right, r139_mod, r139_env, !0);
+                    return r139_a = _r139_t0[1], r118_AssignWithMod(r139_a, r139_right, r139_mod, r139_env, r139_locallyQ || !0);
                 else if (_r139_t2 = !1, Array.isArray(_r139_t0) && _r139_t0.length === 3 && '.syntactic-closure' === _r139_t0[0] && (r139_a = _r139_t0[1], r139_e = _r139_t0[2], r139_e === r139_env || !r139_locallyQ ? _r139_t2 = !0 : _r139_t2 = !1), _r139_t2)
                     return r118_AssignWithMod(r139_a, r139_right, r139_mod, r139_env, r139_locallyQ);
                 else if (_r139_t1 = !1, Array.isArray(_r139_t0) && _r139_t0.length === 3 && '.syntactic-closure' === _r139_t0[0] && (r139_a = _r139_t0[1], r139_e = _r139_t0[2], r139_e !== r139_env && r139_locallyQ ? _r139_t1 = !0 : _r139_t1 = !1), _r139_t1)
@@ -426,9 +429,9 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
         r118_externs.macros.put('define', function _r118_t20(r141_form, r141_env) {
             var r141_any, r141_op, r141_left, r141_right, r141_modifer, _r141_t1, _r141_t0 = r141_form;
             if (Array.isArray(_r141_t0) && _r141_t0.length === 4)
-                return r141_op = _r141_t0[0], r141_modifer = _r141_t0[1], r141_left = _r141_t0[2], r141_right = _r141_t0[3], r118_AssignWithMod(r141_left, r141_right, r141_modifer, r141_env, !0);
+                return r141_op = _r141_t0[0], r141_modifer = _r141_t0[1], r141_left = _r141_t0[2], r141_right = _r141_t0[3], r118_AssignWithMod(r141_left, r141_right, r141_modifer, r141_env, 2);
             else if (Array.isArray(_r141_t0) && _r141_t0.length === 3)
-                return r141_op = _r141_t0[0], r141_left = _r141_t0[1], r141_right = _r141_t0[2], r118_Assign(r141_left, r141_right, r141_env, !0);
+                return r141_op = _r141_t0[0], r141_left = _r141_t0[1], r141_right = _r141_t0[2], r118_Assign(r141_left, r141_right, r141_env, 2);
             else if (_r141_t1 = !1, Array.isArray(_r141_t0) && _r141_t0.length === 2 && (r141_op = _r141_t0[0], r141_left = _r141_t0[1], r1_atom(r141_left) ? _r141_t1 = !0 : _r141_t1 = !1), _r141_t1)
                 return [
                     '.local',
@@ -436,60 +439,73 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                 ];
             else
                 throw r141_any = _r141_t0, new r1_FormInvalidError(r141_any, 'Invalid Assignment');
-        }), r118_externs.macros.put('local', r118_externs.macros.get('define')), r118_externs.macros.put('set', function _r118_t21(r142_form, r142_env) {
-            var r142_any, r142_op, r142_left, r142_right, _r142_t0 = r142_form;
-            if (Array.isArray(_r142_t0) && _r142_t0.length === 3)
-                return r142_op = _r142_t0[0], r142_left = _r142_t0[1], r142_right = _r142_t0[2], r118_Assign(r142_left, r142_right, r142_env, !1);
+        }), r118_externs.macros.put('local', function _r118_t21(r142_form, r142_env) {
+            var r142_any, r142_op, r142_left, r142_right, r142_modifer, _r142_t1, _r142_t0 = r142_form;
+            if (Array.isArray(_r142_t0) && _r142_t0.length === 4)
+                return r142_op = _r142_t0[0], r142_modifer = _r142_t0[1], r142_left = _r142_t0[2], r142_right = _r142_t0[3], r118_AssignWithMod(r142_left, r142_right, r142_modifer, r142_env, !0);
+            else if (Array.isArray(_r142_t0) && _r142_t0.length === 3)
+                return r142_op = _r142_t0[0], r142_left = _r142_t0[1], r142_right = _r142_t0[2], r118_Assign(r142_left, r142_right, r142_env, !0);
+            else if (_r142_t1 = !1, Array.isArray(_r142_t0) && _r142_t0.length === 2 && (r142_op = _r142_t0[0], r142_left = _r142_t0[1], r1_atom(r142_left) ? _r142_t1 = !0 : _r142_t1 = !1), _r142_t1)
+                return [
+                    '.local',
+                    r142_left
+                ];
             else
                 throw r142_any = _r142_t0, new r1_FormInvalidError(r142_any, 'Invalid Assignment');
-        }), r118_externs.macros.put('=', r118_externs.macros.get('set')), r118_externs.macros.put('inc', function _r118_t22(r143_form, r143_env) {
-            var r143_op, r143_id, r143_shift, _r143_t0;
-            return _r143_t0 = r143_form, Array.isArray(_r143_t0) && _r143_t0.length === 2 ? (r143_op = _r143_t0[0], r143_id = _r143_t0[1], r118_Assign(r143_id, [
-                '+',
-                r143_id,
-                [
-                    '.quote',
-                    1
-                ]
-            ], r143_env, !1)) : Array.isArray(_r143_t0) && _r143_t0.length === 3 ? (r143_op = _r143_t0[0], r143_id = _r143_t0[1], r143_shift = _r143_t0[2], r118_Assign(r143_id, [
-                '+',
-                r143_id,
-                r143_shift
-            ], r143_env, !1)) : Array.isArray(_r143_t0) && _r143_t0.length === 4 && 'by' === _r143_t0[2] ? (r143_op = _r143_t0[0], r143_id = _r143_t0[1], r143_shift = _r143_t0[3], r118_Assign(r143_id, [
-                '+',
-                r143_id,
-                r143_shift
-            ], r143_env, !1)) : void 0;
-        }), r118_externs.macros.put('dec', function _r118_t23(r144_form, r144_env) {
+        }), r118_externs.macros.put('const', r118_externs.macros.get('define')), r118_externs.macros.put('set', function _r118_t22(r143_form, r143_env) {
+            var r143_any, r143_op, r143_left, r143_right, _r143_t0 = r143_form;
+            if (Array.isArray(_r143_t0) && _r143_t0.length === 3)
+                return r143_op = _r143_t0[0], r143_left = _r143_t0[1], r143_right = _r143_t0[2], r118_Assign(r143_left, r143_right, r143_env, !1);
+            else
+                throw r143_any = _r143_t0, new r1_FormInvalidError(r143_any, 'Invalid Assignment');
+        }), r118_externs.macros.put('=', r118_externs.macros.get('set')), r118_externs.macros.put('inc', function _r118_t23(r144_form, r144_env) {
             var r144_op, r144_id, r144_shift, _r144_t0;
             return _r144_t0 = r144_form, Array.isArray(_r144_t0) && _r144_t0.length === 2 ? (r144_op = _r144_t0[0], r144_id = _r144_t0[1], r118_Assign(r144_id, [
-                '-',
+                '+',
                 r144_id,
                 [
                     '.quote',
                     1
                 ]
             ], r144_env, !1)) : Array.isArray(_r144_t0) && _r144_t0.length === 3 ? (r144_op = _r144_t0[0], r144_id = _r144_t0[1], r144_shift = _r144_t0[2], r118_Assign(r144_id, [
-                '-',
+                '+',
                 r144_id,
                 r144_shift
             ], r144_env, !1)) : Array.isArray(_r144_t0) && _r144_t0.length === 4 && 'by' === _r144_t0[2] ? (r144_op = _r144_t0[0], r144_id = _r144_t0[1], r144_shift = _r144_t0[3], r118_Assign(r144_id, [
-                '-',
+                '+',
                 r144_id,
                 r144_shift
             ], r144_env, !1)) : void 0;
-        }), r118_externs.macros.put('for', function _r118_t24(r145_form, r145_env) {
-            var r145_init, r145_test, r145_step, r145_body, _r145_t0;
-            return _r145_t0 = r145_form, Array.isArray(_r145_t0) && _r145_t0.length === 5 && 'for' === _r145_t0[0] ? (r145_init = _r145_t0[1], r145_test = _r145_t0[2], r145_step = _r145_t0[3], r145_body = _r145_t0[4], [
+        }), r118_externs.macros.put('dec', function _r118_t24(r145_form, r145_env) {
+            var r145_op, r145_id, r145_shift, _r145_t0;
+            return _r145_t0 = r145_form, Array.isArray(_r145_t0) && _r145_t0.length === 2 ? (r145_op = _r145_t0[0], r145_id = _r145_t0[1], r118_Assign(r145_id, [
+                '-',
+                r145_id,
+                [
+                    '.quote',
+                    1
+                ]
+            ], r145_env, !1)) : Array.isArray(_r145_t0) && _r145_t0.length === 3 ? (r145_op = _r145_t0[0], r145_id = _r145_t0[1], r145_shift = _r145_t0[2], r118_Assign(r145_id, [
+                '-',
+                r145_id,
+                r145_shift
+            ], r145_env, !1)) : Array.isArray(_r145_t0) && _r145_t0.length === 4 && 'by' === _r145_t0[2] ? (r145_op = _r145_t0[0], r145_id = _r145_t0[1], r145_shift = _r145_t0[3], r118_Assign(r145_id, [
+                '-',
+                r145_id,
+                r145_shift
+            ], r145_env, !1)) : void 0;
+        }), r118_externs.macros.put('for', function _r118_t25(r146_form, r146_env) {
+            var r146_init, r146_test, r146_step, r146_body, _r146_t0;
+            return _r146_t0 = r146_form, Array.isArray(_r146_t0) && _r146_t0.length === 5 && 'for' === _r146_t0[0] ? (r146_init = _r146_t0[1], r146_test = _r146_t0[2], r146_step = _r146_t0[3], r146_body = _r146_t0[4], [
                 '.begin',
-                r1_ex(r145_init, r145_env),
+                r1_ex(r146_init, r146_env),
                 [
                     '.while',
-                    r1_ex(r145_test, r145_env),
+                    r1_ex(r146_test, r146_env),
                     [
                         '.begin',
-                        r1_ex(r145_body, r145_env),
-                        r1_ex(r145_step, r145_env)
+                        r1_ex(r146_body, r146_env),
+                        r1_ex(r146_step, r146_env)
                     ]
                 ]
             ]) : void 0;
@@ -503,139 +519,139 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
             '.quote',
             !1
         ]);
-        var r118_toPattern = function _r118_t25(r146_pattern, r146_env, r146_wrapper) {
-            var r146_callee, r146_subpatterns, r146_ms, r146_t, r146_whatever, r146_x, _r146_t1, _r146_t0 = r146_pattern, r146_id = _r146_t0;
-            if (r1_atom(r146_id))
+        var r118_toPattern = function _r118_t26(r147_pattern, r147_env, r147_wrapper) {
+            var r147_callee, r147_subpatterns, r147_ms, r147_t, r147_whatever, r147_x, _r147_t1, _r147_t0 = r147_pattern, r147_id = _r147_t0;
+            if (r1_atom(r147_id))
                 return {
-                    'whether': function _r146_t5(r158_x) {
+                    'whether': function _r147_t5(r159_x) {
                         return null;
                     },
-                    'assign': function _r146_t6(r159_x, r159_locallyQ) {
+                    'assign': function _r147_t6(r160_x, r160_locallyQ) {
                         return [
                             '.set',
-                            r1_ex(r159_locallyQ ? [
+                            r1_ex(r160_locallyQ ? [
                                 '.local',
-                                r146_id
-                            ] : r146_id, r146_env),
-                            r146_wrapper ? [
-                                r146_wrapper,
-                                r159_x
-                            ] : r159_x
+                                r147_id
+                            ] : r147_id, r147_env),
+                            r147_wrapper ? [
+                                r147_wrapper,
+                                r160_x
+                            ] : r160_x
                         ];
                     }
                 };
-            else if (_r146_t1 = !1, Array.isArray(_r146_t0) && _r146_t0.length === 2 && '.id' === _r146_t0[0] && (r146_id = _r146_t0[1], r1_atom(r146_id) ? _r146_t1 = !0 : _r146_t1 = !1), _r146_t1)
+            else if (_r147_t1 = !1, Array.isArray(_r147_t0) && _r147_t0.length === 2 && '.id' === _r147_t0[0] && (r147_id = _r147_t0[1], r1_atom(r147_id) ? _r147_t1 = !0 : _r147_t1 = !1), _r147_t1)
                 return {
-                    'whether': function _r146_t8(r156_x) {
+                    'whether': function _r147_t8(r157_x) {
                         return null;
                     },
-                    'assign': function _r146_t9(r157_x, r157_locallyQ) {
+                    'assign': function _r147_t9(r158_x, r158_locallyQ) {
                         return [
                             '.set',
-                            r1_ex(r157_locallyQ ? [
+                            r1_ex(r158_locallyQ ? [
                                 '.local',
-                                r146_id
-                            ] : r146_id, r146_env),
-                            r146_wrapper ? [
-                                r146_wrapper,
-                                r157_x
-                            ] : r157_x
+                                r147_id
+                            ] : r147_id, r147_env),
+                            r147_wrapper ? [
+                                r147_wrapper,
+                                r158_x
+                            ] : r158_x
                         ];
                     }
                 };
-            else if (Array.isArray(_r146_t0) && _r146_t0.length === 2 && '.quote' === _r146_t0[0])
-                return r146_x = _r146_t0[1], {
-                    'whether': function _r146_t11(r154_x) {
+            else if (Array.isArray(_r147_t0) && _r147_t0.length === 2 && '.quote' === _r147_t0[0])
+                return r147_x = _r147_t0[1], {
+                    'whether': function _r147_t11(r155_x) {
                         return [
                             '===',
-                            r1_ex(r146_pattern, r146_env),
-                            r154_x
+                            r1_ex(r147_pattern, r147_env),
+                            r155_x
                         ];
                     },
-                    'assign': function _r146_t12(r155_x, r155_locallyQ) {
+                    'assign': function _r147_t12(r156_x, r156_locallyQ) {
                         return ['.unit'];
                     }
                 };
-            else if (Array.isArray(_r146_t0) && _r146_t0.length >= 1 && '.' === _r146_t0[0])
-                return r146_whatever = _r146_t0.slice(1), {
-                    'whether': function _r146_t14(r152_x) {
+            else if (Array.isArray(_r147_t0) && _r147_t0.length >= 1 && '.' === _r147_t0[0])
+                return r147_whatever = _r147_t0.slice(1), {
+                    'whether': function _r147_t14(r153_x) {
                         return null;
                     },
-                    'assign': function _r146_t15(r153_x, r153_locallyQ) {
+                    'assign': function _r147_t15(r154_x, r154_locallyQ) {
                         return [
                             '.set',
-                            r1_ex(r146_pattern, r146_env),
-                            r146_wrapper ? [
-                                r146_wrapper,
-                                r153_x
-                            ] : r153_x
+                            r1_ex(r147_pattern, r147_env),
+                            r147_wrapper ? [
+                                r147_wrapper,
+                                r154_x
+                            ] : r154_x
                         ];
                     }
                 };
-            else if (Array.isArray(_r146_t0) && _r146_t0.length >= 1)
-                if (r146_callee = _r146_t0[0], r146_subpatterns = _r146_t0.slice(1), r1_atom(r146_callee) && r146_env.macros.has(r146_callee) && r146_env.macros.get(r146_callee).toPattern)
-                    return r146_env.macros.get(r146_callee).toPattern(r146_pattern, r146_env, r146_wrapper);
-                else if (r1_atom(r146_callee) && r146_env.macros.has(r146_callee) && !r146_env.macros.get(r146_callee).invokeAsAtom)
-                    throw new r1_FormInvalidError(r146_pattern, 'Invalid Pattern');
+            else if (Array.isArray(_r147_t0) && _r147_t0.length >= 1)
+                if (r147_callee = _r147_t0[0], r147_subpatterns = _r147_t0.slice(1), r1_atom(r147_callee) && r147_env.macros.has(r147_callee) && r147_env.macros.get(r147_callee).toPattern)
+                    return r147_env.macros.get(r147_callee).toPattern(r147_pattern, r147_env, r147_wrapper);
+                else if (r1_atom(r147_callee) && r147_env.macros.has(r147_callee) && !r147_env.macros.get(r147_callee).invokeAsAtom)
+                    throw new r1_FormInvalidError(r147_pattern, 'Invalid Pattern');
                 else
-                    return r146_ms = r146_subpatterns.map(function _r146_t20(r147_x) {
-                        return r118_toPattern(r147_x, r146_env, r146_wrapper);
-                    }), r146_t = r146_env.newt(), {
-                        'whether': function _r146_t21(r148_x) {
+                    return r147_ms = r147_subpatterns.map(function _r147_t20(r148_x) {
+                        return r118_toPattern(r148_x, r147_env, r147_wrapper);
+                    }), r147_t = r147_env.newt(), {
+                        'whether': function _r147_t21(r149_x) {
                             return [
                                 '&&',
                                 [
                                     '.set',
-                                    r146_t,
+                                    r147_t,
                                     [
                                         [
                                             '.',
-                                            r1_ex(r146_callee, r146_env),
+                                            r1_ex(r147_callee, r147_env),
                                             [
                                                 '.quote',
                                                 'unapply'
                                             ]
                                         ],
-                                        r148_x,
+                                        r149_x,
                                         [
                                             '.quote',
-                                            r146_ms.length
+                                            r147_ms.length
                                         ]
                                     ]
                                 ]
-                            ].concat(r146_ms.map(function _r148_t2(r149_p, r149_j) {
-                                return r149_p.whether([
+                            ].concat(r147_ms.map(function _r149_t2(r150_p, r150_j) {
+                                return r150_p.whether([
                                     '.',
-                                    r146_t,
+                                    r147_t,
                                     [
                                         '.quote',
-                                        r149_j
+                                        r150_j
                                     ]
                                 ]);
                             })).filter(r118_boole);
                         },
-                        'assign': function _r146_t22(r150_x, r150_locallyQ) {
-                            return ['.begin'].concat(r146_ms.map(function _r150_t2(r151_p, r151_j) {
-                                return r151_p.assign([
+                        'assign': function _r147_t22(r151_x, r151_locallyQ) {
+                            return ['.begin'].concat(r147_ms.map(function _r151_t2(r152_p, r152_j) {
+                                return r152_p.assign([
                                     '.',
-                                    r146_t,
+                                    r147_t,
                                     [
                                         '.quote',
-                                        r151_j
+                                        r152_j
                                     ]
-                                ], r150_locallyQ);
+                                ], r151_locallyQ);
                             }));
                         }
                     };
             else
                 return void 0;
         };
-        r118_externs.macros.put('.list', {}), r118_externs.macros.get('.list').toPattern = function _r118_t26(r160_pattern, r160_env, r160_wrapper) {
-            var r160_subpatterns, r160_ms, _r160_t0 = r160_pattern;
-            return Array.isArray(_r160_t0) && _r160_t0.length >= 1 && '.list' === _r160_t0[0] ? (r160_subpatterns = _r160_t0.slice(1), r160_ms = r160_subpatterns.map(function _r160_t4(r161_x) {
-                return r118_toPattern(r161_x, r160_env, r160_wrapper);
+        r118_externs.macros.put('.list', {}), r118_externs.macros.get('.list').toPattern = function _r118_t27(r161_pattern, r161_env, r161_wrapper) {
+            var r161_subpatterns, r161_ms, _r161_t0 = r161_pattern;
+            return Array.isArray(_r161_t0) && _r161_t0.length >= 1 && '.list' === _r161_t0[0] ? (r161_subpatterns = _r161_t0.slice(1), r161_ms = r161_subpatterns.map(function _r161_t4(r162_x) {
+                return r118_toPattern(r162_x, r161_env, r161_wrapper);
             }), {
-                'whether': function _r160_t5(r162_x) {
+                'whether': function _r161_t5(r163_x) {
                     return [
                         '&&',
                         [
@@ -647,13 +663,13 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                                     'isArray'
                                 ]
                             ],
-                            r162_x
+                            r163_x
                         ],
                         [
                             '===',
                             [
                                 '.',
-                                r162_x,
+                                r163_x,
                                 [
                                     '.quote',
                                     'length'
@@ -661,39 +677,39 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                             ],
                             [
                                 '.quote',
-                                r160_ms.length
+                                r161_ms.length
                             ]
                         ]
-                    ].concat(r160_ms.map(function _r162_t2(r163_p, r163_j) {
-                        return r163_p.whether([
+                    ].concat(r161_ms.map(function _r163_t2(r164_p, r164_j) {
+                        return r164_p.whether([
                             '.',
-                            r162_x,
+                            r163_x,
                             [
                                 '.quote',
-                                r163_j
+                                r164_j
                             ]
                         ]);
                     })).filter(r118_boole);
                 },
-                'assign': function _r160_t6(r164_x, r164_locallyQ) {
-                    return ['.begin'].concat(r160_ms.map(function _r164_t2(r165_p, r165_j) {
-                        return r165_p.assign([
+                'assign': function _r161_t6(r165_x, r165_locallyQ) {
+                    return ['.begin'].concat(r161_ms.map(function _r165_t2(r166_p, r166_j) {
+                        return r166_p.assign([
                             '.',
-                            r164_x,
+                            r165_x,
                             [
                                 '.quote',
-                                r165_j
+                                r166_j
                             ]
-                        ], r164_locallyQ);
-                    }).concat([r164_x]));
+                        ], r165_locallyQ);
+                    }).concat([r165_x]));
                 }
             }) : void 0;
-        }, r118_externs.macros.put('.conslist', {}), r118_externs.macros.get('.conslist').toPattern = function _r118_t27(r166_pattern, r166_env, r166_wrapper) {
-            var r166_subpatterns, r166_ms, r166_final, _r166_t0 = r166_pattern;
-            return Array.isArray(_r166_t0) && _r166_t0.length >= 1 && '.conslist' === _r166_t0[0] ? (r166_subpatterns = _r166_t0.slice(1), r166_ms = r166_pattern.slice(1, -1).map(function _r166_t4(r167_x) {
-                return r118_toPattern(r167_x, r166_env, r166_wrapper);
-            }), r166_final = r118_toPattern(r166_pattern[r166_pattern.length - 1], r166_env), {
-                'whether': function _r166_t5(r168_x) {
+        }, r118_externs.macros.put('.conslist', {}), r118_externs.macros.get('.conslist').toPattern = function _r118_t28(r167_pattern, r167_env, r167_wrapper) {
+            var r167_subpatterns, r167_ms, r167_final, _r167_t0 = r167_pattern;
+            return Array.isArray(_r167_t0) && _r167_t0.length >= 1 && '.conslist' === _r167_t0[0] ? (r167_subpatterns = _r167_t0.slice(1), r167_ms = r167_pattern.slice(1, -1).map(function _r167_t4(r168_x) {
+                return r118_toPattern(r168_x, r167_env, r167_wrapper);
+            }), r167_final = r118_toPattern(r167_pattern[r167_pattern.length - 1], r167_env), {
+                'whether': function _r167_t5(r169_x) {
                     return [
                         '&&',
                         [
@@ -705,13 +721,13 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                                     'isArray'
                                 ]
                             ],
-                            r168_x
+                            r169_x
                         ],
                         [
                             '>=',
                             [
                                 '.',
-                                r168_x,
+                                r169_x,
                                 [
                                     '.quote',
                                     'length'
@@ -719,22 +735,22 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                             ],
                             [
                                 '.quote',
-                                r166_ms.length
+                                r167_ms.length
                             ]
                         ]
-                    ].concat(r166_ms.map(function _r168_t2(r169_p, r169_j) {
-                        return r169_p.whether([
+                    ].concat(r167_ms.map(function _r169_t2(r170_p, r170_j) {
+                        return r170_p.whether([
                             '.',
-                            r168_x,
+                            r169_x,
                             [
                                 '.quote',
-                                r169_j
+                                r170_j
                             ]
                         ]);
-                    }).concat([r166_final.whether([
+                    }).concat([r167_final.whether([
                             [
                                 '.',
-                                r168_x,
+                                r169_x,
                                 [
                                     '.quote',
                                     'slice'
@@ -742,27 +758,27 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                             ],
                             [
                                 '.quote',
-                                r166_ms.length
+                                r167_ms.length
                             ]
                         ])])).filter(r118_boole);
                 },
-                'assign': function _r166_t6(r170_x, r170_locallyQ) {
-                    return ['.begin'].concat(r166_ms.map(function _r170_t2(r171_p, r171_j) {
-                        return r171_p.assign([
+                'assign': function _r167_t6(r171_x, r171_locallyQ) {
+                    return ['.begin'].concat(r167_ms.map(function _r171_t2(r172_p, r172_j) {
+                        return r172_p.assign([
                             '.',
-                            r170_x,
+                            r171_x,
                             [
                                 '.quote',
-                                r171_j
+                                r172_j
                             ]
-                        ], r170_locallyQ);
-                    })).concat([r166_final.assign(r166_wrapper ? [
+                        ], r171_locallyQ);
+                    })).concat([r167_final.assign(r167_wrapper ? [
                             [
                                 '.',
                                 [
                                     [
                                         '.',
-                                        r170_x,
+                                        r171_x,
                                         [
                                             '.quote',
                                             'slice'
@@ -770,7 +786,7 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                                     ],
                                     [
                                         '.quote',
-                                        r166_ms.length
+                                        r167_ms.length
                                     ]
                                 ],
                                 [
@@ -778,11 +794,11 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                                     'map'
                                 ]
                             ],
-                            r166_wrapper
+                            r167_wrapper
                         ] : [
                             [
                                 '.',
-                                r170_x,
+                                r171_x,
                                 [
                                     '.quote',
                                     'slice'
@@ -790,171 +806,171 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                             ],
                             [
                                 '.quote',
-                                r166_ms.length
+                                r167_ms.length
                             ]
-                        ], r170_locallyQ)]).concat([r170_x]);
+                        ], r171_locallyQ)]).concat([r171_x]);
                 }
             }) : void 0;
-        }, r118_externs.macros.put('.hash', {}), r118_externs.macros.get('.hash').toPattern = function _r118_t28(r172_pattern, r172_env, r172_wrapper) {
-            var r172_subpatterns, r172_ms, _r172_t0 = r172_pattern;
-            return Array.isArray(_r172_t0) && _r172_t0.length >= 1 && '.hash' === _r172_t0[0] ? (r172_subpatterns = _r172_t0.slice(1), r172_ms = r172_subpatterns.map(function _r172_t4(r173_pair) {
+        }, r118_externs.macros.put('.hash', {}), r118_externs.macros.get('.hash').toPattern = function _r118_t29(r173_pattern, r173_env, r173_wrapper) {
+            var r173_subpatterns, r173_ms, _r173_t0 = r173_pattern;
+            return Array.isArray(_r173_t0) && _r173_t0.length >= 1 && '.hash' === _r173_t0[0] ? (r173_subpatterns = _r173_t0.slice(1), r173_ms = r173_subpatterns.map(function _r173_t4(r174_pair) {
                 return [
-                    r173_pair[0],
-                    r118_toPattern(r173_pair[1], r172_env, r172_wrapper)
+                    r174_pair[0],
+                    r118_toPattern(r174_pair[1], r173_env, r173_wrapper)
                 ];
             }), {
-                'whether': function _r172_t5(r174_x) {
+                'whether': function _r173_t5(r175_x) {
                     return [
                         '&&',
-                        r174_x
-                    ].concat(r172_ms.map(function _r174_t2(r175_p) {
-                        return r175_p[1].whether([
+                        r175_x
+                    ].concat(r173_ms.map(function _r175_t2(r176_p) {
+                        return r176_p[1].whether([
                             '.',
-                            r174_x,
+                            r175_x,
                             [
                                 '.quote',
-                                r175_p[0]
+                                r176_p[0]
                             ]
                         ]);
                     })).filter(r118_boole);
                 },
-                'assign': function _r172_t6(r176_x, r176_locallyQ) {
-                    return ['.begin'].concat(r172_ms.map(function _r176_t2(r177_p) {
-                        return r177_p[1].assign([
+                'assign': function _r173_t6(r177_x, r177_locallyQ) {
+                    return ['.begin'].concat(r173_ms.map(function _r177_t2(r178_p) {
+                        return r178_p[1].assign([
                             '.',
-                            r176_x,
+                            r177_x,
                             [
                                 '.quote',
-                                r177_p[0]
+                                r178_p[0]
                             ]
-                        ], r176_locallyQ);
-                    }).concat([r176_x]));
+                        ], r177_locallyQ);
+                    }).concat([r177_x]));
                 }
             }) : void 0;
-        }, r118_externs.macros.put('.xhash', {}), r118_externs.macros.get('.xhash').toPattern = function _r118_t29(r178_pattern, r178_env, r178_wrapper) {
-            var r178_subpatterns, r178_ms, _r178_t0 = r178_pattern;
-            return Array.isArray(_r178_t0) && _r178_t0.length >= 1 && '.xhash' === _r178_t0[0] ? (r178_subpatterns = _r178_t0.slice(1), r178_ms = r178_subpatterns.map(function _r178_t4(r179_pair) {
+        }, r118_externs.macros.put('.xhash', {}), r118_externs.macros.get('.xhash').toPattern = function _r118_t30(r179_pattern, r179_env, r179_wrapper) {
+            var r179_subpatterns, r179_ms, _r179_t0 = r179_pattern;
+            return Array.isArray(_r179_t0) && _r179_t0.length >= 1 && '.xhash' === _r179_t0[0] ? (r179_subpatterns = _r179_t0.slice(1), r179_ms = r179_subpatterns.map(function _r179_t4(r180_pair) {
                 return [
-                    r1_ex(r179_pair[0], r178_env),
-                    r118_toPattern(r179_pair[1], r178_env, r178_wrapper)
+                    r1_ex(r180_pair[0], r179_env),
+                    r118_toPattern(r180_pair[1], r179_env, r179_wrapper)
                 ];
             }), {
-                'whether': function _r178_t5(r180_x) {
+                'whether': function _r179_t5(r181_x) {
                     return [
                         '&&',
-                        r180_x
-                    ].concat(r178_ms.map(function _r180_t2(r181_p) {
-                        var r181_key, _r181_t5, _r181_t0 = r181_p[0];
-                        return Array.isArray(_r181_t0) && _r181_t0.length === 2 && '.quote' === _r181_t0[0] ? (r181_key = _r181_t0[1], r181_p[1].whether([
+                        r181_x
+                    ].concat(r179_ms.map(function _r181_t2(r182_p) {
+                        var r182_key, _r182_t5, _r182_t0 = r182_p[0];
+                        return Array.isArray(_r182_t0) && _r182_t0.length === 2 && '.quote' === _r182_t0[0] ? (r182_key = _r182_t0[1], r182_p[1].whether([
                             '.',
-                            r180_x,
-                            r181_p[0]
-                        ])) : (_r181_t5 = r178_env.newt(), function (_r181_leti1, r182_t) {
-                            return r182_t = _r181_leti1, [
+                            r181_x,
+                            r182_p[0]
+                        ])) : (_r182_t5 = r179_env.newt(), function (_r182_leti1, r183_t) {
+                            return r183_t = _r182_leti1, [
                                 '.begin',
                                 [
                                     '.set',
-                                    r182_t,
+                                    r183_t,
                                     [
                                         '.',
-                                        r180_x,
-                                        r181_p[0]
+                                        r181_x,
+                                        r182_p[0]
                                     ]
                                 ],
-                                r181_p[1].whether(r182_t)
+                                r182_p[1].whether(r183_t)
                             ];
-                        }(_r181_t5));
+                        }(_r182_t5));
                     })).filter(r118_boole);
                 },
-                'assign': function _r178_t6(r183_x, r183_locallyQ) {
-                    return ['.begin'].concat(r178_ms.map(function _r183_t2(r184_p) {
-                        var r184_key, _r184_t5, _r184_t0 = r184_p[0];
-                        return Array.isArray(_r184_t0) && _r184_t0.length === 2 && '.quote' === _r184_t0[0] ? (r184_key = _r184_t0[1], r184_p[1].assign([
+                'assign': function _r179_t6(r184_x, r184_locallyQ) {
+                    return ['.begin'].concat(r179_ms.map(function _r184_t2(r185_p) {
+                        var r185_key, _r185_t5, _r185_t0 = r185_p[0];
+                        return Array.isArray(_r185_t0) && _r185_t0.length === 2 && '.quote' === _r185_t0[0] ? (r185_key = _r185_t0[1], r185_p[1].assign([
                             '.',
-                            r183_x,
-                            r184_p[0]
-                        ], r183_locallyQ)) : (_r184_t5 = r178_env.newt(), function (_r184_leti1, r185_t) {
-                            return r185_t = _r184_leti1, [
+                            r184_x,
+                            r185_p[0]
+                        ], r184_locallyQ)) : (_r185_t5 = r179_env.newt(), function (_r185_leti1, r186_t) {
+                            return r186_t = _r185_leti1, [
                                 '.begin',
                                 [
                                     '.set',
-                                    r185_t,
+                                    r186_t,
                                     [
                                         '.',
-                                        r183_x,
-                                        r184_p[0]
+                                        r184_x,
+                                        r185_p[0]
                                     ]
                                 ],
-                                r184_p[1].assign(r185_t, r183_locallyQ)
+                                r185_p[1].assign(r186_t, r184_locallyQ)
                             ];
-                        }(_r184_t5));
-                    }).concat([r183_x]));
+                        }(_r185_t5));
+                    }).concat([r184_x]));
                 }
             }) : void 0;
-        }, r118_externs.macros.put('.quasiquote', {}), r118_externs.macros.get('.quasiquote').toPattern = function _r118_t30(r186_pattern, r186_env, r186_wrapper) {
-            var r186_subpatterns, _r186_t0;
-            return _r186_t0 = r186_pattern, Array.isArray(_r186_t0) && _r186_t0.length >= 1 && '.quasiquote' === _r186_t0[0] ? (r186_subpatterns = _r186_t0.slice(1), r118_toPattern(r1_deQuasiquote(r186_pattern[1], 0, r186_env), r186_env, r186_wrapper)) : void 0;
-        }, r118_externs.macros.put('.operatorPiece', {}), r118_externs.macros.get('.operatorPiece').toPattern = function _r118_t31(r187_pattern, r187_env, r187_wrapper) {
-            return r118_toPattern(r1_opSegToRegular(r187_pattern.slice(1), r187_env), r187_env, r187_wrapper);
-        }, r118_externs.macros.put('&&', {}), r118_externs.macros.get('&&').toPattern = function _r118_t32(r188_pattern, r188_env, r188_wrapper) {
-            var r188_subpatterns, r188_ms, _r188_t0 = r188_pattern;
-            return Array.isArray(_r188_t0) && _r188_t0.length >= 1 && '&&' === _r188_t0[0] ? (r188_subpatterns = _r188_t0.slice(1), r188_ms = r188_subpatterns.map(function _r188_t4(r189_x) {
-                return r118_toPattern(r189_x, r188_env, r188_wrapper);
+        }, r118_externs.macros.put('.quasiquote', {}), r118_externs.macros.get('.quasiquote').toPattern = function _r118_t31(r187_pattern, r187_env, r187_wrapper) {
+            var r187_subpatterns, _r187_t0;
+            return _r187_t0 = r187_pattern, Array.isArray(_r187_t0) && _r187_t0.length >= 1 && '.quasiquote' === _r187_t0[0] ? (r187_subpatterns = _r187_t0.slice(1), r118_toPattern(r1_deQuasiquote(r187_pattern[1], 0, r187_env), r187_env, r187_wrapper)) : void 0;
+        }, r118_externs.macros.put('.operatorPiece', {}), r118_externs.macros.get('.operatorPiece').toPattern = function _r118_t32(r188_pattern, r188_env, r188_wrapper) {
+            return r118_toPattern(r1_opSegToRegular(r188_pattern.slice(1), r188_env), r188_env, r188_wrapper);
+        }, r118_externs.macros.put('&&', {}), r118_externs.macros.get('&&').toPattern = function _r118_t33(r189_pattern, r189_env, r189_wrapper) {
+            var r189_subpatterns, r189_ms, _r189_t0 = r189_pattern;
+            return Array.isArray(_r189_t0) && _r189_t0.length >= 1 && '&&' === _r189_t0[0] ? (r189_subpatterns = _r189_t0.slice(1), r189_ms = r189_subpatterns.map(function _r189_t4(r190_x) {
+                return r118_toPattern(r190_x, r189_env, r189_wrapper);
             }), {
-                'whether': function _r188_t5(r190_x) {
-                    var r190_f = ['&&'].concat(r188_ms.map(function _r190_t2(r191_p, r191_j) {
-                        return r191_p.whether(r190_x);
+                'whether': function _r189_t5(r191_x) {
+                    var r191_f = ['&&'].concat(r189_ms.map(function _r191_t2(r192_p, r192_j) {
+                        return r192_p.whether(r191_x);
                     })).filter(r118_boole);
-                    return r190_f.length === 1 ? [
+                    return r191_f.length === 1 ? [
                         '.quote',
                         !0
-                    ] : r190_f;
+                    ] : r191_f;
                 },
-                'assign': function _r188_t6(r192_x, r192_locallyQ) {
-                    return ['.begin'].concat(r188_ms.map(function _r192_t2(r193_p, r193_j) {
-                        return r193_p.assign(r192_x, r192_locallyQ);
-                    }).concat([r192_x]));
+                'assign': function _r189_t6(r193_x, r193_locallyQ) {
+                    return ['.begin'].concat(r189_ms.map(function _r193_t2(r194_p, r194_j) {
+                        return r194_p.assign(r193_x, r193_locallyQ);
+                    }).concat([r193_x]));
                 }
             }) : void 0;
-        }, r118_externs.macros.put('||', {}), r118_externs.macros.get('||').toPattern = function _r118_t33(r194_pattern, r194_env, r194_wrapper) {
-            var r194_subpatterns, r194_ms, _r194_t0 = r194_pattern;
-            return Array.isArray(_r194_t0) && _r194_t0.length >= 1 && '||' === _r194_t0[0] ? (r194_subpatterns = _r194_t0.slice(1), r194_ms = r194_subpatterns.map(function _r194_t4(r195_x) {
-                return r118_toPattern(r195_x, r194_env, r194_wrapper);
+        }, r118_externs.macros.put('||', {}), r118_externs.macros.get('||').toPattern = function _r118_t34(r195_pattern, r195_env, r195_wrapper) {
+            var r195_subpatterns, r195_ms, _r195_t0 = r195_pattern;
+            return Array.isArray(_r195_t0) && _r195_t0.length >= 1 && '||' === _r195_t0[0] ? (r195_subpatterns = _r195_t0.slice(1), r195_ms = r195_subpatterns.map(function _r195_t4(r196_x) {
+                return r118_toPattern(r196_x, r195_env, r195_wrapper);
             }), {
-                'whether': function _r194_t5(r196_x) {
-                    return ['||'].concat(r194_ms.map(function _r196_t2(r197_p, r197_j) {
-                        return r197_p.whether(r196_x);
+                'whether': function _r195_t5(r197_x) {
+                    return ['||'].concat(r195_ms.map(function _r197_t2(r198_p, r198_j) {
+                        return r198_p.whether(r197_x);
                     })).filter(r118_boole);
                 },
-                'assign': function _r194_t6(r198_x, r198_locallyQ) {
+                'assign': function _r195_t6(r199_x, r199_locallyQ) {
                     return ['.unit'];
                 }
             }) : void 0;
         };
-        var r118_boole = function _r118_t34(r199_x) {
-            return !!r199_x;
+        var r118_boole = function _r118_t35(r200_x) {
+            return !!r200_x;
         };
-        return r118_externs.macros.put('match', function _r118_t35(r200_form, r200_env, r200_wrapper) {
-            var r200_pattern, r200_guard, r200_body, r200_pat, r200_cond, r200_tc, _r200_t0, r200_pairs = r200_form.slice(2), r200_t = r200_env.newt(), r200_f = ['.unit'], r200_j = r200_pairs.length - 1;
-            for (; r200_j >= 0; r200_j -= 1)
-                _r200_t0 = r200_pairs[r200_j], r200_f = Array.isArray(_r200_t0) && _r200_t0.length === 2 ? (r200_pattern = _r200_t0[0], r200_body = _r200_t0[1], r200_pat = r118_toPattern(r200_pattern, r200_env, r200_wrapper), r200_cond = r200_pat.whether(r200_t), r200_cond ? [
+        return r118_externs.macros.put('match', function _r118_t36(r201_form, r201_env, r201_wrapper) {
+            var r201_pattern, r201_guard, r201_body, r201_pat, r201_cond, r201_tc, _r201_t0, r201_pairs = r201_form.slice(2), r201_t = r201_env.newt(), r201_f = ['.unit'], r201_j = r201_pairs.length - 1;
+            for (; r201_j >= 0; r201_j -= 1)
+                _r201_t0 = r201_pairs[r201_j], r201_f = Array.isArray(_r201_t0) && _r201_t0.length === 2 ? (r201_pattern = _r201_t0[0], r201_body = _r201_t0[1], r201_pat = r118_toPattern(r201_pattern, r201_env, r201_wrapper), r201_cond = r201_pat.whether(r201_t), r201_cond ? [
                     '.if',
-                    r200_cond,
+                    r201_cond,
                     [
                         '.begin',
-                        r200_pat.assign(r200_t, !0),
-                        r1_ex(r200_body, r200_env)
+                        r201_pat.assign(r201_t, !0),
+                        r1_ex(r201_body, r201_env)
                     ],
-                    r200_f
+                    r201_f
                 ] : [
                     '.begin',
-                    r200_pat.assign(r200_t, !0),
-                    r1_ex(r200_body, r200_env)
-                ]) : Array.isArray(_r200_t0) && _r200_t0.length === 3 ? (r200_pattern = _r200_t0[0], r200_guard = _r200_t0[1], r200_body = _r200_t0[2], r200_pat = r118_toPattern(r200_pattern, r200_env, r200_wrapper), r200_cond = r200_pat.whether(r200_t), r200_cond ? (r200_tc = r200_env.newt(), [
+                    r201_pat.assign(r201_t, !0),
+                    r1_ex(r201_body, r201_env)
+                ]) : Array.isArray(_r201_t0) && _r201_t0.length === 3 ? (r201_pattern = _r201_t0[0], r201_guard = _r201_t0[1], r201_body = _r201_t0[2], r201_pat = r118_toPattern(r201_pattern, r201_env, r201_wrapper), r201_cond = r201_pat.whether(r201_t), r201_cond ? (r201_tc = r201_env.newt(), [
                     '.begin',
                     [
                         '.set',
-                        r200_tc,
+                        r201_tc,
                         [
                             '.quote',
                             !1
@@ -962,16 +978,16 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                     ],
                     [
                         '.if',
-                        r200_cond,
+                        r201_cond,
                         [
                             '.begin',
-                            r200_pat.assign(r200_t, !0),
+                            r201_pat.assign(r201_t, !0),
                             [
                                 '.if',
-                                r1_ex(r200_guard, r200_env),
+                                r1_ex(r201_guard, r201_env),
                                 [
                                     '.set',
-                                    r200_tc,
+                                    r201_tc,
                                     [
                                         '.quote',
                                         !0
@@ -979,7 +995,7 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                                 ],
                                 [
                                     '.set',
-                                    r200_tc,
+                                    r201_tc,
                                     [
                                         '.quote',
                                         !1
@@ -990,39 +1006,39 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                     ],
                     [
                         '.if',
-                        r200_tc,
-                        r1_ex(r200_body, r200_env),
-                        r200_f
+                        r201_tc,
+                        r1_ex(r201_body, r201_env),
+                        r201_f
                     ]
                 ]) : [
                     '.begin',
-                    r200_pat.assign(r200_t, !0),
+                    r201_pat.assign(r201_t, !0),
                     [
                         '.if',
-                        r1_ex(r200_guard, r200_env),
-                        r1_ex(r200_body, r200_env),
-                        r200_f
+                        r1_ex(r201_guard, r201_env),
+                        r1_ex(r201_body, r201_env),
+                        r201_f
                     ]
-                ]) : r200_f;
+                ]) : r201_f;
             return [
                 '.begin',
                 [
                     '.set',
-                    r200_t,
-                    r1_ex(r200_form[1], r200_env)
+                    r201_t,
+                    r1_ex(r201_form[1], r201_env)
                 ],
-                r200_f
+                r201_f
             ];
-        }), r118_externs.macros.put('matches', function _r118_t36(r201_form, r201_env, r201_wrapper) {
-            var r201_whatever, r201_obj, r201_pattern, r201_pat, r201_t, r201_cond, _r201_t0 = r201_form;
-            return Array.isArray(_r201_t0) && _r201_t0.length === 3 ? (r201_whatever = _r201_t0[0], r201_obj = _r201_t0[1], r201_pattern = _r201_t0[2], r201_pat = r118_toPattern(r201_pattern, r201_env), r201_t = r201_env.newt(), r201_cond = r201_pat.whether(r201_t), r201_cond ? [
+        }), r118_externs.macros.put('matches', function _r118_t37(r202_form, r202_env, r202_wrapper) {
+            var r202_whatever, r202_obj, r202_pattern, r202_pat, r202_t, r202_cond, _r202_t0 = r202_form;
+            return Array.isArray(_r202_t0) && _r202_t0.length === 3 ? (r202_whatever = _r202_t0[0], r202_obj = _r202_t0[1], r202_pattern = _r202_t0[2], r202_pat = r118_toPattern(r202_pattern, r202_env), r202_t = r202_env.newt(), r202_cond = r202_pat.whether(r202_t), r202_cond ? [
                 '.begin',
                 [
                     '.set',
-                    r201_t,
-                    r1_ex(r201_obj, r201_env)
+                    r202_t,
+                    r1_ex(r202_obj, r202_env)
                 ],
-                r201_pat.whether(r201_t)
+                r202_pat.whether(r202_t)
             ] : [
                 '.quote',
                 !0
@@ -1030,89 +1046,89 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
         }), r118_externs.macros.put('<~>', r118_externs.macros.get('matches')), r118_externs.operatorInfo.put('<~>', {
             'priority': 400,
             'associvity': 'never'
-        }), r118_externs.macros.put('regex', function _r118_t37(r202_form, r202_env) {
-            var r202_args, r202_s, r202_flag, _r202_t0;
-            return _r202_t0 = r202_form, Array.isArray(_r202_t0) && _r202_t0.length === 2 && 'regex' === _r202_t0[0] && Array.isArray(_r202_t0[1]) && _r202_t0[1].length === 2 && '.quote' === _r202_t0[1][0] ? (r202_s = _r202_t0[1][1], _r202_t0[1], [
+        }), r118_externs.macros.put('regex', function _r118_t38(r203_form, r203_env) {
+            var r203_args, r203_s, r203_flag, _r203_t0;
+            return _r203_t0 = r203_form, Array.isArray(_r203_t0) && _r203_t0.length === 2 && 'regex' === _r203_t0[0] && Array.isArray(_r203_t0[1]) && _r203_t0[1].length === 2 && '.quote' === _r203_t0[1][0] ? (r203_s = _r203_t0[1][1], _r203_t0[1], [
                 '.quote',
-                new RegExp(r202_s)
-            ]) : Array.isArray(_r202_t0) && _r202_t0.length === 3 && 'regex' === _r202_t0[0] && Array.isArray(_r202_t0[1]) && _r202_t0[1].length === 2 && '.quote' === _r202_t0[1][0] && Array.isArray(_r202_t0[2]) && _r202_t0[2].length === 2 && '.quote' === _r202_t0[2][0] ? (r202_s = _r202_t0[1][1], _r202_t0[1], r202_flag = _r202_t0[2][1], _r202_t0[2], [
+                new RegExp(r203_s)
+            ]) : Array.isArray(_r203_t0) && _r203_t0.length === 3 && 'regex' === _r203_t0[0] && Array.isArray(_r203_t0[1]) && _r203_t0[1].length === 2 && '.quote' === _r203_t0[1][0] && Array.isArray(_r203_t0[2]) && _r203_t0[2].length === 2 && '.quote' === _r203_t0[2][0] ? (r203_s = _r203_t0[1][1], _r203_t0[1], r203_flag = _r203_t0[2][1], _r203_t0[2], [
                 '.quote',
-                new RegExp(r202_s, r202_flag)
-            ]) : Array.isArray(_r202_t0) && _r202_t0.length >= 1 && 'regex' === _r202_t0[0] ? (r202_args = _r202_t0.slice(1), [
+                new RegExp(r203_s, r203_flag)
+            ]) : Array.isArray(_r203_t0) && _r203_t0.length >= 1 && 'regex' === _r203_t0[0] ? (r203_args = _r203_t0.slice(1), [
                 '.new',
                 r118_externs.use('RegExp')
-            ].concat(r202_args)) : void 0;
-        }), r118_externs.macros.put('define-macro', function _r118_t38(r203_form, r203_env) {
-            var r203_op, r203_name, r203_body, r203_coinit, r203_ds, r203_imports, r203_names, r203_assignments, r203_macroG, r203_macroFn, r203_str, _r203_t1, _r203_t0 = r203_form;
-            return Array.isArray(_r203_t0) && _r203_t0.length === 3 && Array.isArray(_r203_t0[1]) && _r203_t0[1].length === 2 && '.quote' === _r203_t0[1][0] ? (r203_op = _r203_t0[0], r203_str = _r203_t0[1][1], _r203_t0[1], r203_body = _r203_t0[2], r1_ex([
-                r203_op,
-                r203_str,
-                r203_body
-            ], r203_env)) : (_r203_t1 = !1, Array.isArray(_r203_t0) && _r203_t0.length === 3 && (r203_op = _r203_t0[0], r203_name = _r203_t0[1], r203_body = _r203_t0[2], r1_atom(r203_name) ? _r203_t1 = !0 : _r203_t1 = !1), _r203_t1 ? (r203_coinit = {
+            ].concat(r203_args)) : void 0;
+        }), r118_externs.macros.put('define-macro', function _r118_t39(r204_form, r204_env) {
+            var r204_op, r204_name, r204_body, r204_coinit, r204_ds, r204_imports, r204_names, r204_assignments, r204_macroG, r204_macroFn, r204_str, _r204_t1, _r204_t0 = r204_form;
+            return Array.isArray(_r204_t0) && _r204_t0.length === 3 && Array.isArray(_r204_t0[1]) && _r204_t0[1].length === 2 && '.quote' === _r204_t0[1][0] ? (r204_op = _r204_t0[0], r204_str = _r204_t0[1][1], _r204_t0[1], r204_body = _r204_t0[2], r1_ex([
+                r204_op,
+                r204_str,
+                r204_body
+            ], r204_env)) : (_r204_t1 = !1, Array.isArray(_r204_t0) && _r204_t0.length === 3 && (r204_op = _r204_t0[0], r204_name = _r204_t0[1], r204_body = _r204_t0[2], r1_atom(r204_name) ? _r204_t1 = !0 : _r204_t1 = !1), _r204_t1 ? (r204_coinit = {
                 'injectForm': void 0,
                 'initFn': void 0
-            }, r203_ds = new r1_Scope(r203_env), r203_imports = {
+            }, r204_ds = new r1_Scope(r204_env), r204_imports = {
                 'ex': r1_ex,
                 'atom': r1_wrapForSyntacticClosure(r1_atom),
                 'prim': r1_wrapForSyntacticClosure(r1_prim),
-                'formOf': function _r203_t6(r204_x) {
-                    return r204_x[1];
+                'formOf': function _r204_t6(r205_x) {
+                    return r205_x[1];
                 },
-                'scopeOf': function _r203_t7(r205_x) {
-                    return r205_x[2];
+                'scopeOf': function _r204_t7(r206_x) {
+                    return r206_x[2];
                 },
-                'definingEnv': r203_env,
+                'definingEnv': r204_env,
                 'externEnv': r118_externs,
                 'require': require,
                 'toPattern': r118_toPattern,
-                'coinit': r203_coinit,
+                'coinit': r204_coinit,
                 'FormInvalidError': r1_FormInvalidError,
                 'deQuasiquote': r1_deQuasiquote,
                 'opSegToRegular': r1_opSegToRegular
-            }, r203_names = Object.keys(r203_imports), r203_ds.declare('$', !0), r203_assignments = ['.begin'].concat(r203_names.map(function _r203_t8(r206_name) {
+            }, r204_names = Object.keys(r204_imports), r204_ds.declare('$', !0), r204_assignments = ['.begin'].concat(r204_names.map(function _r204_t8(r207_name) {
                 return [
                     'local',
-                    r206_name,
+                    r207_name,
                     [
                         '.',
                         '$',
                         [
                             '.quote',
-                            r206_name
+                            r207_name
                         ]
                     ]
                 ];
-            })), r203_macroG = new Function(r203_ds.castName('$'), r1_escodegen.generate(r1_patrisika.generate([
+            })), r204_macroG = new Function(r204_ds.castName('$'), r1_escodegen.generate(r1_patrisika.generate([
                 '.return',
                 r1_ex([
                     '.begin',
-                    r203_assignments,
-                    r203_body
-                ], r203_ds)
-            ], r203_ds, function _r203_t9(r207_form) {
+                    r204_assignments,
+                    r204_body
+                ], r204_ds)
+            ], r204_ds, function _r204_t9(r208_form) {
                 return [
                     '.return',
-                    r207_form
+                    r208_form
                 ];
-            }))), r203_macroFn = r203_macroG(r203_imports), r203_env.macros.put(r203_name, function _r203_t10(r208_c, r208_e) {
-                var r208_result = r203_macroFn(r208_c, r208_e), r208_s = new r1_Scope(r203_env);
-                return r208_s.hanging = r208_e, r208_s.semiparent = r208_e, r1_ex(r208_result, r208_s);
-            }), r203_coinit.initFn && r203_coinit.initFn(r203_env.macros.get(r203_name)), r203_coinit.injectForm ? r1_ex(r203_coinit.injectForm, r203_env) : ['.unit']) : ['.unit']);
-        }), r118_externs.macros.put('macro-match', function _r118_t39(r209_form, r209_env) {
-            var r209_c, r209_e, r209_patterns, r209_t, r209_tx, r209_tw, _r209_t0 = r209_form;
-            return Array.isArray(_r209_t0) && _r209_t0.length >= 3 && 'macro-match' === _r209_t0[0] ? (r209_c = _r209_t0[1], r209_e = _r209_t0[2], r209_patterns = _r209_t0.slice(3), r209_t = r209_env.newt(), r209_tx = r209_env.newt(), r209_tw = r209_env.newt(), [
+            }))), r204_macroFn = r204_macroG(r204_imports), r204_env.macros.put(r204_name, function _r204_t10(r209_c, r209_e) {
+                var r209_result = r204_macroFn(r209_c, r209_e), r209_s = new r1_Scope(r204_env);
+                return r209_s.hanging = r209_e, r209_s.semiparent = r209_e, r1_ex(r209_result, r209_s);
+            }), r204_coinit.initFn && r204_coinit.initFn(r204_env.macros.get(r204_name)), r204_coinit.injectForm ? r1_ex(r204_coinit.injectForm, r204_env) : ['.unit']) : ['.unit']);
+        }), r118_externs.macros.put('macro-match', function _r118_t40(r210_form, r210_env) {
+            var r210_c, r210_e, r210_patterns, r210_t, r210_tx, r210_tw, _r210_t0 = r210_form;
+            return Array.isArray(_r210_t0) && _r210_t0.length >= 3 && 'macro-match' === _r210_t0[0] ? (r210_c = _r210_t0[1], r210_e = _r210_t0[2], r210_patterns = _r210_t0.slice(3), r210_t = r210_env.newt(), r210_tx = r210_env.newt(), r210_tw = r210_env.newt(), [
                 '.begin',
                 [
                     '.set',
-                    r209_t,
-                    r209_e
+                    r210_t,
+                    r210_e
                 ],
                 [
                     '.set',
-                    r209_tw,
+                    r210_tw,
                     [
                         '.lambda',
-                        [r209_tx],
+                        [r210_tx],
                         [
                             '.return',
                             [
@@ -1121,16 +1137,16 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                                     '.quote',
                                     '.syntactic-closure'
                                 ],
-                                r209_tx,
-                                r209_t
+                                r210_tx,
+                                r210_t
                             ]
                         ]
                     ]
                 ],
                 r118_externs.macros.get('match')([
                     'match',
-                    r209_c
-                ].concat(r209_patterns), r209_env, r209_tw)
+                    r210_c
+                ].concat(r210_patterns), r210_env, r210_tw)
             ]) : ['.unit'];
         }), r118_externs.pFamily = 'r', r118_externs;
     };

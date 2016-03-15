@@ -89,13 +89,13 @@ define [Create] : begin
 		local args {}
 		local paras {}
 		local decls {".begin"}
-		for [local j 0] (j < pairs.length) [inc j] : match pairs.(j) 
+		for [local j 0] (j < pairs.length) [inc j] : match pairs.(j)
 			{arg param}           	: begin
 				local t : env.newt 'leti'
-				args.push t; paras.push param; decls.push {"local" arg t}
+				args.push t; paras.push param; decls.push {"define" arg t}
 			{arg} [atom arg]      	: begin
 				local t : env.newt 'leti'
-				args.push t; paras.push [env.use arg]; decls.push {"local" arg t}
+				args.push t; paras.push [env.use arg]; decls.push {"define" arg t}
 			otherwise : throw : new FormInvalidError pairs.(j) "Invalid [let] subpattern"
 		ex {".beta" args {".begin" decls form.((form.length - 1))} :: paras} env
 	externs.macros.put "letrec" : lambda [form env] : begin 
@@ -154,16 +154,16 @@ define [Create] : begin
 
 	define [AssignWithMod left right mod env locallyQ] : match left 
 		id [atom id] : piecewise 
-			locallyQ	{".set" [ex {".local" id} env] [ex {mod right} env]}
+			locallyQ	{".set" [ex {".local" id ((locallyQ || 1) - 1)} env] [ex {mod right} env]}
 			true    	{".set" [ex left env] [ex {mod right} env]}
 		{".id" id} [atom id] : piecewise 
-			locallyQ	{".set" [ex {".local" id} env] [ex {mod right} env]}
+			locallyQ	{".set" [ex {".local" id ((locallyQ || 1) - 1)} env] [ex {mod right} env]}
 			true    	{".set" [ex left env] [ex {mod right} env]}
 		{".id" id e} ([atom id] && (e == env || !locallyQ)) : piecewise 
-			locallyQ	{".set" [ex {".local" id} e] [ex {mod right} e]}
+			locallyQ	{".set" [ex {".local" id ((locallyQ || 1) - 1)} e] [ex {mod right} e]}
 			true    	{".set" [ex left e] [ex {mod right} e]}
 		{".id" id e} ([atom id] && e != env && locallyQ) : throw [new FormInvalidError left "Attempt to redefine non-local subform"]
-		{".local" a} : AssignWithMod a right mod env true
+		{".local" a} : AssignWithMod a right mod env (locallyQ || true)
 		{".syntactic-closure" a e} (e == env || !locallyQ) : AssignWithMod a right mod env locallyQ
 		{".syntactic-closure" a e} (e != env && locallyQ) : throw [new FormInvalidError left "Attempt to redefine non-local subform"]
 		{".revcall" :: whatever} : AssignWithMod {:: whatever} right mod env locallyQ
@@ -190,11 +190,16 @@ define [Create] : begin
 	define [Assign left right env locallyQ] : AssignWithMod left right ".unquote" env locallyQ
 
 	externs.macros.put "define" : lambda [form env] : match form 
+		`[@op @modifer @left @right]	: AssignWithMod left right modifer env 2
+		`[@op @left @right]         	: Assign left right env 2
+		`[@op @left] [atom left]    	: return {".local" left}
+		any                          	: throw [new FormInvalidError any "Invalid Assignment"]
+	externs.macros.put "local" : lambda [form env] : match form 
 		`[@op @modifer @left @right]	: AssignWithMod left right modifer env true
 		`[@op @left @right]         	: Assign left right env true
 		`[@op @left] [atom left]    	: return {".local" left}
 		any                          	: throw [new FormInvalidError any "Invalid Assignment"]
-	externs.macros.put "local" : externs.macros.get "define"
+	externs.macros.put "const" : externs.macros.get "define"
 	externs.macros.put "set" : lambda [form env] : match form 
 		{op left right} : Assign left right env false
 		any : throw [new FormInvalidError any "Invalid Assignment"]
