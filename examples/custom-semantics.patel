@@ -21,8 +21,11 @@ define-macro myor-dirty : syntax-rules
 		if [falsy t] @y t
 	]
 
-
-console.log [myor 1 2]                                      	# 1
-console.log [myor-dirty 1 2]                                	# 1
-let [falsy [lambda [x] true]] : console.log [myor 1 2]      	# 1
-let [falsy [lambda [x] true]] : console.log [myor-dirty 1 2]	# 2
+let : begin
+	console.log [myor 1 2]                                      	# 1
+	console.log t                                                   # undefined
+	let [falsy [lambda [x] true]] : console.log [myor 1 2]      	# 1
+let : begin
+	console.log [myor-dirty 1 2]                                	# 1
+	console.log t                                                   # 1
+	let [falsy [lambda [x] true]] : console.log [myor-dirty 1 2]	# 2
