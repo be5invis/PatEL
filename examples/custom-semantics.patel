@@ -16,9 +16,9 @@ define-macro myor : syntax-rules
 	]
 
 define-macro myor-dirty : syntax-rules
-	`[myor-dirty @x @y] `[begin \\
+	`[myor-dirty @x @y] : dirty `[begin \\
 		local t @x
-		if [@{'.syntactic-closure' `(falsy) arguments.(1)} t] @y t
+		if [falsy t] @y t
 	]
 
 
