@@ -1,5 +1,5 @@
 {
-	"version": "0.30.4",
+	"version": "0.30.5",
 	"name": "patel",
 	"description": "A Patrisika-based Example Language",
 	"repository": "https://github.com/be5invis/patel",
@@ -13,7 +13,6 @@
 	},
 	"main": "./plex.js",
 	"bin" : {
-		"patel-c" : "./bin/patel-c",
-		"patel1920" : "./1920/1920.js"
+		"patel-c" : "./bin/patel-c"
 	}
 }

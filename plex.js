@@ -88,7 +88,7 @@ function compile(_input, _options, callback) {
 	try {
 		if (options['dump-ast']) { return callback(null, null, ast) }
 
-		var xastP = patel.ex(patel.prepareAST, gs0);
+		var xastP = patel.ex(patel.prepareAST, gs);
 
 		gs0.options.trace = true;
 		var xast = ['.begin', xastP, patel.ex(ast, gs)];
