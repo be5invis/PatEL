@@ -1,16 +1,16 @@
 ﻿'use strict';
-var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'), r1_atom = function _r1_t0(r113_x) {
+var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, _r1_t5, _r1_t6, _r1_t7, _r1_t8, _r1_t9, _r1_t10, r1_patrisika = require('patrisika'), r1_atom = function _r1_t6(r113_x) {
         return typeof r113_x === 'string';
-    }, r1_identifier = function _r1_t1(r114_x) {
+    }, r1_identifier = function _r1_t7(r114_x) {
         return r1_atom(r114_x) && /^[A-Za-zªµºÀ-ÖØ-öø-ˁˆ-ˑˠ-ˤˬˮͰ-ʹͶ-ͷͺ-ͽΆΈ-ΊΌΎ-ΡΣ-ϵϷ-ҁҊ-ԣԱ-Ֆՙա-ևא-תװ-ײء-يٮ-ٯٱ-ۓەۥ-ۦۮ-ۯۺ-ۼۿܐܒ-ܯݍ-ޥޱߊ-ߪߴ-ߵߺऄ-हऽॐक़-ॡॱ-ॲॻ-ॿঅ-ঌএ-ঐও-নপ-রলশ-হঽৎড়-ঢ়য়-ৡৰ-ৱਅ-ਊਏ-ਐਓ-ਨਪ-ਰਲ-ਲ਼ਵ-ਸ਼ਸ-ਹਖ਼-ੜਫ਼ੲ-ੴઅ-ઍએ-ઑઓ-નપ-રલ-ળવ-હઽૐૠ-ૡଅ-ଌଏ-ଐଓ-ନପ-ରଲ-ଳଵ-ହଽଡ଼-ଢ଼ୟ-ୡୱஃஅ-ஊஎ-ஐஒ-கங-சஜஞ-டண-தந-பம-ஹௐఅ-ఌఎ-ఐఒ-నప-ళవ-హఽౘ-ౙౠ-ౡಅ-ಌಎ-ಐಒ-ನಪ-ಳವ-ಹಽೞೠ-ೡഅ-ഌഎ-ഐഒ-നപ-ഹഽൠ-ൡൺ-ൿඅ-ඖක-නඳ-රලව-ෆก-ะา-ำเ-ๆກ-ຂຄງ-ຈຊຍດ-ທນ-ຟມ-ຣລວສ-ຫອ-ະາ-ຳຽເ-ໄໆໜ-ໝༀཀ-ཇཉ-ཬྈ-ྋက-ဪဿၐ-ၕၚ-ၝၡၥ-ၦၮ-ၰၵ-ႁႎႠ-Ⴥა-ჺჼᄀ-ᅙᅟ-ᆢᆨ-ᇹሀ-ቈቊ-ቍቐ-ቖቘቚ-ቝበ-ኈኊ-ኍነ-ኰኲ-ኵኸ-ኾዀዂ-ዅወ-ዖዘ-ጐጒ-ጕጘ-ፚᎀ-ᎏᎠ-Ᏼᐁ-ᙬᙯ-ᙶᚁ-ᚚᚠ-ᛪᜀ-ᜌᜎ-ᜑᜠ-ᜱᝀ-ᝑᝠ-ᝬᝮ-ᝰក-ឳៗៜᠠ-ᡷᢀ-ᢨᢪᤀ-ᤜᥐ-ᥭᥰ-ᥴᦀ-ᦩᧁ-ᧇᨀ-ᨖᬅ-ᬳᭅ-ᭋᮃ-ᮠᮮ-ᮯᰀ-ᰣᱍ-ᱏᱚ-ᱽᴀ-ᶿḀ-ἕἘ-Ἕἠ-ὅὈ-Ὅὐ-ὗὙὛὝὟ-ώᾀ-ᾴᾶ-ᾼιῂ-ῄῆ-ῌῐ-ΐῖ-Ίῠ-Ῥῲ-ῴῶ-ῼⁱⁿₐ-ₔℂℇℊ-ℓℕℙ-ℝℤΩℨK-ℭℯ-ℹℼ-ℿⅅ-ⅉⅎↃ-ↄⰀ-Ⱞⰰ-ⱞⱠ-Ɐⱱ-ⱽⲀ-ⳤⴀ-ⴥⴰ-ⵥⵯⶀ-ⶖⶠ-ⶦⶨ-ⶮⶰ-ⶶⶸ-ⶾⷀ-ⷆⷈ-ⷎⷐ-ⷖⷘ-ⷞⸯ々-〆〱-〵〻-〼ぁ-ゖゝ-ゟァ-ヺー-ヿㄅ-ㄭㄱ-ㆎㆠ-ㆷㇰ-ㇿ㐀-䶵一-鿃ꀀ-ꒌꔀ-ꘌꘐ-ꘟꘪ-ꘫꙀ-ꙟꙢ-ꙮꙿ-ꚗꜗ-ꜟꜢ-ꞈꞋ-ꞌꟻ-ꠁꠃ-ꠅꠇ-ꠊꠌ-ꠢꡀ-ꡳꢂ-ꢳꤊ-ꤥꤰ-ꥆꨀ-ꨨꩀ-ꩂꩄ-ꩋ가-힣豈-鶴侮-頻並-龎ﬀ-ﬆﬓ-ﬗיִײַ-ﬨשׁ-זּטּ-לּמּנּ-סּףּ-פּצּ-ﮱﯓ-ﴽﵐ-ﶏﶒ-ﷇﷰ-ﷻﹰ-ﹴﹶ-ﻼＡ-Ｚａ-ｚｦ-ﾾￂ-ￇￊ-ￏￒ-ￗￚ-ￜ_$][0-9A-Z_a-zªµºÀ-ÖØ-öø-ˁˆ-ˑˠ-ˤˬˮ\u0300-ʹͶ-ͷͺ-ͽΆΈ-ΊΌΎ-ΡΣ-ϵϷ-ҁ\u0483-\u0487Ҋ-ԣԱ-Ֆՙա-և\u0591-\u05bd\u05bf\u05c1-\u05c2\u05c4-\u05c5\u05c7א-תװ-ײ\u0610-\u061aء-\u065e٠-٩ٮ-ۓە-\u06dc\u06df-\u06e8\u06ea-ۼۿܐ-\u074aݍ-ޱ߀-ߵߺ\u0901-ह\u093c-\u094dॐ-\u0954क़-\u0963०-९ॱ-ॲॻ-ॿ\u0981-\u0983অ-ঌএ-ঐও-নপ-রলশ-হ\u09bc-\u09c4\u09c7-\u09c8\u09cb-ৎ\u09d7ড়-ঢ়য়-\u09e3০-ৱ\u0a01-\u0a03ਅ-ਊਏ-ਐਓ-ਨਪ-ਰਲ-ਲ਼ਵ-ਸ਼ਸ-ਹ\u0a3c\u0a3e-\u0a42\u0a47-\u0a48\u0a4b-\u0a4d\u0a51ਖ਼-ੜਫ਼੦-\u0a75\u0a81-\u0a83અ-ઍએ-ઑઓ-નપ-રલ-ળવ-હ\u0abc-\u0ac5\u0ac7-\u0ac9\u0acb-\u0acdૐૠ-\u0ae3૦-૯\u0b01-\u0b03ଅ-ଌଏ-ଐଓ-ନପ-ରଲ-ଳଵ-ହ\u0b3c-\u0b44\u0b47-\u0b48\u0b4b-\u0b4d\u0b56-\u0b57ଡ଼-ଢ଼ୟ-\u0b63୦-୯ୱ\u0b82-ஃஅ-ஊஎ-ஐஒ-கங-சஜஞ-டண-தந-பம-ஹ\u0bbe-\u0bc2\u0bc6-\u0bc8\u0bca-\u0bcdௐ\u0bd7௦-௯\u0c01-\u0c03అ-ఌఎ-ఐఒ-నప-ళవ-హఽ-\u0c44\u0c46-\u0c48\u0c4a-\u0c4d\u0c55-\u0c56ౘ-ౙౠ-\u0c63౦-౯\u0c82-\u0c83ಅ-ಌಎ-ಐಒ-ನಪ-ಳವ-ಹ\u0cbc-\u0cc4\u0cc6-\u0cc8\u0cca-\u0ccd\u0cd5-\u0cd6ೞೠ-\u0ce3೦-೯\u0d02-\u0d03അ-ഌഎ-ഐഒ-നപ-ഹഽ-\u0d44\u0d46-\u0d48\u0d4a-\u0d4d\u0d57ൠ-\u0d63൦-൯ൺ-ൿ\u0d82-\u0d83අ-ඖක-නඳ-රලව-ෆ\u0dca\u0dcf-\u0dd4\u0dd6\u0dd8-\u0ddf\u0df2-\u0df3ก-\u0e3aเ-\u0e4e๐-๙ກ-ຂຄງ-ຈຊຍດ-ທນ-ຟມ-ຣລວສ-ຫອ-\u0eb9\u0ebb-ຽເ-ໄໆ\u0ec8-\u0ecd໐-໙ໜ-ໝༀ\u0f18-\u0f19༠-༩\u0f35\u0f37\u0f39\u0f3e-ཇཉ-ཬ\u0f71-\u0f84\u0f86-ྋ\u0f90-\u0f97\u0f99-\u0fbc\u0fc6က-၉ၐ-႙Ⴀ-Ⴥა-ჺჼᄀ-ᅙᅟ-ᆢᆨ-ᇹሀ-ቈቊ-ቍቐ-ቖቘቚ-ቝበ-ኈኊ-ኍነ-ኰኲ-ኵኸ-ኾዀዂ-ዅወ-ዖዘ-ጐጒ-ጕጘ-ፚ\u135fᎀ-ᎏᎠ-Ᏼᐁ-ᙬᙯ-ᙶᚁ-ᚚᚠ-ᛪᜀ-ᜌᜎ-\u1714ᜠ-\u1734ᝀ-\u1753ᝠ-ᝬᝮ-ᝰ\u1772-\u1773ក-ឳ\u17b6-\u17d3ៗៜ-\u17dd០-៩\u180b-\u180d᠐-᠙ᠠ-ᡷᢀ-ᢪᤀ-ᤜ\u1920-\u192b\u1930-\u193b᥆-ᥭᥰ-ᥴᦀ-ᦩ\u19b0-\u19c9᧐-᧙ᨀ-\u1a1b\u1b00-ᭋ᭐-᭙\u1b6b-\u1b73\u1b80-\u1baaᮮ-᮹ᰀ-\u1c37᱀-᱉ᱍ-ᱽᴀ-\u1de6\u1dfe-ἕἘ-Ἕἠ-ὅὈ-Ὅὐ-ὗὙὛὝὟ-ώᾀ-ᾴᾶ-ᾼιῂ-ῄῆ-ῌῐ-ΐῖ-Ίῠ-Ῥῲ-ῴῶ-ῼ‿-⁀⁔ⁱⁿₐ-ₔ\u20d0-\u20dc\u20e1\u20e5-\u20f0ℂℇℊ-ℓℕℙ-ℝℤΩℨK-ℭℯ-ℹℼ-ℿⅅ-ⅉⅎↃ-ↄⰀ-Ⱞⰰ-ⱞⱠ-Ɐⱱ-ⱽⲀ-ⳤⴀ-ⴥⴰ-ⵥⵯⶀ-ⶖⶠ-ⶦⶨ-ⶮⶰ-ⶶⶸ-ⶾⷀ-ⷆⷈ-ⷎⷐ-ⷖⷘ-ⷞ\u2de0-\u2dffⸯ々-〆\u302a-\u302f〱-〵〻-〼ぁ-ゖ\u3099-\u309aゝ-ゟァ-ヺー-ヿㄅ-ㄭㄱ-ㆎㆠ-ㆷㇰ-ㇿ㐀-䶵一-鿃ꀀ-ꒌꔀ-ꘌꘐ-ꘫꙀ-ꙟꙢ-\ua66f\ua67c-\ua67dꙿ-ꚗꜗ-ꜟꜢ-ꞈꞋ-ꞌꟻ-\ua827ꡀ-ꡳ\ua880-\ua8c4꣐-꣙꤀-\ua92dꤰ-\ua953ꨀ-\uaa36ꩀ-\uaa4d꩐-꩙가-힣豈-鶴侮-頻並-龎ﬀ-ﬆﬓ-ﬗיִ-ﬨשׁ-זּטּ-לּמּנּ-סּףּ-פּצּ-ﮱﯓ-ﴽﵐ-ﶏﶒ-ﷇﷰ-ﷻ\ufe00-\ufe0f\ufe20-\ufe26︳-︴﹍-﹏ﹰ-ﹴﹶ-ﻼ０-９Ａ-Ｚ＿ａ-ｚｦ-ﾾￂ-ￇￊ-ￏￒ-ￗￚ-ￜ\-_@$]*$/.test(r114_x);
-    }, r1_prim = function _r1_t2(r115_x) {
+    }, r1_prim = function _r1_t8(r115_x) {
         return r1_atom(r115_x) && !r1_identifier(r115_x);
-    }, r1_Scope = require('patrisika').Scope, r1_escodegen = require('escodegen'), r1_util = require('util'), r1_exlib = require('./ex'), r1_ex = r1_exlib.ex, r1_deQuasiquote = r1_exlib.deQuasiquote, r1_opSegToRegular = r1_exlib.opSegToRegular, r1_FormInvalidError = r1_exlib.FormInvalidError, r1_wrapForSyntacticClosure = function _r1_t3(r116_fn) {
+    }, r1_Scope = require('patrisika').Scope, r1_escodegen = require('escodegen'), r1_util = require('util'), r1_exlib = require('./ex'), r1_ex = r1_exlib.ex, r1_deQuasiquote = r1_exlib.deQuasiquote, r1_opSegToRegular = r1_exlib.opSegToRegular, r1_FormInvalidError = r1_exlib.FormInvalidError, r1_wrapForSyntacticClosure = function _r1_t9(r116_fn) {
         return function _r116_t2(r117_x) {
-            var r117_c, r117_e, _r117_t0;
-            return _r117_t0 = r117_x, Array.isArray(_r117_t0) && _r117_t0.length === 3 && '.syntactic-closure' === _r117_t0[0] ? (r117_c = _r117_t0[1], r117_e = _r117_t0[2], r116_fn(r117_c)) : r116_fn(r117_x);
+            var r117_c, r117_e, _r117_t0 = r117_x;
+            return Array.isArray(_r117_t0) && _r117_t0.length === 3 && '.syntactic-closure' === _r117_t0[0] ? (r117_c = _r117_t0[1], r117_e = _r117_t0[2], r116_fn(r117_c)) : r116_fn(r117_x);
         };
-    }, r1_Create = function _r1_t4() {
+    }, r1_Create = function _r1_t10() {
         var r118_externs = r1_patrisika.DefaultExterns();
         r118_externs.castName = function _r118_t2(r119_name) {
             return r119_name;
@@ -23,8 +23,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                 throw new r1_FormInvalidError(r122_form, r122_reason);
             };
         r118_externs.macros.put('begin', r118_operatorRename('.begin')), r118_externs.macros.put('then', r118_operatorRename('.begin')), r118_externs.macros.put('else', r118_operatorRename('.begin')), r118_externs.macros.put('while', r118_operatorRename('.while')), r118_externs.macros.put('try', r118_operatorRename('.try')), r118_externs.macros.put('is', r118_operatorRename('.is')), r118_externs.macros.put('<@', r118_operatorRename('.is')), r118_externs.macros.put('new', r118_operatorRename('.new')), r118_externs.macros.put('this', r118_operatorRename('.thisp')), r118_externs.macros.put('arguments', r118_operatorRename('.argsp')), r118_externs.macros.put('and', r118_operatorRename('&&')), r118_externs.macros.put('or', r118_operatorRename('||')), r118_externs.macros.put('not', r118_operatorRename('!')), r118_externs.macros.put('return', r118_operatorRename('.return')), r118_externs.macros.put('yield', r118_operatorRename('.yield')), r118_externs.macros.put('throw', r118_operatorRename('.throw')), r118_externs.macros.put('list', r118_operatorRename('.list')), r118_externs.macros.put('typeof', r118_operatorRename('.typeof')), r118_externs.macros.put('quasiquote', r118_operatorRename('.quasiquote')), r118_externs.macros.put('syntax', r118_operatorRename('.quasiquote')), r118_externs.macros.put('lambda', function _r118_t5(r123_form, r123_env) {
-            var r123_otherwise, r123_car, r123_body, r123_parameters, _r123_t0, _r123_t1;
-            return _r123_t0 = r123_form, _r123_t1 = !1, Array.isArray(_r123_t0) && _r123_t0.length === 3 && (r123_car = _r123_t0[0], r123_parameters = _r123_t0[1], r123_body = _r123_t0[2], r1_atom(r123_parameters) ? _r123_t1 = !0 : _r123_t1 = !1), _r123_t1 ? r1_ex([
+            var r123_otherwise, r123_car, r123_body, r123_parameters, _r123_t0 = r123_form, _r123_t1 = !1;
+            return Array.isArray(_r123_t0) && _r123_t0.length === 3 && (r123_car = _r123_t0[0], r123_parameters = _r123_t0[1], r123_body = _r123_t0[2], r1_atom(r123_parameters) ? _r123_t1 = !0 : _r123_t1 = !1), _r123_t1 ? r1_ex([
                 '.lambda',
                 [r123_parameters],
                 r123_body
@@ -67,8 +67,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
         }), r118_externs.macros.put('.prefix.=', function _r118_t10(r128_form, r128_env) {
             return r1_ex(r128_form[1], r128_env);
         }), r118_externs.macros.put('if', function _r118_t11(r129_form, r129_env) {
-            var r129_otherwise, r129_test, r129_consequents, r129_alternates, r129_consequent, r129_alternate, _r129_t0;
-            return _r129_t0 = r129_form, Array.isArray(_r129_t0) && _r129_t0.length === 3 && 'if' === _r129_t0[0] ? (r129_test = _r129_t0[1], r129_consequent = _r129_t0[2], r1_ex([
+            var r129_otherwise, r129_test, r129_consequents, r129_alternates, r129_consequent, r129_alternate, _r129_t0 = r129_form;
+            return Array.isArray(_r129_t0) && _r129_t0.length === 3 && 'if' === _r129_t0[0] ? (r129_test = _r129_t0[1], r129_consequent = _r129_t0[2], r1_ex([
                 '.if',
                 r129_test,
                 r129_consequent
@@ -479,8 +479,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
             else
                 throw r143_any = _r143_t0, new r1_FormInvalidError(r143_any, 'Invalid Assignment');
         }), r118_externs.macros.put('=', r118_externs.macros.get('set')), r118_externs.macros.put('inc', function _r118_t23(r144_form, r144_env) {
-            var r144_op, r144_id, r144_shift, _r144_t0;
-            return _r144_t0 = r144_form, Array.isArray(_r144_t0) && _r144_t0.length === 2 ? (r144_op = _r144_t0[0], r144_id = _r144_t0[1], r118_Assign(r144_id, [
+            var r144_op, r144_id, r144_shift, _r144_t0 = r144_form;
+            return Array.isArray(_r144_t0) && _r144_t0.length === 2 ? (r144_op = _r144_t0[0], r144_id = _r144_t0[1], r118_Assign(r144_id, [
                 '+',
                 r144_id,
                 [
@@ -497,8 +497,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                 r144_shift
             ], r144_env, !1)) : void 0;
         }), r118_externs.macros.put('dec', function _r118_t24(r145_form, r145_env) {
-            var r145_op, r145_id, r145_shift, _r145_t0;
-            return _r145_t0 = r145_form, Array.isArray(_r145_t0) && _r145_t0.length === 2 ? (r145_op = _r145_t0[0], r145_id = _r145_t0[1], r118_Assign(r145_id, [
+            var r145_op, r145_id, r145_shift, _r145_t0 = r145_form;
+            return Array.isArray(_r145_t0) && _r145_t0.length === 2 ? (r145_op = _r145_t0[0], r145_id = _r145_t0[1], r118_Assign(r145_id, [
                 '-',
                 r145_id,
                 [
@@ -515,8 +515,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                 r145_shift
             ], r145_env, !1)) : void 0;
         }), r118_externs.macros.put('for', function _r118_t25(r146_form, r146_env) {
-            var r146_init, r146_test, r146_step, r146_body, _r146_t0;
-            return _r146_t0 = r146_form, Array.isArray(_r146_t0) && _r146_t0.length === 5 && 'for' === _r146_t0[0] ? (r146_init = _r146_t0[1], r146_test = _r146_t0[2], r146_step = _r146_t0[3], r146_body = _r146_t0[4], [
+            var r146_init, r146_test, r146_step, r146_body, _r146_t0 = r146_form;
+            return Array.isArray(_r146_t0) && _r146_t0.length === 5 && 'for' === _r146_t0[0] ? (r146_init = _r146_t0[1], r146_test = _r146_t0[2], r146_step = _r146_t0[3], r146_body = _r146_t0[4], [
                 '.begin',
                 r1_ex(r146_init, r146_env),
                 [
@@ -583,23 +583,23 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                 };
             else if (Array.isArray(_r147_t0) && _r147_t0.length === 2 && '.quote' === _r147_t0[0])
                 return r147_x = _r147_t0[1], {
-                    'whether': function _r147_t11(r159_x) {
+                    'whether': function _r147_t17(r159_x) {
                         return [
                             '===',
                             r1_ex(r147_pattern, r147_env),
                             r159_x
                         ];
                     },
-                    'assign': function _r147_t12(r160_x) {
+                    'assign': function _r147_t18(r160_x) {
                         return ['.unit'];
                     }
                 };
             else if (Array.isArray(_r147_t0) && _r147_t0.length >= 1 && '.' === _r147_t0[0])
                 return r147_whatever = _r147_t0.slice(1), {
-                    'whether': function _r147_t14(r157_x) {
+                    'whether': function _r147_t19(r157_x) {
                         return null;
                     },
-                    'assign': function _r147_t15(r158_x) {
+                    'assign': function _r147_t20(r158_x) {
                         return [
                             '.set',
                             r1_ex(r147_pattern, r147_env),
@@ -616,7 +616,7 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                 else if (r1_atom(r147_callee) && r147_env.macros.has(r147_callee) && !r147_env.macros.get(r147_callee).invokeAsAtom)
                     throw new r1_FormInvalidError(r147_pattern, 'Invalid Pattern');
                 else
-                    return r147_ms = r147_subpatterns.map(function _r147_t20(r148_x) {
+                    return r147_ms = r147_subpatterns.map(function _r147_t16(r148_x) {
                         return r118_toPattern(r148_x, r147_env, r147_config);
                     }), r147_t = r147_env.newt(), r147_config && r147_config.unchecked ? {
                         'whether': function _r147_t22(r149_x) {
@@ -949,13 +949,13 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                         '&&',
                         r185_x
                     ].concat(r183_ms.map(function _r185_t2(r186_p) {
-                        var r186_key, _r186_t5, _r186_t0 = r186_p[0];
+                        var r186_key, _r186_t5, _r186_t6, _r186_t0 = r186_p[0];
                         return Array.isArray(_r186_t0) && _r186_t0.length === 2 && '.quote' === _r186_t0[0] ? (r186_key = _r186_t0[1], r186_p[1].whether([
                             '.',
                             r185_x,
                             r186_p[0]
                         ])) : (_r186_t5 = r183_env.newt(), function (_r186_leti1, r187_t) {
-                            return r187_t = _r186_leti1, [
+                            return r187_t = _r186_leti1, _r186_t6 = [
                                 '.begin',
                                 [
                                     '.set',
@@ -973,13 +973,13 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                 },
                 'assign': function _r183_t6(r188_x) {
                     return ['.begin'].concat(r183_ms.map(function _r188_t2(r189_p) {
-                        var r189_key, _r189_t5, _r189_t0 = r189_p[0];
+                        var r189_key, _r189_t5, _r189_t6, _r189_t0 = r189_p[0];
                         return Array.isArray(_r189_t0) && _r189_t0.length === 2 && '.quote' === _r189_t0[0] ? (r189_key = _r189_t0[1], r189_p[1].assign([
                             '.',
                             r188_x,
                             r189_p[0]
                         ])) : (_r189_t5 = r183_env.newt(), function (_r189_leti1, r190_t) {
-                            return r190_t = _r189_leti1, [
+                            return r190_t = _r189_leti1, _r189_t6 = [
                                 '.begin',
                                 [
                                     '.set',
@@ -997,8 +997,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
                 }
             }) : void 0;
         }, r118_externs.macros.put('.quasiquote', {}), r118_externs.macros.get('.quasiquote').toPattern = function _r118_t31(r191_pattern, r191_env, r191_config) {
-            var r191_subpatterns, _r191_t0;
-            return _r191_t0 = r191_pattern, Array.isArray(_r191_t0) && _r191_t0.length >= 1 && '.quasiquote' === _r191_t0[0] ? (r191_subpatterns = _r191_t0.slice(1), r118_toPattern(r1_deQuasiquote(r191_pattern[1], 0, r191_env), r191_env, r191_config)) : void 0;
+            var r191_subpatterns, _r191_t0 = r191_pattern;
+            return Array.isArray(_r191_t0) && _r191_t0.length >= 1 && '.quasiquote' === _r191_t0[0] ? (r191_subpatterns = _r191_t0.slice(1), r118_toPattern(r1_deQuasiquote(r191_pattern[1], 0, r191_env), r191_env, r191_config)) : void 0;
         }, r118_externs.macros.put('.operatorPiece', {}), r118_externs.macros.get('.operatorPiece').toPattern = function _r118_t32(r192_pattern, r192_env, r192_config) {
             return r118_toPattern(r1_opSegToRegular(r192_pattern.slice(1), r192_env), r192_env, r192_config);
         }, r118_externs.macros.put('&&', {}), r118_externs.macros.get('&&').toPattern = function _r118_t33(r193_pattern, r193_env, r193_config) {
@@ -1145,8 +1145,8 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, r1_patrisika = require('patrisika'),
             'priority': 400,
             'associvity': 'never'
         }), r118_externs.macros.put('regex', function _r118_t38(r207_form, r207_env) {
-            var r207_args, r207_s, r207_flag, _r207_t0;
-            return _r207_t0 = r207_form, Array.isArray(_r207_t0) && _r207_t0.length === 2 && 'regex' === _r207_t0[0] && Array.isArray(_r207_t0[1]) && _r207_t0[1].length === 2 && '.quote' === _r207_t0[1][0] ? (r207_s = _r207_t0[1][1], _r207_t0[1], [
+            var r207_args, r207_s, r207_flag, _r207_t0 = r207_form;
+            return Array.isArray(_r207_t0) && _r207_t0.length === 2 && 'regex' === _r207_t0[0] && Array.isArray(_r207_t0[1]) && _r207_t0[1].length === 2 && '.quote' === _r207_t0[1][0] ? (r207_s = _r207_t0[1][1], _r207_t0[1], [
                 '.quote',
                 new RegExp(r207_s)
             ]) : Array.isArray(_r207_t0) && _r207_t0.length === 3 && 'regex' === _r207_t0[0] && Array.isArray(_r207_t0[1]) && _r207_t0[1].length === 2 && '.quote' === _r207_t0[1][0] && Array.isArray(_r207_t0[2]) && _r207_t0[2].length === 2 && '.quote' === _r207_t0[2][0] ? (r207_s = _r207_t0[1][1], _r207_t0[1], r207_flag = _r207_t0[2][1], _r207_t0[2], [
