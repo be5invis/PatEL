@@ -45,6 +45,7 @@ define [Create] : begin
 	externs.macros.put "or" : operatorRename "||"
 	externs.macros.put "not" : operatorRename "!"
 	externs.macros.put "return" : operatorRename ".return"
+	externs.macros.put "break" : operatorRename ".break"
 	externs.macros.put "yield" : operatorRename ".yield"
 	externs.macros.put "throw" : operatorRename ".throw"
 	externs.macros.put "list" : operatorRename ".list"
@@ -186,7 +187,7 @@ define [Create] : begin
 			[prim callee] {".set" [ex left env] [ex {mod right} env]}
 			[atom callee] : piecewise 
 				locallyQ {".set" 
-					[ex {".local" callee ((locallyQ || 1) - 1)} env] 
+					[ex {".local" callee ((locallyQ || 1) - 1)} env]
 					[ex {mod {".lambda" {::paras} right}} env]}
 				true {".set" 
 					[ex callee env]

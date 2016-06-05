@@ -22,7 +22,7 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, _r1_t5, _r1_t6, _r1_t7, _r1_t8, _r1_
             }, r118_reportInvalid = function _r118_t4(r122_form, r122_reason) {
                 throw new r1_FormInvalidError(r122_form, r122_reason);
             };
-        r118_externs.macros.put('begin', r118_operatorRename('.begin')), r118_externs.macros.put('then', r118_operatorRename('.begin')), r118_externs.macros.put('else', r118_operatorRename('.begin')), r118_externs.macros.put('while', r118_operatorRename('.while')), r118_externs.macros.put('try', r118_operatorRename('.try')), r118_externs.macros.put('is', r118_operatorRename('.is')), r118_externs.macros.put('<@', r118_operatorRename('.is')), r118_externs.macros.put('new', r118_operatorRename('.new')), r118_externs.macros.put('this', r118_operatorRename('.thisp')), r118_externs.macros.put('arguments', r118_operatorRename('.argsp')), r118_externs.macros.put('and', r118_operatorRename('&&')), r118_externs.macros.put('or', r118_operatorRename('||')), r118_externs.macros.put('not', r118_operatorRename('!')), r118_externs.macros.put('return', r118_operatorRename('.return')), r118_externs.macros.put('yield', r118_operatorRename('.yield')), r118_externs.macros.put('throw', r118_operatorRename('.throw')), r118_externs.macros.put('list', r118_operatorRename('.list')), r118_externs.macros.put('typeof', r118_operatorRename('.typeof')), r118_externs.macros.put('quasiquote', r118_operatorRename('.quasiquote')), r118_externs.macros.put('syntax', r118_operatorRename('.quasiquote')), r118_externs.macros.put('lambda', function _r118_t5(r123_form, r123_env) {
+        r118_externs.macros.put('begin', r118_operatorRename('.begin')), r118_externs.macros.put('then', r118_operatorRename('.begin')), r118_externs.macros.put('else', r118_operatorRename('.begin')), r118_externs.macros.put('while', r118_operatorRename('.while')), r118_externs.macros.put('try', r118_operatorRename('.try')), r118_externs.macros.put('is', r118_operatorRename('.is')), r118_externs.macros.put('<@', r118_operatorRename('.is')), r118_externs.macros.put('new', r118_operatorRename('.new')), r118_externs.macros.put('this', r118_operatorRename('.thisp')), r118_externs.macros.put('arguments', r118_operatorRename('.argsp')), r118_externs.macros.put('and', r118_operatorRename('&&')), r118_externs.macros.put('or', r118_operatorRename('||')), r118_externs.macros.put('not', r118_operatorRename('!')), r118_externs.macros.put('return', r118_operatorRename('.return')), r118_externs.macros.put('break', r118_operatorRename('.break')), r118_externs.macros.put('yield', r118_operatorRename('.yield')), r118_externs.macros.put('throw', r118_operatorRename('.throw')), r118_externs.macros.put('list', r118_operatorRename('.list')), r118_externs.macros.put('typeof', r118_operatorRename('.typeof')), r118_externs.macros.put('quasiquote', r118_operatorRename('.quasiquote')), r118_externs.macros.put('syntax', r118_operatorRename('.quasiquote')), r118_externs.macros.put('lambda', function _r118_t5(r123_form, r123_env) {
             var r123_otherwise, r123_car, r123_body, r123_parameters, _r123_t0 = r123_form, _r123_t1 = !1;
             return Array.isArray(_r123_t0) && _r123_t0.length === 3 && (r123_car = _r123_t0[0], r123_parameters = _r123_t0[1], r123_body = _r123_t0[2], r1_atom(r123_parameters) ? _r123_t1 = !0 : _r123_t1 = !1), _r123_t1 ? r1_ex([
                 '.lambda',
@@ -949,13 +949,13 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, _r1_t5, _r1_t6, _r1_t7, _r1_t8, _r1_
                         '&&',
                         r185_x
                     ].concat(r183_ms.map(function _r185_t2(r186_p) {
-                        var r186_key, _r186_t5, _r186_t6, _r186_t0 = r186_p[0];
+                        var r186_key, _r186_t5, _r186_t0 = r186_p[0];
                         return Array.isArray(_r186_t0) && _r186_t0.length === 2 && '.quote' === _r186_t0[0] ? (r186_key = _r186_t0[1], r186_p[1].whether([
                             '.',
                             r185_x,
                             r186_p[0]
                         ])) : (_r186_t5 = r183_env.newt(), function (_r186_leti1, r187_t) {
-                            return r187_t = _r186_leti1, _r186_t6 = [
+                            return r187_t = _r186_leti1, [
                                 '.begin',
                                 [
                                     '.set',
@@ -973,13 +973,13 @@ var _r1_t0, _r1_t1, _r1_t2, _r1_t3, _r1_t4, _r1_t5, _r1_t6, _r1_t7, _r1_t8, _r1_
                 },
                 'assign': function _r183_t6(r188_x) {
                     return ['.begin'].concat(r183_ms.map(function _r188_t2(r189_p) {
-                        var r189_key, _r189_t5, _r189_t6, _r189_t0 = r189_p[0];
+                        var r189_key, _r189_t5, _r189_t0 = r189_p[0];
                         return Array.isArray(_r189_t0) && _r189_t0.length === 2 && '.quote' === _r189_t0[0] ? (r189_key = _r189_t0[1], r189_p[1].assign([
                             '.',
                             r188_x,
                             r189_p[0]
                         ])) : (_r189_t5 = r183_env.newt(), function (_r189_leti1, r190_t) {
-                            return r190_t = _r189_leti1, _r189_t6 = [
+                            return r190_t = _r189_leti1, [
                                 '.begin',
                                 [
                                     '.set',
