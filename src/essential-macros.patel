@@ -444,3 +444,16 @@ define-macro class : syntax-rules
 		]]]
 	
 	otherwise : the-form-is-invalid
+
+define-macro $$include : syntax-rules
+	{'$$include' {'.quote' file}} : begin
+		local path : require 'path'
+		local fs : require 'fs'
+		local f0 [[env.macros.get 'input-path']].1
+		local parse [require './syntax.js'].parse
+
+		local absolutePath : path.resolve [path.dirname f0] [formOf file]
+		local input : fs.readFileSync absolutePath 'utf-8'
+		local ast : parse input {.within {.file absolutePath .input input}}
+		return {'.syntactic-closure' ast env}
+	otherwise : the-form-is-invalid
