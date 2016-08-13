@@ -1,6 +1,6 @@
-define-macro syntax-rules : lambda [form env] : macro-match form env 
+define-macro syntax-rules : lambda [form env] : macro-match form env
 	`[syntax-rules @::patterns] {'.syntactic-closure' `[lambda [form env] [begin
-		[local [dirty s] {'.syntactic-closure' s env}] 
+		[local [dirty s] {'.syntactic-closure' s env}]
 		[macro-match form env @::[patterns.map formOf]]]] env}
 	otherwise : throw : new FormInvalidError form "Invalid Macro Difinition"
 
@@ -21,7 +21,7 @@ define-macro set-operator-info : syntax-rules
 			.associvity "never"
 		}
 		return nothing
-	
+
 	otherwise : the-form-is-invalid
 
 define-macro define-operator : syntax-rules
@@ -44,14 +44,14 @@ define-macro define-operator : syntax-rules
 	`[define-operator prefix @{".quote" operator} @body] : dirty `[begin \\
 		define-macro @{".quote" (".prefix." + [formOf operator])} @[formOf body]
 	]
-	
+
 	otherwise : the-form-is-invalid
 
-define-macro its : syntax-rules 
+define-macro its : syntax-rules
 	`[its @property] : return `[let [t @property] [lambda [x] x.(t)]]
 	otherwise : the-form-is-invalid
 
-define-macro call-its : syntax-rules 
+define-macro call-its : syntax-rules
 	`[call-its @property] : return `[let [t @property] [lambda [x] [x.(t)]]]
 	`[call-its @property @::args] : return `[let [t @property] [a {@::args}] [lambda [x] [x.(t).apply x a]]]
 	otherwise : the-form-is-invalid
@@ -59,7 +59,7 @@ define-macro call-its : syntax-rules
 define-macro do : syntax-rules
 	`[do @::stmts] : dirty `[let : begin @::[stmts.map formOf]]
 
-define-macro getAllKeys : begin 
+define-macro getAllKeys : begin
 	local exoticAST {.type "FunctionExpression" .id null .params {{.type "Identifier" .name "o"}} .defaults {} .body {.type "BlockStatement" .body {{.type "VariableDeclaration" .declarations {{.type "VariableDeclarator" .id {.type "Identifier" .name "a"} .init {.type "ArrayExpression" .elements {}}}} .kind "var"} { .type "ForInStatement" .left {.type "VariableDeclaration" .declarations {{.type "VariableDeclarator" .id {.type "Identifier" .name "k"} .init null}} .kind "var"} .right {.type "Identifier" .name "o"} .body {.type "BlockStatement" .body {{.type "ExpressionStatement" .expression {.type "CallExpression" .callee { .type "MemberExpression" .computed false .object {.type "Identifier" .name "a"} .property {.type "Identifier" .name "push"} } .arguments {{.type "Identifier" .name "k"}}}}}} .each false } {.type "ReturnStatement" .argument {.type "Identifier" .name "a"}}}} .rest null .generator false .expression false }
 	local t : definingEnv.newt
 	#local coinitStatement : ex `[set @t @{".preserve" {".exotic" exoticAST}}] definingEnv
@@ -68,7 +68,7 @@ define-macro getAllKeys : begin
 	define [used] : begin
 		if [not ijp.1] : set ijp.1 : ex `[set @t @{".preserve" {".exotic" exoticAST}}] definingEnv
 
-	local f : syntax-rules 
+	local f : syntax-rules
 		`[getAllKeys] `{}
 		`[getAllKeys @obj] : begin [used] `[@t @obj]
 		`[getAllKeys @obj @::unused] : begin [used] `[@t @obj]
@@ -85,9 +85,10 @@ define-macro items-of : begin
 			[local n t.length]
 			[for [local i 0] (i < n) (i = i + 1) [yield t.(i)]]
 		]]] definingEnv
-	return : syntax-rules 
+	return : syntax-rules
 		`[items-of @obj] : begin [use 'items-of'] `[@t1 @obj]
 		otherwise : throw : new FormInvalidError form "Invalid form about [items-of]"
+
 define-macro pairs-of : begin
 	local ijp {".begin" nothing nothing nothing nothing}
 	set coinit.injectForm `[begin @{".preserve" ijp}]
@@ -112,10 +113,11 @@ define-macro pairs-of : begin
 				for [local i 0] (i < n) (i = i + 1) : yield { a.(i) t.(a.(i)) }
 			]]] definingEnv
 			return t
-	return : syntax-rules 
+	return : syntax-rules
 		`[pairs-of @obj] : begin `[@[use 'pairs-of-eigen'] @obj]
 		`[pairs-of all @obj] : begin `[@[use 'pairs-of-all'] @obj]
 		otherwise : throw : new FormInvalidError form "Invalid form about [pairs-of]"
+
 define-macro range : begin
 	local ijp {".begin" nothing nothing nothing nothing}
 	set coinit.injectForm `[begin @{".preserve" ijp}]
@@ -136,15 +138,20 @@ define-macro range : begin
 		'downtill' : if [not ijp.4] : set ijp.4 : ex `[set @t4 [lambda [lo hi] : begin \\
 			for [local j lo] (j >= hi) (j = j - 1) : yield j
 		]] definingEnv
-	return : syntax-rules 
+	return : syntax-rules
 		`[range @low @high] : begin [use 'upto'] `[@t1 @low @high]
 		`[range @low till @high] : begin [use 'uptill'] `[@t2 @low @high]
 		`[range @low downto @high] : begin [use 'downto'] `[@t3 @low @high]
 		`[range @low downtill @high] : begin [use 'downtill'] `[@t4 @low @high]
 		otherwise : throw : new FormInvalidError form "Invalid form about [range]"
-define-macro foreach : syntax-rules 
+
+define-macro foreach : syntax-rules
+	`[foreach [let @varid] @body] : throw : new FormInvalidError form "Invalid form about [foreach]"
+	`[foreach [let @varid @enumRange] @body] : begin
+		local t : env.newt
+		return {'.syntactic-closure' `[foreach @t @[formOf enumRange] : let [@[formOf varid] @t] @[formOf body]] env}
 	`[foreach [@varid @enumRange] @body] {'.syntactic-closure' `[foreach @[formOf varid] @[formOf enumRange] @[formOf body]] env}
-	`[foreach @varid [range @low @high] @body] ([env.macros.get "range"] === [definingEnv.macros.get "range"]): begin 
+	`[foreach @varid [range @low @high] @body] ([env.macros.get "range"] === [definingEnv.macros.get "range"]): begin
 		local lo [env.newt]
 		local hi [env.newt]
 		return `[begin \\
@@ -152,7 +159,7 @@ define-macro foreach : syntax-rules
 			local @hi @high
 			for @{'.syntactic-closure' `[local @[formOf varid] @lo] env} (@[formOf varid] < @hi) (@[formOf varid] = @[formOf varid] + 1) : begin @body
 		]
-	`[foreach @varid [range @low till @high] @body] ([env.macros.get "range"] === [definingEnv.macros.get "range"]): begin 
+	`[foreach @varid [range @low till @high] @body] ([env.macros.get "range"] === [definingEnv.macros.get "range"]): begin
 		local lo [env.newt]
 		local hi [env.newt]
 		return `[begin \\
@@ -160,7 +167,7 @@ define-macro foreach : syntax-rules
 			local @hi @high
 			for @{'.syntactic-closure' `[local @[formOf varid] @lo] env} (@[formOf varid] <= @hi) (@[formOf varid] = @[formOf varid] + 1) : begin @body
 		]
-	`[foreach @varid [range @low downto @high] @body] ([env.macros.get "range"] === [definingEnv.macros.get "range"]): begin 
+	`[foreach @varid [range @low downto @high] @body] ([env.macros.get "range"] === [definingEnv.macros.get "range"]): begin
 		local lo [env.newt]
 		local hi [env.newt]
 		return `[begin \\
@@ -168,7 +175,7 @@ define-macro foreach : syntax-rules
 			local @hi @high
 			for @{'.syntactic-closure' `[local @[formOf varid] @lo] env} (@[formOf varid] > @hi) (@[formOf varid] = @[formOf varid] - 1) : begin @body
 		]
-	`[foreach @varid [range @low downtill @high] @body] ([env.macros.get "range"] === [definingEnv.macros.get "range"]): begin 
+	`[foreach @varid [range @low downtill @high] @body] ([env.macros.get "range"] === [definingEnv.macros.get "range"]): begin
 		local lo [env.newt]
 		local hi [env.newt]
 		return `[begin \\
@@ -176,7 +183,7 @@ define-macro foreach : syntax-rules
 			local @hi @high
 			for @{'.syntactic-closure' `[local @[formOf varid] @lo] env} (@[formOf varid] >= @hi) (@[formOf varid] = @[formOf varid] - 1) : begin @body
 		]
-	`[foreach @varid [items-of @enumList] @body] ([env.macros.get "items-of"] === [definingEnv.macros.get "items-of"]): begin 
+	`[foreach @varid [items-of @enumList] @body] ([env.macros.get "items-of"] === [definingEnv.macros.get "items-of"]): begin
 		local tR [env.newt]
 		local tN [env.newt]
 		local t  [env.newt]
@@ -184,29 +191,29 @@ define-macro foreach : syntax-rules
 			local @tR @enumList
 			local @tN @tR.length
 			local @t 0
-			while (@t < @tN) : begin 
+			while (@t < @tN) : begin
 				begin @{'.syntactic-closure' `[local @[formOf varid] @tR.(@t)] env}
 				begin @body
 				@t = @t + 1
 		]
-	`[foreach @varid @enumRange @body] : begin 
+	`[foreach @varid @enumRange @body] : begin
 		local tR [env.newt]
 		local t  [env.newt]
 		return `[begin \\
 			local @tR : @enumRange.(@[externEnv.use 'Symbol'].iterator)
 			local @t nothing
-			while (! [set @t [@tR.next]].done) : begin 
+			while (! [set @t [@tR.next]].done) : begin
 				begin @{'.syntactic-closure' `[local @[formOf varid] @t.value] env}
 				begin @body
 		]
-	
+
 	otherwise : the-form-is-invalid "Invalid [foreach] Construction."
 
 define-macro extern : syntax-rules
 	`[extern @_id] [atom _id] : let [id : formOf _id] : begin
 		externEnv.declare id
 		return : dirty `[local @id @[externEnv.use id]]
-	
+
 	otherwise : the-form-is-invalid
 
 define-macro import : syntax-rules
@@ -214,7 +221,7 @@ define-macro import : syntax-rules
 	`[import @slot from @module] [atom slot] : dirty `[local @[formOf slot] [@[externEnv.use 'require'] @module].default]
 	`[import @patterns from @module] : dirty `[local [object @::[formOf patterns]] [@[externEnv.use 'require'] @module]]
 	`[import @module] : dirty `[@[externEnv.use 'require'] @module]
-	
+
 	otherwise : the-form-is-invalid
 
 define-macro export : syntax-rules
@@ -231,7 +238,7 @@ define-macro export : syntax-rules
 	`[export : @(`define||`local) @modifer [@slot @::pars] @body] [atom slot] `[set
 		@[externEnv.use 'exports'].(@{".quote" [formOf slot]})
 		@[dirty `[local @modifer [@[formOf slot] @::[pars.map formOf]] @[formOf body]]]]
-	
+
 	# Direct exports
 	`[export all @content] `[begin \\
 		local xs @[externEnv.use 'module'].exports
@@ -241,7 +248,7 @@ define-macro export : syntax-rules
 	`[export @content as @slot] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @[dirty : formOf content]]
 	`[export as @slot @content] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @[dirty : formOf content]]
 	`[export @slot] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @slot]
-	
+
 	otherwise : the-form-is-invalid
 
 # The mighty [class] macro implements OOP operations
@@ -252,7 +259,7 @@ define-macro class : syntax-rules
 
 		local terms {}
 		local accessorAssignments {.}
-		
+
 		define [wrapPublicMethodBody name body] `[begin \\
 			define-macro super : syntax-rules
 				`[super @::args] `[(Super.prototype.(@2*{".quote" name})).call @[dirty `this] @::args]
@@ -277,7 +284,7 @@ define-macro class : syntax-rules
 				`[super @::args] `[(Super.prototype.(Super.protectedTerms.(@2*{".quote" name}))).call @[dirty `this] @::args]
 			* @body
 		]
-		
+
 		define [ConstructorTerm params body] : lambda `[set Constructor : function @params : begin \\
 			define-macro super : syntax-rules
 				`[super @::args] `[Super.call @[dirty `this] @::args]
@@ -308,13 +315,13 @@ define-macro class : syntax-rules
 			set Type.prototype.(protectedTerms.(@{".quote" name})) @val
 		]
 		define [StaticTerm name val] : lambda [] `[set Type.(@{".quote" name}) @val]
-		
+
 		define [handleTerm term] : match term
 			# Inheritance term
 			`[inherits @Super @::indentedLines] : begin
 				set Inherits Super
 				indentedLines.forEach handleTerm # for `[class Type : inherits Base<newline><indent>whatever] form
-			
+
 			# Public term
 			# constructor
 			`[define public [new @::params] @body] : terms.push : ConstructorTerm params body
@@ -346,41 +353,41 @@ define-macro class : syntax-rules
 			`[define private @name @val] [atom name] : terms.push : PrivateTerm name val
 			`[define private [@name @::params] @body] [atom name] : terms.push : PrivateTerm name `[function @params @body]
 			`[define private @modifer [@name @::params] @body] [atom name] : terms.push : PrivateTerm name `[@modifer : function @params @body]
-			
+
 			# Protected term, use symbols
 			`[define protected @name] [atom name] : terms.push : ProtectedTerm name `nothing
 			`[define protected @name @val] [atom name] : terms.push : ProtectedTerm name val
 			`[define protected [@name @::params] @body] [atom name] : terms.push : ProtectedTerm name `[function @params @[wrapProtectedMethodBody name body]]
 			`[define protected @modifer [@name @::params] @body] [atom name] : terms.push : ProtectedTerm name `[@modifer : function @params @[wrapProtectedMethodBody name body]]
-			
+
 			# Static term
 			`[define static @name] [atom name] : terms.push : StaticTerm name `nothing
 			`[define static @name @val] [atom name] : terms.push : StaticTerm name val
 			`[define static [@name @::params] @body] [atom name] : terms.push : StaticTerm name `[function @params @body]
 			`[define static @modifer [@name @::params] @body] [atom name] : terms.push : StaticTerm name `[@modifer : function @params @body]
-			
+
 			# Shorthands
 			`[public @::whatever] : handleTerm `[define public @::whatever]
 			`[private @::whatever] : handleTerm `[define private @::whatever]
 			`[protected @::whatever] : handleTerm `[define protected @::whatever]
 			`[static @::whatever] : handleTerm `[define static @::whatever]
-			
+
 			# Modifer applications
 			`[apply @mdf] : terms.push : lambda [] `[@mdf.call Type.prototype Type Super]
-			
+
 			otherwise : the-form-is-invalid
 
 		foreach [bl bodylines] : handleTerm bl
-		
+
 		return : dirty `[begin \\
 			define @typename : [function [Super] : begin \\
 				# constructor
 				local Constructor : lambda
 				local Type [function [] : begin [Constructor.apply this arguments] [return nothing]]
-				
+
 				# inheritance
 				* @[if Inherits `[set Type.prototype [@[externEnv.use 'Object'].create Super.prototype]] `nothing]
-				
+
 				extern Symbol
 				[lambda [] : begin \\
 					define-macro public : begin
@@ -413,7 +420,7 @@ define-macro class : syntax-rules
 					set Type.protectedTerms : local protectedTerms : @[externEnv.use 'Object'].create (Super.protectedTerms || null)
 
 					begin @::[terms.map : [t] -> [t]]
-					
+
 					return nothing
 				].call Type.prototype
 				return Type
@@ -436,13 +443,13 @@ define-macro class : syntax-rules
 							local m [new Map]
 						: else
 							local m : [lambda [@::params] [class _r @::terms]].apply null arguments
-						
+
 						pivot.set arguments.(j) m
 						set pivot m
 				return pivot
 			return GenericType
 		]]]
-	
+
 	otherwise : the-form-is-invalid
 
 define-macro $$include : syntax-rules
