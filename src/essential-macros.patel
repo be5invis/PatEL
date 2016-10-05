@@ -240,6 +240,9 @@ define-macro export : syntax-rules
 		@[dirty `[local @modifer [@[formOf slot] @::[pars.map formOf]] @[formOf body]]]]
 
 	# Direct exports
+	`[export default @content] `[begin \\
+		set @[externEnv.use 'module'].exports @[dirty : formOf content]
+	]
 	`[export all @content] `[begin \\
 		local xs @[externEnv.use 'module'].exports
 		set @[externEnv.use 'module'].exports @[dirty : formOf content]
