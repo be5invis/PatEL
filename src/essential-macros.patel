@@ -91,28 +91,28 @@ define-macro items-of : begin
 
 define-macro pairs-of : begin
 	local ijp {".begin" nothing nothing nothing nothing}
+	local t-eigen : definingEnv.newt
+	local t-all : definingEnv.newt
 	set coinit.injectForm `[begin @{".preserve" ijp}]
 	define [use id] : match id
-		'pairs-of-eigen' : if [not ijp.1] : begin
-			local t : definingEnv.newt
-			set ijp.1 : ex `[set @t [lambda [t] [begin \\
-				if (t <@ Array) : then
-					local n t.length
-					for [local i 0] (i < n) (i = i + 1) : yield { i t.(i) }
-				: else
-					local a : Object.keys t
+		'pairs-of-eigen' : begin
+			if [not ijp.1] : set ijp.1 : ex `[set @t-eigen [lambda [t] [begin \\
+					if (t <@ Array) : then
+						local n t.length
+						for [local i 0] (i < n) (i = i + 1) : yield { i t.(i) }
+					: else
+						local a : Object.keys t
+						local n a.length
+						for [local i 0] (i < n) (i = i + 1) : yield { a.(i) t.(a.(i)) }
+				]]] definingEnv
+			return t-eigen
+		'pairs-of-all' : begin
+			if [not ijp.2] : set ijp.2 : ex `[set @t-all [lambda [t] [begin \\
+					local a : getAllKeys t
 					local n a.length
 					for [local i 0] (i < n) (i = i + 1) : yield { a.(i) t.(a.(i)) }
-			]]] definingEnv
-			return t
-		'pairs-of-all' : if [not ijp.2] : begin
-			local t : definingEnv.newt
-			set ijp.2 : ex `[set @t [lambda [t] [begin \\
-				local a : getAllKeys t
-				local n a.length
-				for [local i 0] (i < n) (i = i + 1) : yield { a.(i) t.(a.(i)) }
-			]]] definingEnv
-			return t
+				]]] definingEnv
+			return t-all
 	return : syntax-rules
 		`[pairs-of @obj] : begin `[@[use 'pairs-of-eigen'] @obj]
 		`[pairs-of all @obj] : begin `[@[use 'pairs-of-all'] @obj]
