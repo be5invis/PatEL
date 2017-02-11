@@ -3,18 +3,19 @@ var os = require('os');
 var fs = require('fs');
 var util = require('util');
 var resumer = require('resumer');
+var tty = require('tty');
 var yargs = require('yargs')
 	.alias('o', 'output-into')
-	.alias('?', 'help')
+	.help('h')
+	.alias('h', 'help')
+	.alias('h', '?')
 	.alias('l', 'line')
 	.boolean(['use-dev', 'dump-ast', 'dump-expanded', 'dump-regularized', 'dump-transformed', 'strict', 'optimize', 'mangle', 'ugly'])
 	.describe('?', 'Displays this help.')
 	.describe('l', 'Compile one-line script.')
 	.describe('o', 'Output sfd path. When absent, the result sfd is written to STDOUT.');
-var tty = require('tty');
 
 var argv = yargs.argv;
-if (argv.help) { process.stderr.write(yargs.help()); return };
 
 if (argv['use-dev']) {
 	var patel = require('../index-dev');

@@ -1,5 +1,5 @@
 {
-	"version": "0.32.0",
+	"version": "0.32.1",
 	"name": "patel",
 	"description": "A Patrisika-based Example Language",
 	"repository": "https://github.com/be5invis/patel",
@@ -7,7 +7,7 @@
 		"patrisika": ">=0.21.0",
 		"escodegen": ">=1.1.0",
 		"esmangle": ">=1.0.1",
-		"yargs": ">=1.3.0",
+		"yargs": "^6.6.0",
 		"resumer": "*"
 	},
 	"main": "./plex.js",
