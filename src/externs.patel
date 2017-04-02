@@ -60,16 +60,14 @@ define [Create] : begin
 		{car}                                  	: ex {'.lambda' {} {'.unit'}} env
 		otherwise                              	: reportInvalid otherwise "Invalid Lambda Formation"
 	externs.macros.put "function" : externs.macros.get "lambda"
+	
+	# operators
+	externs.macros.put "<-" : lambda [form env] : [externs.macros.get "define"] {"define" form.1 {"yield" form.2}} env
+	externs.operatorInfo.put "<-" { .priority 970 .associvity 'right' }
 	externs.macros.put "->" : externs.macros.get "lambda"
+	externs.operatorInfo.put "->" { .priority 900 .associvity 'right' }
 	externs.macros.put "=>" : externs.macros.get "lambda"
-	externs.operatorInfo.put "->" {
-		.priority 900
-		.associvity 'right'
-	}
-	externs.operatorInfo.put "=>" {
-		.priority 950
-		.associvity 'right'
-	}
+	externs.operatorInfo.put "=>" { .priority 950 .associvity 'right' }
 	
 	externs.macros.put ".prefix.-" : lambda [form env] {"-" [ex form.1 env]}
 	externs.macros.put ".prefix.+" : lambda [form env] {"+" [ex form.1 env]}

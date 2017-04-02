@@ -18,11 +18,11 @@ define trace console.log
 
 define GeneratorFunction [sequent] : begin 
 	trace "Google"
-	local a : yield [get 'http://www.google.com']
+	a <- [get 'http://www.google.com']
 	trace "typeof.net"
-	local b : yield [get 'http://typeof.net']
+	b <- [get 'http://typeof.net']
 	trace "Baidu"
-	local c : yield [get 'http://baidu.com']
+	c <- [get 'http://baidu.com']
 	trace a.0.statusCode
 	trace b.0.statusCode
 	trace c.0.statusCode
