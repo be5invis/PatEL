@@ -123,7 +123,4 @@ instream.on("end", function() {
       }
     }
   );
-  if (!compileResult) {
-    process.exit(1);
-  }
 });
