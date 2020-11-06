@@ -28,3 +28,5 @@ docs
 ipatel
 
 .vscode
+.build
+.build.*
