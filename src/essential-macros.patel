@@ -217,40 +217,41 @@ define-macro extern : syntax-rules
 	otherwise : the-form-is-invalid
 
 define-macro import : syntax-rules
-	`[import @module as @name] : dirty `[local @[formOf name] [@[externEnv.use 'require'] @module]]
-	`[import @slot from @module] [atom slot] : dirty `[local @[formOf slot] [@[externEnv.use 'require'] @module].default]
-	`[import @patterns from @module] : dirty `[local [object @::[formOf patterns]] [@[externEnv.use 'require'] @module]]
-	`[import @module] : dirty `[@[externEnv.use 'require'] @module]
+	`[import @{".quote" module} as @name]
+		dirty `[local @[formOf name] @{".import" [formOf module]}]
+	`[import @slot from @{".quote" module}] [atom slot]
+		dirty `[local @[formOf slot] @{".import" [formOf module]}.default]
+	`[import @patterns from @{".quote" module}]
+		dirty `[local [object @::[formOf patterns]] @{".import" [formOf module]}]
+	`[import @{".quote" module}]
+		dirty {".import" [formOf module]}
 
 	otherwise : the-form-is-invalid
 
 define-macro export : syntax-rules
 	# Declaration exports, variable and function
 	`[export : @(`define||`local) @slot @val] [atom slot] `[set
-		@[externEnv.use 'exports'].(@{".quote" [formOf slot]})
+		@{".export" [formOf slot]}
 		@[dirty `[local @[formOf slot] @[formOf val]]]]
 	`[export : @(`define||`local) [@slot @::pars] @body] [atom slot] `[set
-		@[externEnv.use 'exports'].(@{".quote" [formOf slot]})
+		@{".export" [formOf slot]}
 		@[dirty `[local [@[formOf slot] @::[pars.map formOf]] @[formOf body]]]]
 	`[export : @(`define||`local) @modifer @slot @val] [atom slot] `[set
-		@[externEnv.use 'exports'].(@{".quote" [formOf slot]})
+		@{".export" [formOf slot]}
 		@[dirty `[local @[formOf slot] @[formOf val]]]]
 	`[export : @(`define||`local) @modifer [@slot @::pars] @body] [atom slot] `[set
-		@[externEnv.use 'exports'].(@{".quote" [formOf slot]})
+		@{".export" [formOf slot]}
 		@[dirty `[local @modifer [@[formOf slot] @::[pars.map formOf]] @[formOf body]]]]
 
-	# Direct exports
-	`[export default @content] `[begin \\
-		set @[externEnv.use 'module'].exports @[dirty : formOf content]
-	]
-	`[export all @content] `[begin \\
-		local xs @[externEnv.use 'module'].exports
-		set @[externEnv.use 'module'].exports @[dirty : formOf content]
-		foreach [s : items-of : Object.keys xs] : set @[externEnv.use 'module'].exports.(s) xs.(s)
-	]
-	`[export @content as @slot] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @[dirty : formOf content]]
-	`[export as @slot @content] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @[dirty : formOf content]]
-	`[export @slot] [atom slot] `[set @[externEnv.use 'exports'].(@{".quote" [formOf slot]}) @slot]
+	`[export @content as @slot] [atom slot] `[set
+		@{".export" [formOf slot]}
+		@[dirty : formOf content]]
+	`[export as @slot @content] [atom slot] `[set
+		@{".export" [formOf slot]}
+		@[dirty : formOf content]]
+	`[export @slot] [atom slot] `[set
+		@{".export" [formOf slot]}
+		@slot]
 
 	otherwise : the-form-is-invalid
 
@@ -457,13 +458,8 @@ define-macro class : syntax-rules
 
 define-macro $$include : syntax-rules
 	{'$$include' {'.quote' file}} : begin
-		local path : require 'path'
-		local fs : require 'fs'
 		local f0 [[env.macros.get 'input-path']].1
-		local parse [require './syntax.js'].parse
-
-		local absolutePath : path.resolve [path.dirname f0] [formOf file]
-		local input : fs.readFileSync absolutePath 'utf-8'
-		local ast : parse input {.within {.file absolutePath .input input}}
+		local lr : loadSourceRelative f0 [formOf file]
+		local ast : parseSoruce lr.source {.within {.file lr.absolutePath .input lr.source}}
 		return {'.syntactic-closure' ast env}
 	otherwise : the-form-is-invalid
