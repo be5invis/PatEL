@@ -219,6 +219,8 @@ define-macro extern : syntax-rules
 define-macro import : syntax-rules
 	`[import @{".quote" module} as @name]
 		dirty `[local @[formOf name] @{".import" [formOf module]}]
+	`[import as @name from @{".quote" module}]
+		dirty `[local @[formOf name] @{".import" [formOf module]}]
 	`[import @slot from @{".quote" module}] [atom slot]
 		dirty `[local @[formOf slot] @{".import" [formOf module]}.default]
 	`[import @patterns from @{".quote" module}]
