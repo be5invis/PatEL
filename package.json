@@ -1,10 +1,10 @@
 {
-	"version": "0.35.1",
+	"version": "0.36.0",
 	"name": "patel",
 	"description": "A Patrisika-based Example Language",
 	"repository": "https://github.com/be5invis/patel",
 	"dependencies": {
-		"patrisika": "^0.23.0",
+		"patrisika": "^0.24.0",
 		"escodegen": "^2.0.0",
 		"esmangle": "^1.0.1",
 		"yargs": "^16.1.0",

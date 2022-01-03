@@ -119,15 +119,6 @@ function compile (_input, _options, callback) {
 
 		if (options.optimize) {
 			tast = esmangle.optimize(tast);
-		} else {
-			tast = esmangle.optimize(tast, [[
-				require("esmangle/lib/pass/drop-variable-definition"),
-				require("esmangle/lib/pass/remove-side-effect-free-expressions"),
-				require("esmangle/lib/pass/dead-code-elimination"),
-				require("esmangle/lib/pass/remove-unreachable-branch"),
-				require("esmangle/lib/pass/remove-empty-statement"),
-				require("esmangle/lib/pass/remove-wasted-blocks")
-			]]);
 		}
 		if (options.mangle) tast = esmangle.mangle(tast);
 		var codegenOptions = { sourceMap: getComeFrom(), sourceMapWithCode: true };
