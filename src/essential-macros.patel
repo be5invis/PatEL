@@ -240,10 +240,10 @@ define-macro export : syntax-rules
 		@[dirty `[local [@[formOf slot] @::[pars.map formOf]] @[formOf body]]]]
 	`[export : @(`define||`local) @modifer @slot @val] [atom slot] `[set
 		@{".export" [formOf slot]}
-		@[dirty `[local @[formOf slot] @[formOf val]]]]
+		@[dirty `[local @[formOf modifier] @[formOf slot] @[formOf val]]]]
 	`[export : @(`define||`local) @modifer [@slot @::pars] @body] [atom slot] `[set
 		@{".export" [formOf slot]}
-		@[dirty `[local @modifer [@[formOf slot] @::[pars.map formOf]] @[formOf body]]]]
+		@[dirty `[local @[formOf modifer] [@[formOf slot] @::[pars.map formOf]] @[formOf body]]]]
 
 	`[export @content as @slot] [atom slot] `[set
 		@{".export" [formOf slot]}
@@ -256,6 +256,41 @@ define-macro export : syntax-rules
 		@slot]
 
 	otherwise : the-form-is-invalid
+
+define-macro namespace : syntax-rules
+	`[namespace @::body] : begin
+		local tExports : env.newt
+		return `[begin \\
+			define-macro export : syntax-rules
+				# Declaration exports, variable and function
+				`[export : @(`define||`local) @slot @val] [atom slot] `[set
+					@{"." tExports {'.quote' [formOf slot]}}
+					@[dirty `[local @[formOf slot] @[formOf val]]]]
+				`[export : @(`define||`local) [@slot @::pars] @body] [atom slot] `[set
+					@{"." tExports {'.quote' [formOf slot]}}
+					@[dirty `[local [@[formOf slot] @::[pars.map formOf]] @[formOf body]]]]
+				`[export : @(`define||`local) @modifer @slot @val] [atom slot] `[set
+					@{"." tExports {'.quote' [formOf slot]}}
+					@[dirty `[local @[formOf modifier] @[formOf slot] @[formOf val]]]]
+				`[export : @(`define||`local) @modifer [@slot @::pars] @body] [atom slot] `[set
+					@{"." tExports {'.quote' [formOf slot]}}
+					@[dirty `[local @[formOf modifer] [@[formOf slot] @::[pars.map formOf]] @[formOf body]]]]
+
+				`[export @content as @slot] [atom slot] `[set
+					@{"." tExports {'.quote' [formOf slot]}}
+					@[dirty : formOf content]]
+				`[export as @slot @content] [atom slot] `[set
+					@{"." tExports {'.quote' [formOf slot]}}
+					@[dirty : formOf content]]
+				`[export @slot] [atom slot] `[set
+					@{"." tExports {'.quote' [formOf slot]}}
+					@slot]
+
+				otherwise : the-form-is-invalid
+
+			do [set @tExports {.}] [begin @::[body.map formOf]] nothing
+			* @tExports
+		]
 
 # The mighty [class] macro implements OOP operations
 define-macro class : syntax-rules
