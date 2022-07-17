@@ -3,124 +3,125 @@ var os = require("os");
 var fs = require("fs");
 var util = require("util");
 var resumer = require("resumer");
-var tty = require("tty");
 var yargs = require("yargs")
-  .alias("o", "output-into")
-  .help("h")
-  .alias("h", "help")
-  .alias("h", "?")
-  .alias("l", "line")
-  .boolean([
-    "use-dev",
-    "dump-ast",
-    "dump-expanded",
-    "dump-regularized",
-    "dump-transformed",
-    "strict",
-    "optimize",
-    "mangle",
-    "ugly"
-  ])
-  .describe("?", "Displays this help.")
-  .describe("l", "Compile one-line script.")
-  .describe(
-    "o",
-    "Output sfd path. When absent, the result sfd is written to STDOUT."
-  );
+    .alias("o", "output-into")
+    .help("h")
+    .alias("h", "help")
+    .alias("h", "?")
+    .alias("l", "line")
+    .boolean([
+        "use-dev",
+        "dump-ast",
+        "dump-expanded",
+        "dump-regularized",
+        "dump-transformed",
+        "strict",
+        "esm",
+        "optimize",
+        "mangle",
+        "ugly",
+    ])
+    .describe("?", "Displays this help.")
+    .describe("l", "Compile one-line script.")
+    .describe(
+        "o",
+        "Output sfd path. When absent, the result sfd is written to STDOUT."
+    );
 
 var argv = yargs.argv;
 
 if (argv["use-dev"]) {
-  var patel = require("../index-dev");
+    var patel = require("../index-dev");
 } else {
-  var patel = require("../index");
+    var patel = require("../index");
 }
 var plex = require("../plex");
 
-var instream = (function() {
-  if (argv.l) {
-    var s = resumer();
-    s.queue(argv.l);
-    setTimeout(function() {
-      s.end();
-    }, 1);
-    return s;
-  } else if (argv._[0]) {
-    return fs.createReadStream(argv._[0]);
-  } else {
-    return process.stdin;
-  }
+var instream = (function () {
+    if (argv.l) {
+        var s = resumer();
+        s.queue(argv.l);
+        setTimeout(function () {
+            s.end();
+        }, 1);
+        return s;
+    } else if (argv._[0]) {
+        return fs.createReadStream(argv._[0]);
+    } else {
+        return process.stdin;
+    }
 })();
 var outstream = argv.o
-  ? fs.createWriteStream(argv.o, { encoding: "utf-8" })
-  : process.stdout;
+    ? fs.createWriteStream(argv.o, { encoding: "utf-8" })
+    : process.stdout;
 
 var generateLineAndColumnMap = plex.generateLineAndColumnMap;
 var reportError = plex.reportError;
 
 function deepcopy(form) {
-  if (form instanceof Array) return form.map(deepcopy);
-  else return form;
+    if (form instanceof Array) return form.map(deepcopy);
+    else return form;
 }
 function dumpStruct(form) {
-  if (!outstream.isTTY) outstream.write(JSON.stringify(form));
-  else outstream.write(util.inspect(deepcopy(form), { depth: null }) + "\n");
+    if (!outstream.isTTY) outstream.write(JSON.stringify(form));
+    else outstream.write(util.inspect(deepcopy(form), { depth: null }) + "\n");
 }
 function dumpString(s) {
-  outstream.write(s);
+    outstream.write(s);
 }
 function handleError(ex) {
-  if (ex.suberrors) {
-    for (var j = 0; j < ex.suberrors.length; j++) {
-      reportError(ex.suberrors[j], process.stderr);
+    if (ex.suberrors) {
+        for (var j = 0; j < ex.suberrors.length; j++) {
+            reportError(ex.suberrors[j], process.stderr);
+        }
+    } else {
+        reportError(ex, process.stderr);
     }
-  } else {
-    reportError(ex, process.stderr);
-  }
 }
 
 var input = "";
-instream.on("data", function(buf) {
-  input += buf.toString();
+instream.on("data", function (buf) {
+    input += buf.toString();
 });
-instream.on("end", function() {
-  var compileResult = plex.compile(
-    input,
-    {
-      patel: patel,
-      from: argv.l
-        ? { argv: "l" }
-        : argv._[0]
-          ? { file: argv._[0] }
-          : { stream: "stdin" },
-      strict: argv.strict,
-      optimize: argv.optimize,
-      mangle: argv.mangle,
-      ugly: argv.ugly,
+instream.on("end", function () {
+    var compileResult = plex.compile(
+        input,
+        {
+            patel: patel,
+            from: argv.l
+                ? { argv: "l" }
+                : argv._[0]
+                ? { file: argv._[0] }
+                : { stream: "stdin" },
+            esm: argv.esm,
+            strict: argv.strict,
+            optimize: argv.optimize,
+            mangle: argv.mangle,
+            ugly: argv.ugly,
 
-      warn: handleError,
+            warn: handleError,
 
-      "dump-input": argv["dump-input"],
-      "dump-ast": argv["dump-ast"],
-      "dump-expanded": argv["dump-expanded"],
-      "dump-regularized": argv["dump-regularized"],
-      "dump-transformed": argv["dump-transformed"]
-    },
-    function(ex, result, dump) {
-      if (ex) {
-        handleError(ex);
-        process.exit(1);
-      } else if (result) {
-        if (argv["source-map"]) {
-          outstream.write(result.map.toString() + "\n");
-        } else {
-          if (os.platform() === "win32") outstream.write("\uFEFF");
-          outstream.write(result.code + "\n");
+            "dump-input": argv["dump-input"],
+            "dump-ast": argv["dump-ast"],
+            "dump-expanded": argv["dump-expanded"],
+            "dump-regularized": argv["dump-regularized"],
+            "dump-transformed": argv["dump-transformed"],
+        },
+        function (ex, result, dump) {
+            if (ex) {
+                handleError(ex);
+                process.exit(1);
+            } else if (result) {
+                if (argv["source-map"]) {
+                    outstream.write(result.map.toString() + "\n");
+                } else {
+                    if (os.platform() === "win32") outstream.write("\uFEFF");
+                    outstream.write(result.code + "\n");
+                }
+            } else {
+                if (typeof dump === "string") dumpString(dump);
+                else dumpStruct(dump);
+            }
         }
-      } else {
-        if (typeof dump === "string") dumpString(dump);
-        else dumpStruct(dump);
-      }
-    }
-  );
+    );
 });
