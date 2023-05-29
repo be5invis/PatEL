@@ -57,7 +57,16 @@ define-macro call-its : syntax-rules
 	otherwise : the-form-is-invalid
 
 define-macro do : syntax-rules
-	`[do @::stmts] : dirty `[let : begin @::[stmts.map formOf]]
+	`[do @::stmts] : begin
+		local pairs {}
+		local body : stmts.map formOf
+		if (stmts.length >= 1) : begin
+			local lastStatement : formOf stmts.(stmts.length - 1)
+			if (lastStatement.0 == "where") : begin
+				set pairs : lastStatement.slice 1
+				body.pop
+		pairs.push `[begin @::body]
+		dirty `[letrec @::pairs]
 
 define-macro getAllKeys : begin
 	local exoticAST {.type "FunctionExpression" .id null .params {{.type "Identifier" .name "o"}} .defaults {} .body {.type "BlockStatement" .body {{.type "VariableDeclaration" .declarations {{.type "VariableDeclarator" .id {.type "Identifier" .name "a"} .init {.type "ArrayExpression" .elements {}}}} .kind "var"} { .type "ForInStatement" .left {.type "VariableDeclaration" .declarations {{.type "VariableDeclarator" .id {.type "Identifier" .name "k"} .init null}} .kind "var"} .right {.type "Identifier" .name "o"} .body {.type "BlockStatement" .body {{.type "ExpressionStatement" .expression {.type "CallExpression" .callee { .type "MemberExpression" .computed false .object {.type "Identifier" .name "a"} .property {.type "Identifier" .name "push"} } .arguments {{.type "Identifier" .name "k"}}}}}} .each false } {.type "ReturnStatement" .argument {.type "Identifier" .name "a"}}}} .rest null .generator false .expression false }
