@@ -1,17 +1,17 @@
 {
-	"version": "0.39.0",
-	"name": "patel",
-	"description": "A Patrisika-based Example Language",
-	"repository": "https://github.com/be5invis/patel",
-	"dependencies": {
-		"patrisika": "^0.25.0",
-		"escodegen": "^2.0.0",
-		"esmangle": "^1.0.1",
-		"yargs": "^16.1.0",
-		"resumer": "*"
-	},
-	"main": "./plex.js",
-	"bin": {
-		"patel-c": "./bin/patel-c"
-	}
+    "version": "0.40.0",
+    "name": "patel",
+    "description": "A Patrisika-based Example Language",
+    "repository": "https://github.com/be5invis/patel",
+    "dependencies": {
+        "astring": "^1.8.6",
+        "patrisika": "^0.26.0",
+        "resumer": "*",
+        "source-map": "^0.7.4",
+        "yargs": "^17.7.2"
+    },
+    "main": "./plex.js",
+    "bin": {
+        "patel-c": "./bin/patel-c"
+    }
 }

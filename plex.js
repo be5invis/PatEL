@@ -1,5 +1,5 @@
 var patel_default = require("./index");
-var esmangle = require("esmangle");
+var sourceMap = require("source-map");
 
 function generateLineAndColumnMap(input) {
     var lines = [];
@@ -130,7 +130,10 @@ function compile(_input, _options, callback) {
             return callback(null, null, rast);
         }
 
-        var tast = patel.pat2esc(rast, gs, lcmap, { isProgram: true, esm: options.esm });
+        var tast = patel.pat2esc(rast, gs, lcmap, {
+            isProgram: true,
+            esm: options.esm,
+        });
         if (tast.type === "BlockStatement") {
             tast.type = "Program";
         } else {
@@ -139,7 +142,7 @@ function compile(_input, _options, callback) {
                 body: [tast],
             };
         }
-        if (options.strict)
+        if (options.strict) {
             tast.body.unshift({
                 type: "ExpressionStatement",
                 expression: {
@@ -147,29 +150,21 @@ function compile(_input, _options, callback) {
                     value: "use strict",
                 },
             });
+        }
         if (options["dump-transformed"]) {
             return callback(null, null, tast);
         }
 
-        if (options.optimize) {
-            tast = esmangle.optimize(tast);
-        }
-        if (options.mangle) tast = esmangle.mangle(tast);
         var codegenOptions = {
-            sourceMap: getComeFrom(),
-            sourceMapWithCode: true,
+            indent: "    ",
+            sourceMap: new sourceMap.SourceMapGenerator({
+                file: getComeFrom(),
+            }),
         };
-        if (options.ugly) {
-            codegenOptions.format = {
-                renumber: true,
-                hexadecimal: true,
-                escapeless: false,
-                compact: true,
-                semicolons: false,
-                parentheses: false,
-            };
-        }
-        return callback(null, patel.generateCode(tast, codegenOptions));
+
+        const code = patel.generateCode(tast, codegenOptions);
+
+        return callback(null, { code, map: codegenOptions.sourceMap });
     } catch (ex) {
         return callback(ex);
     }

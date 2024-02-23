@@ -1,5 +1,5 @@
 import "patrisika" as patrisika
-import "escodegen" as escodegen
+import "astring" as astring
 import "util" as util
 import "path" as path
 import "fs"   as fs
@@ -470,7 +470,7 @@ export : define [Create] : begin
 			local assignments {".begin" :: [names.map : [name] => {"local" name {"." "$" {".quote" name}}}]}
 			local macroG : new Function 
 				ds.castName '$'
-				escodegen.generate : patrisika.generate {".return" [ex {".begin" assignments body} ds]} ds [lambda [form] {".return" form}]
+				astring.generate : patrisika.generate {".return" [ex {".begin" assignments body} ds]} ds [lambda [form] {".return" form}]
 			local macroFn [macroG imports]
 			env.macros.put name : lambda [c e] : begin 
 				local result [macroFn c e]

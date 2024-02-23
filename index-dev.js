@@ -1,5 +1,5 @@
 var patrisika = require("patrisika");
-var escodegen = require("escodegen");
+var astring = require("astring");
 var parserLib = require("./src/syntax.js");
 var exLib = require("./src/ex");
 var externsLib = require("./src/externs");
@@ -27,6 +27,6 @@ exports.parse = parse;
 exports.ex = ex;
 exports.regularize = patrisika.regularize;
 exports.pat2esc = patrisika.pat2esc;
-exports.generateCode = escodegen.generate;
+exports.generateCode = astring.generate;
 exports.checkEvaluated = checkEvaluated;
 exports.prepareAST = prepareAST;
