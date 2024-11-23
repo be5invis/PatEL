@@ -18,16 +18,16 @@
 	}
 	function BeginsEndsWith(form, begins, ends) {
 		if(form instanceof Array) {
-			form.within = options.within
-			form.begins = begins;
-			form.ends = ends;
+			Object.defineProperty(form, 'within', { value: options.within, enumerable: false, configurable: true });
+			Object.defineProperty(form, 'begins', { value: begins, enumerable: false, configurable: true });
+			Object.defineProperty(form, 'ends', { value: ends, enumerable: false, configurable: true });
 		}
 		return form
 	}
 	function Unevaluated(form){
 		if(form instanceof Array){
 			form.forEach(Unevaluated);
-			form.unevaluated = true
+			Object.defineProperty(form, 'unevaluated', { value: true, enumerable: false, configurable: true });
 		};
 		return form
 	}
@@ -314,7 +314,7 @@ NEWLINE_INDENT_SAME_OR_MORE
 
 INDENT_ADD = spaces:_ & { return spaces.length > textIndent.length && spaces.slice(0, textIndent.length) === textIndent }
                   { textIndentStack.push(textIndent); textIndent = spaces }
-INDENT_REMOVE = { textIndent = textIndentStack.pop() }
+INDENT_REMOVE = "" { textIndent = textIndentStack.pop() }
 INDENT_SAME = spaces:_ & { return spaces === textIndent }
 INDENT_SAME_OR_MORE = spaces:_ & { return spaces === textIndent || spaces.slice(0, textIndent.length) === textIndent }
 
@@ -325,7 +325,7 @@ STATEMENT_SEPARATOR
 LAYER_SEPARATOR
 	= _ "," _
 
-POS = { return offset() }
+POS = "" { return offset() }
 
 // Unicode Character Classes
 UnicodeLetter
