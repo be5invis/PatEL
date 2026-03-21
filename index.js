@@ -5,8 +5,20 @@ var exLib = require("./active/ex");
 var externsLib = require("./active/externs");
 var prepareAST = require("./active/essential-macros.json");
 
-var parse = function () {
-    return parserLib.parse.apply(this, arguments);
+var parse = function (input, options) {
+    try {
+        return parserLib.parse.apply(this, arguments);
+    } catch (e) {
+        if (e.location) {
+            var wrappedParseError = new SyntaxError(e.message);
+            wrappedParseError.begins = e.location.start.offset;
+            wrappedParseError.ends = e.location.end.offset;
+            wrappedParseError.within = options.within;
+            throw wrappedParseError;
+        } else {
+            throw e;
+        }
+    }
 };
 var ex = function () {
     return exLib.ex.apply(this, arguments);
